@@ -1,0 +1,82 @@
+name: spello_frontend
+description: "Spello FrontEnd"
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+# Dependencies specify other packages that your package needs in order to work.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  animated_toggle_switch: ^0.8.4
+  smooth_page_indicator: ^1.2.0+3
+  flutter_slidable: ^4.0.0
+  # Added animated toggle switch dependency
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices.
+  flutter_lints: ^5.0.0
+
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+
+    - assets/images/parental_control_two.png
+    - assets/images/clipboard.png
+    - assets/images/onboarding_screen_one.png
+    - assets/images/onboarding_screen_two.png
+    - assets/images/onboarding_screen_three.png
+    - assets/images/cloud.png
+    - assets/images/parental_control.png
+    - assets/images/start.png
+    - assets/images/help_center.png
+    - assets/images/settings.png
+    - assets/images/dashboard.png
+    - assets/images/notification.png
+    - assets/images/parental_control_one.png
+
+
+  fonts:
+    - family: "Fredoka One"
+      fonts:
+        - asset: assets/fonts/FredokaOne-Regular.ttf
+
+    - family: "Fredoka"
+      fonts:
+        - asset: assets/fonts/Fredoka.ttf
+
+
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section.
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
+  #       - asset: fonts/CustomFont-Bold.ttf
+  #         weight: 700
