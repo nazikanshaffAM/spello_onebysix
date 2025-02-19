@@ -56,6 +56,9 @@ flutter:
     - assets/images/dashboard.png
     - assets/images/notification.png
     - assets/images/parental_control_one.png
+    - assets/images/game_one.png
+    - assets/images/game_two.png
+    - assets/images/game_three.png
 
 
   fonts:
