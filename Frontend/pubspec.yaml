@@ -56,6 +56,15 @@ flutter:
     - assets/images/dashboard.png
     - assets/images/notification.png
     - assets/images/parental_control_one.png
+    - assets/images/game_one.png
+    - assets/images/game_two.png
+    - assets/images/game_three.png
+    - assets/images/apple.png
+    - assets/images/astronaut.png
+    - assets/images/facebook.png
+    - assets/images/fb.png
+    - assets/images/google.png
+    - assets/images/spello.png
 
 
   fonts:
