@@ -1,67 +1,82 @@
+// game_rules.dart (Game Logic)
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
+import 'EndingPage.dart';
 
+class GameRules extends ChangeNotifier {
+  BuildContext context;
+  double position = 500;
+  int xp = 0;
+  int lives = 3;
+  int timeLeft = 300;
+  List<String> words = ["apple", "banana", "cherry"];
+  int currentWordIndex = 0;
+  bool gameEnded = false;
 
-class GameRules extends StatefulWidget {
-  @override
-  _MovingImageGameState createState() => _MovingImageGameState();
-}
+  String get currentWord => words[currentWordIndex];
 
-class _MovingImageGameState extends State<GameRules> {
-  double _position = 500; // Initial position (bottom)
-  int _randomValue = 50; // Default value
+  GameRules(this.context) {
+    startTimer();
+  }
 
-  void fetchAndAnimate() async {
-    int value = await ApiService.fetchRandomValue();
-
-    setState(() {
-      _randomValue = value;
-      if (_randomValue >= 75) {
-        _position = -50; // Move up and disappear
+  void startTimer() {
+    Future.delayed(Duration(seconds: 1), () {
+      if (timeLeft > 0 && lives > 0) {
+        timeLeft--;
+        notifyListeners();
+        startTimer();
       } else {
-        _position = 200; // Move halfway up, then drop back
-        Future.delayed(Duration(seconds: 1), () {
-          setState(() {
-            _position = 500;
-          });
-        });
+        endGame();
       }
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Moving Image Game")),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 50,
-            left: MediaQuery.of(context).size.width / 2 - 50,
-            child: Image.asset('assets/images/ufo.png', width: 100),
-          ),
-          AnimatedPositioned(
-            duration: Duration(seconds: 2),
-            top: _position,
-            left: MediaQuery.of(context).size.width / 2 - 50,
-            child: Image.asset('assets/images/character.png', width: 100),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Random Value: $_randomValue", style: TextStyle(fontSize: 24)),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: fetchAndAnimate,
-                  child: Text("Get Random & Animate"),
-                ),
-              ],
-            ),
-          ),
-        ],
+  void checkPronunciation() async {
+    int value = await ApiService.fetchRandomValue();
+    if (value >= 75) {
+      position = -50;
+      xp += 100;
+      nextWord();
+    } else {
+      position = 200;
+      Future.delayed(const Duration(seconds: 1), () {
+        position = 500;
+        loseLife();
+      });
+    }
+    notifyListeners();
+  }
+
+  void nextWord() {
+    if (currentWordIndex < words.length - 1) {
+      currentWordIndex++;
+    } else {
+      endGame();
+    }
+    notifyListeners();
+  }
+
+  void loseLife() {
+    lives--;
+    if (lives == 0) {
+      endGame();
+    }
+    notifyListeners();
+  }
+
+  void endGame() {
+    gameEnded = true;
+    notifyListeners();
+    Future.microtask(() => Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EndingPage(
+          correctlyPronouncedWords: xp ~/ 100,
+          totalWords: words.length,
+          accuracy: (xp / (words.length * 100)) * 100,
+          userLevel: xp ~/ 500,
+        ),
       ),
-    );
+    ));
   }
 }
