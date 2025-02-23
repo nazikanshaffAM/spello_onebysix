@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mygame/GamePage.dart';
 import 'package:mygame/HowToPlayPage.dart';
 import 'package:mygame/SettingsPage.dart';
 
@@ -41,7 +42,7 @@ class _StartPageState extends State<StartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GameRules(), // Navigate to the game
+                          builder: (context) => GamePage(), // Navigate to the game
                         ),
                       );
                     }),
