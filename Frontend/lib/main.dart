@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
@@ -20,8 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF8092CC)),
       home: const OnboardingPage(),
       routes: {
-        '/startPractice': (context) =>
-            const OnboardingScreenTwo(), // Placeholder for now
+        '/startPractice': (context) => const GamePage(), // Placeholder for now
         '/parentalControl': (context) => ParentalControl(),
         '/dashboard': (context) => OnboardingScreenTwo(),
         '/notifications': (context) => OnboardingScreenTwo(),
