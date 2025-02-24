@@ -76,17 +76,14 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFF8092CC),
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            "PARENTAL CONTROL",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: "Fredoka One",
-              fontSize: screenWidth * 0.06,
-            ),
-          ),
+        title: Text(
+          "Parental Control",
+          style: TextStyle(
+              fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
         ),
-        backgroundColor: const Color(0xFF3A435F),
+        backgroundColor: Color(0xFF3A435F),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       floatingActionButton: Padding(
         padding: EdgeInsets.only(
@@ -112,7 +109,9 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         ),
         child: Column(
           children: [
-            // Heading
+            SizedBox(
+              height: screenHeight * 0.02,
+            ), // Heading
             Text(
               wordList.isEmpty
                   ? "No words, please Add a New word."

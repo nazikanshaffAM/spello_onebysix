@@ -19,23 +19,20 @@ class _ParentalControlState extends State<ParentalControl> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            'Parental Control',
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: "Fredoka One",
-              fontSize: screenWidth * 0.09,
-            ),
-          ),
+        title: Text(
+          "Parental Control",
+          style: TextStyle(
+              fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
         ),
-        backgroundColor: const Color(0xFF373E58),
+        backgroundColor: Color(0xFF3A435F),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: screenHeight * 0.05),
+            SizedBox(height: screenHeight * 0.03),
 
             // Top text
             Padding(
@@ -55,7 +52,7 @@ class _ParentalControlState extends State<ParentalControl> {
                 ),
               ),
             ),
-
+            SizedBox(height: screenHeight * 0.03),
             // Image
             Image.asset(
               "assets/images/parental_control_one.png",
@@ -63,7 +60,7 @@ class _ParentalControlState extends State<ParentalControl> {
               width: screenWidth * 0.7,
               fit: BoxFit.contain,
             ),
-
+            SizedBox(height: screenHeight * 0.03),
             // Buttons
             Column(
               children: [

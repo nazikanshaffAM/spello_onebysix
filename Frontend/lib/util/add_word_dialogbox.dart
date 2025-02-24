@@ -36,21 +36,25 @@ class AddWordDialogbox extends StatelessWidget {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white, // TextField background is white
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(12), // Small border radius
+                ),
                 hintText: "Add a new Word",
                 hintStyle: const TextStyle(
-                    color: Color(0xFF3A435F), // Hint text color
-                    fontFamily: "Fredoka",
-                    fontWeight: FontWeight.bold),
+                  color: Color(0xFF3A435F), // Hint text color
+                  fontFamily: "Fredoka",
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.01),
+              padding: EdgeInsets.only(top: screenHeight * 0.008),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomElevatedButton(
-                    buttonLength: screenWidth * 0.29, // responsive button width
+                    buttonLength: screenWidth * 0.3, // responsive button width
                     buttonHeight:
                         screenHeight * 0.05, // responsive button height
                     buttonName: "Save",
@@ -59,9 +63,9 @@ class AddWordDialogbox extends StatelessWidget {
                     textColor: Colors.white,
                     onPressed: onSave,
                   ),
-                  SizedBox(width: screenWidth * 0.05),
+                  SizedBox(width: screenWidth * 0.04),
                   CustomElevatedButton(
-                    buttonLength: screenWidth * 0.29,
+                    buttonLength: screenWidth * 0.3,
                     buttonHeight: screenHeight * 0.05,
                     buttonName: "Cancel",
                     primaryColor: 0xFFFFC000,

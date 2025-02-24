@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
     },
     {
       'icon': "assets/images/parental_control.png",
-      'label': 'Parental Control',
+      'label': 'Parental\nControl',
       'navigateTo': "/parentalControl",
     },
     {
@@ -66,24 +66,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final double responsiveFontSize = screenWidth * 0.043;
+    final double responsiveFontSize = screenWidth * 0.05;
     final double responsivePadding = screenWidth * 0.04;
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(80), // Increased height
-        child: AppBar(
-          backgroundColor: const Color(0xFF4C5679),
-          title: Text(
-            'Home',
-            style: TextStyle(
-              fontFamily: "Fredoka One",
-              color: Colors.white,
-              fontSize: screenWidth * 0.09,
-            ),
-          ),
-          centerTitle: true,
+      appBar: AppBar(
+        title: Text(
+          "Home",
+          style: TextStyle(
+              fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
         ),
+        backgroundColor: Color(0xFF3A435F),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: responsivePadding),

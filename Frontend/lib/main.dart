@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
-import 'package:spello_frontend/pages/HomePages/SubPages/parental_control_two.dart';
+import 'package:spello_frontend/pages/HomePages/SubPages/page_under_construction.dart';
 import 'package:spello_frontend/pages/OnboardingPages/onboarding_screen_two.dart';
 
 void main() {
@@ -19,14 +20,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF8092CC)),
-      home: const OnboardingPage(),
+      home: OnboardingPage(),
       routes: {
         '/startPractice': (context) => const GamePage(), // Placeholder for now
         '/parentalControl': (context) => ParentalControl(),
-        '/dashboard': (context) => OnboardingScreenTwo(),
-        '/notifications': (context) => OnboardingScreenTwo(),
-        '/settings': (context) => OnboardingScreenTwo(),
-        '/helpCenter': (context) => OnboardingScreenTwo(),
+        '/dashboard': (context) => Dashboard(),
+        '/notifications': (context) => PageUnderConstruction(),
+        '/settings': (context) => PageUnderConstruction(),
+        '/helpCenter': (context) => PageUnderConstruction(),
       },
     );
   }
