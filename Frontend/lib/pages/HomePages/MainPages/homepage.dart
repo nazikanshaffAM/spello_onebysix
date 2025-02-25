@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,6 +11,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // Track which tile is tapped
   int? _tappedIndex;
+
+  // Create a GlobalKey for each grid tile (6 items)
+  final List<GlobalKey> _gridItemKeys =
+      List.generate(6, (index) => GlobalKey());
+
+  // Tutorial Coach Mark objects
+  late TutorialCoachMark tutorialCoachMark;
+  List<TargetFocus> targets = [];
 
   // Grid data
   final List<Map<String, dynamic>> gridItems = [
@@ -45,6 +54,62 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    // Ensure layout is built before showing the tutorial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initTargets();
+      _showTutorial();
+    });
+  }
+
+  /// Define the tutorial targets for all six grid tiles.
+  void _initTargets() {
+    targets = List.generate(gridItems.length, (index) {
+      return TargetFocus(
+        identify: gridItems[index]['label'],
+        keyTarget: _gridItemKeys[index],
+        shape: ShapeLightFocus.RRect,
+        radius: 8,
+        contents: [
+          TargetContent(
+            align: index % 2 == 0 ? ContentAlign.bottom : ContentAlign.top,
+            child: Text(
+              "Tap here for ${gridItems[index]['label']}",
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  fontFamily: "Fredoka"),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  /// Show the tutorial overlay.
+  void _showTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      targets: targets,
+      colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
+      textSkip: "SKIP",
+      paddingFocus: 8,
+      onFinish: () {
+        debugPrint("Tutorial finished");
+      },
+      onClickTarget: (target) {
+        debugPrint("Target clicked: ${target.identify}");
+      },
+      onClickOverlay: (target) {
+        debugPrint("Overlay clicked: ${target.identify}");
+      },
+    );
+
+    tutorialCoachMark.show(context: context);
+  }
+
   void _onTileTap(int index, BuildContext context) {
     setState(() {
       _tappedIndex = index;
@@ -74,9 +139,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           "Home",
           style: TextStyle(
-              fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
+            fontFamily: "Fredoka One", // Updated font family
+            fontWeight: FontWeight.bold, // Updated font weight
+            fontSize: screenWidth * 0.07,
+          ),
         ),
-        backgroundColor: Color(0xFF3A435F),
+        backgroundColor: const Color(0xFF3A435F),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -87,8 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: screenHeight * 0.03), // Moves grid down
             Expanded(
               child: GridView.builder(
-                padding: EdgeInsets.only(
-                    top: screenHeight * 0.02), // Extra padding on top
+                padding: EdgeInsets.only(top: screenHeight * 0.02),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: screenWidth * 0.04,
@@ -102,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return GestureDetector(
                     onTap: () => _onTileTap(index, context),
                     child: AnimatedContainer(
+                      key: _gridItemKeys[index],
                       duration: const Duration(milliseconds: 100),
                       curve: Curves.easeOut,
                       decoration: BoxDecoration(
@@ -131,12 +199,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             gridItems[index]['label'],
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: const Color(
-                                  0xFF3A4562), // Slightly darker font color
+                              color: const Color(0xFF3A4562),
                               fontSize: responsiveFontSize,
-                              fontFamily: "Fredoka One",
-                              height:
-                                  1.2, // Adjust line spacing for 'Parental Control'
+                              fontFamily:
+                                  "Fredoka One", // Updated font family// Bold text
+                              height: 1.2,
                             ),
                           ),
                         ],

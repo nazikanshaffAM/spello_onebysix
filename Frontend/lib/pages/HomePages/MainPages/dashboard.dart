@@ -45,7 +45,7 @@ class _DashboardState extends State<Dashboard> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final borderRadius = BorderRadius.circular(screenWidth * 0.02);
-    const shadowColor = Color(0xFFB0B0B0);
+    const shadowColor = Color(0xFF8C8C8C);
     const accuracyContainerColor = Color(0xFFFFB000); // Dark yellow
     const textColor = Color(0xFF3A435F); // Dark blue-gray
     const chartLineColor = Color(0xFF3A435F); // Dark blue-gray
@@ -66,7 +66,7 @@ class _DashboardState extends State<Dashboard> {
           style: TextStyle(
               fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
         ),
-        backgroundColor: Color(0xFF3A435F),
+        backgroundColor: const Color(0xFF3A435F),
         foregroundColor: Colors.white,
         centerTitle: true,
       ),
@@ -83,12 +83,12 @@ class _DashboardState extends State<Dashboard> {
                 boxShadow: [
                   BoxShadow(
                     color: shadowColor,
-                    offset: const Offset(2, 2),
+                    offset: const Offset(4, 4),
                   ),
                 ],
               ),
               height: screenHeight * 0.1,
-              width: screenWidth * 0.94,
+              width: screenWidth * 0.9,
               padding: EdgeInsets.all(defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,13 +102,13 @@ class _DashboardState extends State<Dashboard> {
                       fontFamily: "Fredoka",
                     ),
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: screenHeight * 0.018),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
                       value: streakDays / 7, // Normalize to weekly progress
                       backgroundColor: Colors.grey.shade300,
-                      color: Color(0xFFFFB000),
+                      color: const Color(0xFFFFB000),
                       minHeight: 15,
                     ),
                   ),
@@ -130,12 +130,12 @@ class _DashboardState extends State<Dashboard> {
                     boxShadow: [
                       BoxShadow(
                         color: shadowColor,
-                        offset: const Offset(2, 2),
+                        offset: const Offset(4, 4),
                       ),
                     ],
                   ),
                   height: screenHeight * 0.213,
-                  width: screenWidth * 0.45,
+                  width: screenWidth * 0.4,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -163,7 +163,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
                           "Accuracy Score",
                           style: TextStyle(
@@ -187,7 +187,7 @@ class _DashboardState extends State<Dashboard> {
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
-                            offset: const Offset(2, 2),
+                            offset: const Offset(4, 4),
                           ),
                         ],
                       ),
@@ -226,7 +226,7 @@ class _DashboardState extends State<Dashboard> {
                         boxShadow: [
                           BoxShadow(
                             color: shadowColor,
-                            offset: const Offset(2, 2),
+                            offset: const Offset(4, 4),
                           ),
                         ],
                       ),
@@ -273,21 +273,28 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ],
               ),
-              height: screenHeight * 0.5,
-              width: screenWidth * 0.94,
-              padding: EdgeInsets.all(defaultPadding),
+              // Reverted to previous sizes
+              height: screenHeight * 0.45,
+              width: screenWidth * 0.9,
+              padding: EdgeInsets.only(
+                left: defaultPadding * 0.5,
+                right: defaultPadding * 1.5,
+                top: defaultPadding,
+                bottom: defaultPadding,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Weekly Accuracy Trend",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: textColor,
-                        fontFamily: "Fredoka"),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                      fontFamily: "Fredoka",
+                    ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.02),
                   Expanded(
                     child: LineChart(
                       LineChartData(
@@ -297,27 +304,47 @@ class _DashboardState extends State<Dashboard> {
                           getDrawingHorizontalLine: (value) {
                             return FlLine(
                               color: Colors.grey.shade300,
-                              strokeWidth: 1.2, // Thicker grid lines
-                              dashArray: [5, 5], // Subtle dashed grid lines
+                              strokeWidth: 1.2,
+                              dashArray: [5, 5],
                             );
                           },
                           getDrawingVerticalLine: (value) {
                             return FlLine(
                               color: Colors.grey.shade300,
-                              strokeWidth: 1.2, // Thicker grid lines
+                              strokeWidth: 1.2,
                               dashArray: [5, 5],
                             );
                           },
                         ),
                         titlesData: FlTitlesData(
                           leftTitles: AxisTitles(
+                            axisNameWidget: Padding(
+                              // Add some padding to create a gap between axis name and labels
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              child: Text(
+                                "Daily Accuracy (%)",
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "Fredoka"),
+                              ),
+                            ),
+                            // Increase axisNameSize for extra space
+                            axisNameSize: 40,
                             sideTitles: SideTitles(
                               showTitles: true,
-                              reservedSize: 40,
+                              reservedSize:
+                                  30, // Keep labels close, but not too close
+                              interval: 10,
                               getTitlesWidget: (value, meta) {
-                                if (value % 20 == 0) {
-                                  return Text('${value.toInt()}%',
-                                      style: TextStyle(fontSize: 12));
+                                if (value % 10 == 0) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 4.0),
+                                    child: Text(
+                                      '${value.toInt()}%',
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  );
                                 }
                                 return Container();
                               },
@@ -330,9 +357,17 @@ class _DashboardState extends State<Dashboard> {
                             sideTitles: SideTitles(showTitles: false),
                           ),
                           bottomTitles: AxisTitles(
+                            axisNameWidget: Text(
+                              "Day",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: "Fredoka"),
+                            ),
+                            axisNameSize: 20,
                             sideTitles: SideTitles(
                               showTitles: true,
-                              interval: 1, // Ensures each day appears only once
+                              interval: 1,
                               getTitlesWidget: (value, meta) {
                                 List<String> days = [
                                   "Mon",
@@ -344,9 +379,10 @@ class _DashboardState extends State<Dashboard> {
                                   "Sun"
                                 ];
                                 if (value >= 0 && value < days.length) {
-                                  return Text(days[value.toInt()],
-                                      style: TextStyle(
-                                          fontSize: 12, fontFamily: "Fredoka"));
+                                  return Text(
+                                    days[value.toInt()],
+                                    style: const TextStyle(fontSize: 12),
+                                  );
                                 }
                                 return Container();
                               },
@@ -355,7 +391,8 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         borderData: FlBorderData(
                           show: true,
-                          border: Border.all(color: Colors.grey.shade400),
+                          border:
+                              Border.all(color: Colors.grey.shade400, width: 1),
                         ),
                         minX: 0,
                         maxX: 6,
@@ -366,21 +403,20 @@ class _DashboardState extends State<Dashboard> {
                             spots: lineSpots,
                             isCurved: true,
                             color: chartLineColor,
-                            barWidth: 3,
+                            barWidth: 4,
+                            isStrokeCapRound: true,
                             belowBarData: BarAreaData(
                               show: true,
                               gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  graphFillColor.withOpacity(
-                                      0.9), // Top part with 0 opacity
-                                  graphFillColor.withOpacity(
-                                      0.5), // Bottom part with opacity
+                                  graphFillColor.withOpacity(0.9), // Top part
+                                  graphFillColor
+                                      .withOpacity(0.5), // Bottom part
                                 ],
                               ),
                             ),
-                            dotData: FlDotData(show: true),
                           ),
                         ],
                       ),
@@ -388,7 +424,7 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
