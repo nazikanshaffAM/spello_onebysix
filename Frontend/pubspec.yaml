@@ -25,6 +25,9 @@ dependencies:
   smooth_page_indicator: ^1.2.0+3
   flutter_slidable: ^4.0.0
   fl_chart: ^0.70.2
+  tutorial_coach_mark: ^1.2.13
+
+
 
   # Added animated toggle switch dependency
 
