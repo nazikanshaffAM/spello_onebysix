@@ -1,4 +1,6 @@
 // game_rules.dart (Game Logic)
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
 import 'EndingPage.dart';
@@ -8,8 +10,8 @@ class GameRules extends ChangeNotifier {
   double position = 500;
   int xp = 0;
   int lives = 3;
-  int timeLeft = 300;
-  List<String> words = ["apple", "banana", "cherry"];
+  int timeLeft = 30;
+  List<String> words = ["apple", "banana", "cherry","miyuru"];
   int currentWordIndex = 0;
   bool gameEnded = false;
 
@@ -32,20 +34,56 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation() async {
-    int value = await ApiService.fetchRandomValue();
+    int value = await testValue(); // Fetch accuracy value
+
     if (value >= 75) {
-      position = -50;
-      xp += 100;
-      nextWord();
-    } else {
-      position = 200;
+      moveImageToTop();
       Future.delayed(const Duration(seconds: 1), () {
-        position = 500;
-        loseLife();
+        shouldAnimate = false; // Disable animation
+        resetImagePosition();  // Instantly reset position
+        shouldAnimate = true;  // Enable animation for next round
+        xp += 100;
+        nextWord();
       });
+    } else {
+      moveImageHalfway();
     }
     notifyListeners();
   }
+
+  bool shouldAnimate = true; // Default to animated movement
+
+
+  void moveImageToTop() {
+    if (shouldAnimate) {
+      position = -50; // Move to top smoothly
+    }
+    notifyListeners();
+  }
+
+  void moveImageHalfway() {
+    if (shouldAnimate) {
+      position = 200; // Move halfway
+      Future.delayed(const Duration(seconds: 1), () {
+        position = 500; // Move back to bottom
+        loseLife();
+        notifyListeners();
+      });
+    }
+  }
+
+  void resetImagePosition() {
+    position = 500; // Instantly reset to default
+    notifyListeners();
+  }
+
+
+
+  Future<int> testValue() async {
+    await Future.delayed(Duration(milliseconds: 500)); // Simulate network delay
+    return Random().nextInt(51) + 50; // Generates a number between 50 and 100
+  }
+
 
   void nextWord() {
     if (currentWordIndex < words.length - 1) {
