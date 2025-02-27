@@ -1,4 +1,6 @@
 // game_rules.dart (Game Logic)
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
 import 'EndingPage.dart';
@@ -8,7 +10,7 @@ class GameRules extends ChangeNotifier {
   double position = 500;
   int xp = 0;
   int lives = 3;
-  int timeLeft = 300;
+  int timeLeft = 30;
   List<String> words = ["apple", "banana", "cherry"];
   int currentWordIndex = 0;
   bool gameEnded = false;
@@ -32,7 +34,8 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation() async {
-    int value = await ApiService.fetchRandomValue();
+    int value = await testValue();//fetchRandomValue();
+    //int value = await ApiService.fetchRandomValue();
     if (value >= 75) {
       position = -50;
       xp += 100;
@@ -46,6 +49,11 @@ class GameRules extends ChangeNotifier {
     }
     notifyListeners();
   }
+  Future<int> testValue() async {
+    await Future.delayed(Duration(milliseconds: 500)); // Simulate network delay
+    return Random().nextInt(51) + 50; // Generates a number between 50 and 100
+  }
+
 
   void nextWord() {
     if (currentWordIndex < words.length - 1) {
