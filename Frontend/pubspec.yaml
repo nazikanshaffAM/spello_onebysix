@@ -24,6 +24,11 @@ dependencies:
   animated_toggle_switch: ^0.8.4
   smooth_page_indicator: ^1.2.0+3
   flutter_slidable: ^4.0.0
+  fl_chart: ^0.70.2
+  tutorial_coach_mark: ^1.2.13
+
+
+
   # Added animated toggle switch dependency
 
 dev_dependencies:
@@ -56,6 +61,17 @@ flutter:
     - assets/images/dashboard.png
     - assets/images/notification.png
     - assets/images/parental_control_one.png
+    - assets/images/game_one.png
+    - assets/images/game_two.png
+    - assets/images/game_three.png
+    - assets/images/apple.png
+    - assets/images/astronaut.png
+    - assets/images/facebook.jpg
+    - assets/images/fb.png
+    - assets/images/google.png
+    - assets/images/spello.png
+    - assets/images/page_under_construction.png
+    - assets/images/under_construction.png
 
 
   fonts:
