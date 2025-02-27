@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // For platform channels (optional)
 import 'StartPage.dart';
+import 'game_backend.dart'; // Import the backend
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure async code runs
+
+  final backend = GameBackend();
+  await backend.startServer(); // Start backend before UI
+
   runApp(const VoiceGameApp());
 }
 
@@ -12,10 +19,8 @@ class VoiceGameApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Voice Game',
-      debugShowCheckedModeBanner: false, // Hides the debug banner
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: const StartPage(),
     );
   }

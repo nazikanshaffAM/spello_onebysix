@@ -34,7 +34,7 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation() async {
-    int value = await testValue(); // Fetch accuracy value
+    int value = await ApiService.fetchRandomValue(); // Fetch accuracy value
 
     if (value >= 75) {
       moveImageToTop();
