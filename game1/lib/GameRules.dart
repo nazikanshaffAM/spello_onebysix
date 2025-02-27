@@ -33,23 +33,29 @@ class GameRules extends ChangeNotifier {
     });
   }
 
-  void checkPronunciation() async {
-    int value = await ApiService.fetchRandomValue(); // Fetch accuracy value
+  void checkPronunciation(String filePath) async {
+    int? value = await ApiService.uploadAudio(filePath); // Upload audio and get accuracy
 
-    if (value >= 75) {
-      moveImageToTop();
-      Future.delayed(const Duration(seconds: 1), () {
-        shouldAnimate = false; // Disable animation
-        resetImagePosition();  // Instantly reset position
-        shouldAnimate = true;  // Enable animation for next round
-        xp += 100;
-        nextWord();
-      });
+    if (value != null) {
+      if (value >= 75) {
+        moveImageToTop();
+        Future.delayed(const Duration(seconds: 1), () {
+          shouldAnimate = false; // Disable animation
+          resetImagePosition();  // Instantly reset position
+          shouldAnimate = true;  // Enable animation for next round
+          xp += 100;
+          nextWord();
+        });
+      } else {
+        moveImageHalfway();
+      }
     } else {
-      moveImageHalfway();
+      print(" Error: Could not fetch pronunciation accuracy.");
     }
+
     notifyListeners();
   }
+
 
   bool shouldAnimate = true; // Default to animated movement
 

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // For platform channels (optional)
+import 'package:flutter/services.dart';
 import 'StartPage.dart';
 import 'game_backend.dart'; // Import the backend
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure async code runs
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures async operations work
 
   final backend = GameBackend();
-  await backend.startServer(); // Start backend before UI
+
+  try {
+    await backend.startServer(); // Start backend before launching UI
+    print("✅ Backend started successfully.");
+  } catch (e) {
+    print("❌ Error starting backend: $e");
+  }
 
   runApp(const VoiceGameApp());
 }
