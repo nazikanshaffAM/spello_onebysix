@@ -1,10 +1,11 @@
-// game_page.dart (Game UI)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'GameRules.dart';
-
+import 'AudioService.dart';
 
 class GamePage extends StatelessWidget {
+  final AudioService _audioService = AudioService();
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -14,18 +15,23 @@ class GamePage extends StatelessWidget {
           builder: (context, gameRules, child) {
             return Stack(
               children: [
+                // 🖼 Background Image
                 Positioned.fill(
                   child: Image.asset(
                     'assets/images/backgroundEndingPage.png',
                     fit: BoxFit.cover,
                   ),
                 ),
+
+                // XP Display
                 Positioned(
                   top: 30,
                   left: 20,
                   child: Text("XP: ${gameRules.xp}",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
+
+                // Life Display
                 Positioned(
                   top: 30,
                   right: 20,
@@ -43,6 +49,8 @@ class GamePage extends StatelessWidget {
                     }),
                   ),
                 ),
+
+                // Timer Display
                 Positioned(
                   top: 30,
                   left: MediaQuery.of(context).size.width / 2 - 30,
@@ -51,20 +59,23 @@ class GamePage extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
+
+                //  Character Animation
                 gameRules.shouldAnimate
                     ? AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
-                  top: gameRules.position, // Animated movement
+                  top: gameRules.position,
                   left: MediaQuery.of(context).size.width / 2 - 50,
                   child: Image.asset('assets/images/character.png', width: 100),
                 )
                     : Positioned(
-                  top: gameRules.position, // Instant movement
+                  top: gameRules.position,
                   left: MediaQuery.of(context).size.width / 2 - 50,
                   child: Image.asset('assets/images/character.png', width: 100),
                 ),
 
+                //  Word Display
                 Positioned(
                   bottom: 80,
                   left: 20,
@@ -73,14 +84,12 @@ class GamePage extends StatelessWidget {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ),
+
+                // ️ Microphone Button (Updated)
                 Positioned(
                   bottom: 50,
                   right: 20,
-                  child: FloatingActionButton(
-                    onPressed: () => gameRules.checkPronunciation(),
-                    backgroundColor: Colors.red,
-                    child: Icon(Icons.mic, size: 30),
-                  ),
+                  child: _buildMicButton(),
                 ),
               ],
             );
@@ -89,5 +98,30 @@ class GamePage extends StatelessWidget {
       ),
     );
   }
-}
 
+  /// ️  Hold to record, release to stop & send
+  Widget _buildMicButton() {
+    return GestureDetector(
+      onLongPress: () async {
+        await _audioService.startRecording();
+      },
+      onLongPressUp: () async {
+        await _audioService.stopRecording();
+        await _audioService.sendAudioToBackend();
+      },
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 100),
+        height: 70,
+        width: 70,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(color: Colors.redAccent, blurRadius: 10, spreadRadius: 2),
+          ],
+        ),
+        child: Icon(Icons.mic, size: 35, color: Colors.white),
+      ),
+    );
+  }
+}
