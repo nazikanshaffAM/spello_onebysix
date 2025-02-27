@@ -34,21 +34,51 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation() async {
-    int value = await testValue();//fetchRandomValue();
-    //int value = await ApiService.fetchRandomValue();
+    int value = await testValue(); // Fetch accuracy value
+
     if (value >= 75) {
-      position = -50;
-      xp += 100;
-      nextWord();
-    } else {
-      position = 200;
+      moveImageToTop();
       Future.delayed(const Duration(seconds: 1), () {
-        position = 500;
-        loseLife();
+        shouldAnimate = false; // Disable animation
+        resetImagePosition();  // Instantly reset position
+        shouldAnimate = true;  // Enable animation for next round
+        xp += 100;
+        nextWord();
       });
+    } else {
+      moveImageHalfway();
     }
     notifyListeners();
   }
+
+  bool shouldAnimate = true; // Default to animated movement
+
+
+  void moveImageToTop() {
+    if (shouldAnimate) {
+      position = -50; // Move to top smoothly
+    }
+    notifyListeners();
+  }
+
+  void moveImageHalfway() {
+    if (shouldAnimate) {
+      position = 200; // Move halfway
+      Future.delayed(const Duration(seconds: 1), () {
+        position = 500; // Move back to bottom
+        loseLife();
+        notifyListeners();
+      });
+    }
+  }
+
+  void resetImagePosition() {
+    position = 500; // Instantly reset to default
+    notifyListeners();
+  }
+
+
+
   Future<int> testValue() async {
     await Future.delayed(Duration(milliseconds: 500)); // Simulate network delay
     return Random().nextInt(51) + 50; // Generates a number between 50 and 100

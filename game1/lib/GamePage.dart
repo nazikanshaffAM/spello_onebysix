@@ -51,12 +51,20 @@ class GamePage extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                AnimatedPositioned(
-                  duration: Duration(seconds: 2),
-                  top: gameRules.position,
+                gameRules.shouldAnimate
+                    ? AnimatedPositioned(
+                  duration: Duration(seconds: 1),
+                  curve: Curves.easeInOut,
+                  top: gameRules.position, // Animated movement
+                  left: MediaQuery.of(context).size.width / 2 - 50,
+                  child: Image.asset('assets/images/character.png', width: 100),
+                )
+                    : Positioned(
+                  top: gameRules.position, // Instant movement
                   left: MediaQuery.of(context).size.width / 2 - 50,
                   child: Image.asset('assets/images/character.png', width: 100),
                 ),
+
                 Positioned(
                   bottom: 80,
                   left: 20,
