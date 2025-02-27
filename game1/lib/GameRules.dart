@@ -11,7 +11,7 @@ class GameRules extends ChangeNotifier {
   int xp = 0;
   int lives = 3;
   int timeLeft = 30;
-  List<String> words = ["apple", "banana", "cherry"];
+  List<String> words = ["apple", "banana", "cherry","miyuru"];
   int currentWordIndex = 0;
   bool gameEnded = false;
 
