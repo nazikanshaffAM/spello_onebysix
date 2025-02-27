@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://127.0.0.1:5000";
+  static const String _baseUrl = 'http://localhost:8080';
 
+  // Fetch random number from the backend
   static Future<int> fetchRandomValue() async {
-    final response = await http.get(Uri.parse("$baseUrl/get-random"));
+    final response = await http.get(Uri.parse('$_baseUrl/random'));
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return data["value"];
+      return int.parse(response.body);
     } else {
-      throw Exception("Failed to fetch value");
+      throw Exception('❌ Failed to load random value');
     }
   }
 }
