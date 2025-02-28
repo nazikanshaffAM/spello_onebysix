@@ -7,9 +7,13 @@ import 'package:shelf_router/shelf_router.dart';
 
 class GameBackend {
   /// Function to handle audio upload
+  String getWritablePath() {
+    final directory = Directory.systemTemp; // Use a writable temp directory
+    return '${directory.path}/uploaded_audio.wav';
+  }
+
   Future<Response> uploadAudio(Request request) async {
     try {
-      // Read the request body (audio bytes)
       final bytes = await request.read().expand((element) => element).toList();
 
       if (bytes.isEmpty) {
@@ -17,17 +21,16 @@ class GameBackend {
         return Response.badRequest(body: jsonEncode({"error": "Audio file not received"}));
       }
 
-      // Save the audio file in .wav format
-      final file = File('uploaded_audio.wav');
+      // Save to a writable directory
+      final filePath = getWritablePath();
+      final file = File(filePath);
       await file.writeAsBytes(bytes);
 
-      print(" Audio received and saved as uploaded_audio.wav");
+      print(" Audio received and saved at: $filePath");
 
-      // Generate a random integer between 50 - 100
       int randomValue = 50 + Random().nextInt(51);
       print(" Generated value: $randomValue");
 
-      // Return the random value as response
       return Response.ok(jsonEncode({"randomValue": randomValue}),
           headers: {'Content-Type': 'application/json'});
     } catch (e) {

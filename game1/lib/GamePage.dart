@@ -9,7 +9,7 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => GameRules(context),
+      create: (_) => GameRules(context), // ✅ Corrected context usage
       child: Scaffold(
         body: Consumer<GameRules>(
           builder: (context, gameRules, child) {
@@ -60,7 +60,7 @@ class GamePage extends StatelessWidget {
                   ),
                 ),
 
-                //  Character Animation
+                // Character Animation
                 gameRules.shouldAnimate
                     ? AnimatedPositioned(
                   duration: Duration(seconds: 1),
@@ -75,7 +75,7 @@ class GamePage extends StatelessWidget {
                   child: Image.asset('assets/images/character.png', width: 100),
                 ),
 
-                //  Word Display
+                // Word Display
                 Positioned(
                   bottom: 80,
                   left: 20,
@@ -85,11 +85,11 @@ class GamePage extends StatelessWidget {
                   ),
                 ),
 
-                // ️ Microphone Button (Updated)
+                // Microphone Button (Fixed Context Usage)
                 Positioned(
                   bottom: 50,
                   right: 20,
-                  child: _buildMicButton(),
+                  child: _buildMicButton(context), // ✅ Pass context
                 ),
               ],
             );
@@ -99,15 +99,17 @@ class GamePage extends StatelessWidget {
     );
   }
 
-  /// ️  Hold to record, release to stop & send
-  Widget _buildMicButton() {
+  /// 🎤 Hold to record, release to stop & send
+  Widget _buildMicButton(BuildContext context) {
     return GestureDetector(
       onLongPress: () async {
         await _audioService.startRecording();
       },
       onLongPressUp: () async {
         await _audioService.stopRecording();
-        await _audioService.sendAudioToBackend();
+
+        var gameRules = Provider.of<GameRules>(context, listen: false); // ✅ Get the existing GameRules instance
+        await _audioService.sendAudioToBackend(context, gameRules);
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
