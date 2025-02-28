@@ -15,3 +15,10 @@ MODEL_PATH = "vosk-model-small-en-us-0.15"
 # Load Vosk Model
 if not os.path.exists(MODEL_PATH):
     raise ValueError("Model not found! Please download and extract it.")
+
+
+model = vosk.Model(MODEL_PATH)
+recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
+
+
+TARGET_WORD = "cow"
