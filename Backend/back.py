@@ -32,3 +32,32 @@ def calculate_accuracy(target, spoken):
     max_length = max(len(target), len(spoken))
     accuracy = ((max_length - distance) / max_length) * 100
     return round(accuracy, 2)
+
+
+# API Endpoint to receive audio
+@app.route('/speech-to-text', methods=['POST'])
+def speech_to_text():
+    # Get audio data from the request (expecting audio in WAV format)
+    audio_file = request.files['audio']
+
+    # Read the audio file
+    audio_data = audio_file.read()
+
+    # Process audio with Vosk model
+    recognizer.AcceptWaveform(audio_data)
+    result = json.loads(recognizer.Result())
+    spoken_word = result.get("text", "").strip()
+
+    # Calculate accuracy
+    accuracy = calculate_accuracy(TARGET_WORD, spoken_word)
+
+    # Return the accuracy to the client
+    return jsonify({
+        "spoken_word": spoken_word,
+        "target_word": TARGET_WORD,
+        "accuracy": accuracy
+    })
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
