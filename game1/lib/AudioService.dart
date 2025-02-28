@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:mygame/GameRules.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'ApiService.dart'; // Import the API service to send the file
@@ -41,12 +44,15 @@ class AudioService {
   }
 
   /// 📡 Sends recorded audio to backend
-  Future<void> sendAudioToBackend() async {
+  Future<void> sendAudioToBackend(BuildContext context, GameRules gameRules) async {
     if (_filePath != null && File(_filePath!).existsSync()) {
       print(" Sending audio to backend...");
       await ApiService.uploadAudio(_filePath!);
+      gameRules.checkPronunciation(_filePath!); // ✅ Use the correct instance
     } else {
       print(" No audio file found to send.");
     }
   }
+
+
 }

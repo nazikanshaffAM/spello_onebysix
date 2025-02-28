@@ -1,6 +1,5 @@
 // game_rules.dart (Game Logic)
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
 import 'EndingPage.dart';
@@ -34,10 +33,10 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation(String filePath) async {
-    int? value = await ApiService.uploadAudio(filePath); // Upload audio and get accuracy
+    int? accuracy = await ApiService.uploadAudio(filePath); //  Wait for backend response
 
-    if (value != null) {
-      if (value >= 75) {
+    if (accuracy != null) { //  Call logic only if accuracy is received
+      if (accuracy >= 75) {
         moveImageToTop();
         Future.delayed(const Duration(seconds: 1), () {
           shouldAnimate = false; // Disable animation
@@ -55,6 +54,7 @@ class GameRules extends ChangeNotifier {
 
     notifyListeners();
   }
+
 
 
   bool shouldAnimate = true; // Default to animated movement
