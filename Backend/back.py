@@ -22,6 +22,7 @@ model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
 #sample word
+# create a function for this keep it organized
 TARGET_WORD_LIST = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin", "Fish", "Water",
              "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
 random.shuffle(TARGET_WORD_LIST)
