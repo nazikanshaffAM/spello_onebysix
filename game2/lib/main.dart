@@ -1,23 +1,9 @@
 import 'package:flutter/material.dart';
-import 'ui/hangman_page.dart';
-import 'engine/hangman.dart';
+import 'ui/start_screen.dart'; // Import the StartScreen
 
 void main() => runApp(HangmanApp());
 
-class HangmanApp extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _HangmanAppState();
-}
-
-class _HangmanAppState extends State<HangmanApp> {
-  late HangmanGame _engine;
-
-  @override
-  void initState() {
-    super.initState();
-    _engine = HangmanGame();
-  }
-
+class HangmanApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,7 +12,7 @@ class _HangmanAppState extends State<HangmanApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HangmanPage(_engine),
+      home: StartScreen(), // Set the StartScreen as the initial screen
     );
   }
 }
