@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hangman/ui/results_page.dart';
 import '../engine/hangman.dart';
 
 const List<String> progressImages = [
@@ -34,7 +35,8 @@ class _HangmanPageState extends State<HangmanPage> {
   String _activeImage = '';
   int _livesLeft = 7;
   int _accuracy = 0;
-  String _feedbackMessage = ''; // New feedback message
+  String _feedbackMessage = '';
+  bool _isGameOver = false;
 
   @override
   void initState() {
@@ -59,7 +61,7 @@ class _HangmanPageState extends State<HangmanPage> {
     setState(() {
       _livesLeft = lives;
       if (_livesLeft == 0) {
-        _activeImage = progressImages[7]; // Show progress_7 when the game is lost
+        _activeImage = progressImages[7];
       }
     });
   }
@@ -74,8 +76,7 @@ class _HangmanPageState extends State<HangmanPage> {
     setState(() {
       _accuracy = accuracy;
 
-      // Update feedback message based on accuracy
-      if (_accuracy >= 70) { // Changed condition to 70%
+      if (_accuracy >= 70) {
         _feedbackMessage = "Good job! Keep going!";
       } else {
         _feedbackMessage = "You got this! Try again harder.";
@@ -92,7 +93,11 @@ class _HangmanPageState extends State<HangmanPage> {
 
   void _lose([_]) {
     setState(() {
-      _activeImage = progressImages[7]; // Show progress_7 for losing stage
+      _activeImage = progressImages[7];
+      _isGameOver = true; // Disable further button presses when game is lost
+    });
+
+    Future.delayed(Duration(seconds: 1), () {
       _gameOver();
     });
   }
@@ -101,6 +106,16 @@ class _HangmanPageState extends State<HangmanPage> {
     setState(() {
       _showNewGame = true;
     });
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          averageAccuracy: widget._engine.averageAccuracy,
+          livesLeft: _livesLeft,
+        ),
+      ),
+    );
   }
 
   void _newGame() {
@@ -110,13 +125,27 @@ class _HangmanPageState extends State<HangmanPage> {
       _activeImage = '';
       _livesLeft = 7;
       _accuracy = 0;
-      _feedbackMessage = ''; // Reset feedback message
+      _feedbackMessage = '';
       _showNewGame = false;
+      _isGameOver = false;
     });
   }
 
   void _simulatePronunciation() {
-    widget._engine.pronounceWord();
+    if (!_isGameOver) {
+      widget._engine.pronounceWord();
+    }
+  }
+
+  Widget _renderProgressImage() {
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 300),
+      child: Image.asset(
+        _activeImage,
+        key: ValueKey<String>(_activeImage), // Ensures the widget is replaced when the image changes
+        fit: BoxFit.contain,
+      ),
+    );
   }
 
   Widget _renderBottomContent() {
@@ -128,7 +157,7 @@ class _HangmanPageState extends State<HangmanPage> {
     } else {
       return ElevatedButton(
         child: Text('Pronounce Word'),
-        onPressed: _simulatePronunciation,
+        onPressed: _isGameOver ? null : _simulatePronunciation, // Disable button if game is over
       );
     }
   }
@@ -139,13 +168,20 @@ class _HangmanPageState extends State<HangmanPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Hangman'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            if (_activeImage.isNotEmpty)
-              Expanded(child: Image.asset(_activeImage)),
+            if (_activeImage.isNotEmpty) Expanded(child: _renderProgressImage()),
             Padding(
               padding: EdgeInsets.all(20.0),
               child: Center(
@@ -160,7 +196,6 @@ class _HangmanPageState extends State<HangmanPage> {
               padding: EdgeInsets.all(10.0),
               child: Text('Accuracy: $_accuracy%', style: TextStyle(fontSize: 18.0)),
             ),
-            // Display feedback message
             Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(

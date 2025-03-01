@@ -2,12 +2,16 @@ import 'dart:async';
 import 'dart:math';
 
 class HangmanGame {
-  static const int maxLives = 7; // Original Hangman life system (7 incorrect attempts)
+  static const int maxLives = 7;
 
-  final String wordToPronounce = "Apple"; // Placeholder word
+  final String wordToPronounce = "Octopus"; // Placeholder word
   int _livesLeft;
-  int _letterIndex = 0; // Tracks which letters are revealed
-  int _accuracy = 0; // Tracks pronunciation accuracy
+  int _letterIndex = 0;
+  int _accuracy = 0;
+
+  double _totalAccuracy = 0;
+  int _wordsPlayed = 0;
+  Map<String, double> wordPerformance = {};
 
   late StreamController<Null> _onWin;
   Stream<Null> get onWin => _onWin.stream;
@@ -40,8 +44,11 @@ class HangmanGame {
     _livesLeft = maxLives;
     _letterIndex = 0;
     _accuracy = 0;
+    _totalAccuracy = 0;
+    _wordsPlayed = 0;
+    wordPerformance.clear();
     _onLivesChange.add(_livesLeft);
-    _onProgressChange.add(0); // No body parts drawn at the start
+    _onProgressChange.add(0);
     _onWordChange.add(wordForDisplay);
     _onAccuracyChange.add(_accuracy);
   }
@@ -50,26 +57,25 @@ class HangmanGame {
     _accuracy = _simulatePronunciationAccuracy();
     _onAccuracyChange.add(_accuracy);
 
-    if (_accuracy >= 70) {  // Changed condition to 70%
-      // Simulate revealing a letter and no life lost
+    _updateWordAccuracy(wordToPronounce, _accuracy);
+
+    if (_accuracy >= 70) {
       if (_letterIndex < wordToPronounce.length) {
         _letterIndex++;
         _onWordChange.add(wordForDisplay);
       }
     } else {
-      // Lose a life if accuracy is below 70%
       _livesLeft--;
       _onLivesChange.add(_livesLeft);
-      _onProgressChange.add(maxLives - _livesLeft); // Progress = body parts drawn
+      _onProgressChange.add(maxLives - _livesLeft);
 
       if (_livesLeft == 0) {
-        _onLose.add(null); // Game over
+        _onLose.add(null);
       }
     }
 
-    // Check if the word is completely revealed (win condition)
     if (_letterIndex == wordToPronounce.length) {
-      _onWin.add(null); // Trigger win condition
+      _onWin.add(null);
     }
   }
 
@@ -82,4 +88,12 @@ class HangmanGame {
     Random random = Random();
     return random.nextInt(101); // Simulate accuracy between 0 and 100
   }
+
+  void _updateWordAccuracy(String word, int accuracy) {
+    wordPerformance[word] = accuracy.toDouble();
+    _totalAccuracy += accuracy;
+    _wordsPlayed++;
+  }
+
+  double get averageAccuracy => _wordsPlayed == 0 ? 0 : _totalAccuracy / _wordsPlayed;
 }
