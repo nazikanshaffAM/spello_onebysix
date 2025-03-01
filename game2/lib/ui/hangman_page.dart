@@ -94,6 +94,7 @@ class _HangmanPageState extends State<HangmanPage> {
   void _lose([_]) {
     setState(() {
       _activeImage = progressImages[7];
+      _isGameOver = true; // Disable further button presses when game is lost
     });
 
     Future.delayed(Duration(seconds: 1), () {
@@ -104,7 +105,6 @@ class _HangmanPageState extends State<HangmanPage> {
   void _gameOver([_]) {
     setState(() {
       _showNewGame = true;
-      _isGameOver = true;
     });
 
     Navigator.pushReplacement(
