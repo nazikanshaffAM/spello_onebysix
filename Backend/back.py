@@ -5,6 +5,8 @@ import random
 import vosk
 from rapidfuzz.distance import Levenshtein
 from flask import Flask, request, jsonify
+# from pydub import AudioSegment
+# import io
 from io import BytesIO
 
 app = Flask(__name__)
@@ -22,14 +24,21 @@ model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
 def get_random_target_word():
-    TARGET_WORD_LIST = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin", "Fish", "Water",
+    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin", "Fish", "Water",
              "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
-    random.shuffle(TARGET_WORD_LIST)
-    return random.choice(TARGET_WORD_LIST)
+    random.shuffle(target_word_list)
+    return random.choice(target_word_list)
 
 #get one target word from the list
-TARGET_WORD = get_random_target_word()
-print(TARGET_WORD)
+target_word = get_random_target_word()
+
+
+
+#API endpoint to send the target word to frontend
+@app.route('/get-target-word', methods=['GET'])
+def get_target_word():
+    return jsonify({"target_word": target_word})
+
 
 
 
@@ -58,14 +67,42 @@ def speech_to_text():
     spoken_word = result.get("text", "").strip()
 
     # Calculate accuracy
-    accuracy = calculate_accuracy(TARGET_WORD, spoken_word)
+    accuracy = calculate_accuracy(target_word, spoken_word)
 
     # Return the accuracy to the client
     return jsonify({
         "spoken_word": spoken_word,
-        "target_word": TARGET_WORD,
+        "target_word": target_word,
         "accuracy": accuracy
     })
+
+
+#
+# @app.route('/speech-to-text', methods=['POST'])
+# def speech_to_text():
+#     audio_file = request.files['audio']
+#
+#     # Convert MP3 to WAV if necessary
+#     if audio_file.filename.endswith('.mp3'):
+#         audio = AudioSegment.from_file(io.BytesIO(audio_file.read()), format="mp3")
+#         audio = audio.set_frame_rate(16000).set_channels(1)  # Ensure 16kHz, mono
+#         wav_io = io.BytesIO()
+#         audio.export(wav_io, format="wav")
+#         audio_data = wav_io.getvalue()
+#     else:
+#         audio_data = audio_file.read()
+#
+#     recognizer.AcceptWaveform(audio_data)
+#     result = json.loads(recognizer.Result())
+#     spoken_word = result.get("text", "").strip()
+#
+#     accuracy = calculate_accuracy(target_word, spoken_word)
+#
+#     return jsonify({
+#         "spoken_word": spoken_word,
+#         "target_word": target_word,
+#         "accuracy": accuracy
+#     })
 
 
 if __name__ == '__main__':
