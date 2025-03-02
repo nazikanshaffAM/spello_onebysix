@@ -64,7 +64,7 @@ def speech_to_text():
     # Process audio with Vosk model
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
-    spoken_word = result.get("text", "").strip()
+    spoken_word = result.get("text", "").strip().capitalize()
 
     # Calculate accuracy
     accuracy = calculate_accuracy(target_word, spoken_word)
@@ -77,7 +77,7 @@ def speech_to_text():
     })
 
 
-#
+
 # @app.route('/speech-to-text', methods=['POST'])
 # def speech_to_text():
 #     audio_file = request.files['audio']
