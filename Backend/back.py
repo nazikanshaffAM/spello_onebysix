@@ -141,6 +141,13 @@ def get_user():
     return jsonify(user)
 
 
+# Route to delete the last inserted user
+@app.route("/delete_last_user", methods=["DELETE"])
+def delete_last_user():
+
+        return jsonify({"error": "Failed to delete the last user"}), 500
+
+
 
 
 if __name__ == '__main__':
