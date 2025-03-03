@@ -54,6 +54,16 @@ class AddWordDialogbox extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomElevatedButton(
+                    buttonLength: screenWidth * 0.3,
+                    buttonHeight: screenHeight * 0.05,
+                    buttonName: "Cancel",
+                    primaryColor: 0xFFFFC000,
+                    shadowColor: 0xFFD29338,
+                    textColor: Colors.white,
+                    onPressed: onCancel,
+                  ),
+                  SizedBox(width: screenWidth * 0.04),
+                  CustomElevatedButton(
                     buttonLength: screenWidth * 0.3, // responsive button width
                     buttonHeight:
                         screenHeight * 0.05, // responsive button height
@@ -62,16 +72,6 @@ class AddWordDialogbox extends StatelessWidget {
                     shadowColor: 0xFFD29338,
                     textColor: Colors.white,
                     onPressed: onSave,
-                  ),
-                  SizedBox(width: screenWidth * 0.04),
-                  CustomElevatedButton(
-                    buttonLength: screenWidth * 0.3,
-                    buttonHeight: screenHeight * 0.05,
-                    buttonName: "Cancel",
-                    primaryColor: 0xFFFFC000,
-                    shadowColor: 0xFFD29338,
-                    textColor: Colors.white,
-                    onPressed: onCancel,
                   )
                 ],
               ),

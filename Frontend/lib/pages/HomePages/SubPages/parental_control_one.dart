@@ -1,4 +1,3 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spello_frontend/util/custom_elevated_button.dart';
@@ -25,11 +24,11 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
     _loadPreferences();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final screenWidth = MediaQuery.of(context).size.width;
-      _initTargets(screenWidth); // Pass screenWidth dynamically
+      _initTargets(screenWidth);
       bool tutorialShown = await _getTutorialShown();
       if (!tutorialShown) {
         _showTutorial();
-        _setTutorialShown();
+        await _setTutorialShown();
       }
     });
   }
@@ -43,7 +42,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
 
   Future<void> _savePreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('parentalToggle', parentalToggle);
+    await prefs.setBool('parentalToggle', parentalToggle);
   }
 
   Future<bool> _getTutorialShown() async {
@@ -53,7 +52,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
 
   Future<void> _setTutorialShown() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('tutorialShown', true);
+    await prefs.setBool('tutorialShown', true);
   }
 
   void _initTargets(double screenWidth) {
@@ -68,11 +67,11 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
             align: ContentAlign.bottom,
             child: Text(
               "Click the tile to allocate the sound for practice.",
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: "Fredoka",
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: screenWidth * 0.04,
               ),
             ),
           ),
@@ -89,10 +88,9 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
             child: Text(
               "Click 'Apply' to apply the selected sounds.",
               style: TextStyle(
-                // Removed const, using dynamic size
                 fontFamily: "Fredoka",
                 color: Colors.white,
-                fontSize: screenWidth * 0.05, // Now properly passed
+                fontSize: screenWidth * 0.04,
               ),
             ),
           ),
@@ -156,6 +154,9 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
               children: List.generate(
                 21,
                 (index) => ControlPanelTiles(
+                  key: index == 0
+                      ? _patTileKey
+                      : null, // Assign key to the first tile
                   tileName: _getTileName(index),
                   isLocked: index >= 6,
                 ),
@@ -171,9 +172,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
             primaryColor: 0xFFFFC000,
             shadowColor: 0xFFD29338,
             textColor: Colors.white,
-            onPressed: () {
-              _savePreferences();
-            },
+            onPressed: _savePreferences,
           ),
           SizedBox(height: screenHeight * 0.03),
         ],
