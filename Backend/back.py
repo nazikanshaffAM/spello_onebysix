@@ -114,6 +114,62 @@ def store_user():
 
     return jsonify({"message": "User data stored successfully!", "user": user})
 
+# Route to get all stored users from the database
+@app.route("/get_users", methods=["GET"])
+def get_users():
+    # Retrieve all users from the database
+    users = collection.find({}, {"_id": 0})  # Exclude MongoDB's default "_id" field
+
+    user_list = list(users)  # Convert cursor to a list
+    return jsonify({"users": user_list})
+
+
+#get one user based on email
+@app.route("/get_user", methods=["GET"])
+def get_user():
+    email = request.args.get("email")  # Get email from query parameters
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Find user by email, exclude MongoDB "_id" field from response
+    user = collection.find_one({"email": email}, {"_id": 0})
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify(user)
+
+
+# Route to delete the last inserted user
+@app.route("/delete_last_user", methods=["DELETE"])
+def delete_last_user():
+    # Find the last inserted user
+    # Note: This assumes your MongoDB documents have a natural insertion order
+    # For a more reliable approach, you might want to add a timestamp field
+    last_user = collection.find_one({}, sort=[("_id", -1)])
+
+    if not last_user:
+        return jsonify({"error": "No users found in the database"}), 404
+
+    # Delete the last user
+    result = collection.delete_one({"_id": last_user["_id"]})
+
+    if result.deleted_count == 1:
+        return jsonify({
+            "message": "Last user deleted successfully",
+            "deleted_user": {
+                "name": last_user.get("name"),
+                "email": last_user.get("email"),
+                "age": last_user.get("age"),
+                "gender": last_user.get("gender")
+            }
+        })
+    else:
+        return jsonify({"error": "Failed to delete the last user"}), 500
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
