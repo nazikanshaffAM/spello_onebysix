@@ -46,6 +46,30 @@ class User {
   }
 }
 
+// API service
+class ApiService {
+  static const String baseUrl = 'https://dummy-api-endpoint.com/api';
+
+  static Future<bool> registerUser(User user) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/register'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(user.toJson()),
+      );
+
+      // For demonstration purposes, we're considering any status code in the 200 range as success
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      print('Error registering user: $e');
+      // In a real app, you might want to handle specific exceptions differently
+      return false;
+    }
+  }
+}
+
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
 
