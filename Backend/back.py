@@ -20,20 +20,19 @@ if not os.path.exists(MODEL_PATH):
 model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
-def get_random_target_word():
-    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin", "Fish", "Water",
-             "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
-    random.shuffle(target_word_list)
-    return random.choice(target_word_list)
-
-#get one target word from the list
-target_word = get_random_target_word()
-
+#creating a dictionary to store targeted words
+session_data = {}
 
 
 #API endpoint to send the target word to frontend
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
+    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin",
+                        "Fish", "Water", "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
+    random.shuffle(target_word_list)
+    target_word = random.choice(target_word_list)
+    session_data['target_word'] = target_word
+
     return jsonify({"target_word": target_word})
 
 
@@ -62,6 +61,7 @@ def speech_to_text():
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
     spoken_word = result.get("text", "").strip().capitalize()
+    target_word = session_data.get('target_word', '')
 
     # Calculate accuracy
     accuracy = calculate_accuracy(target_word, spoken_word)
