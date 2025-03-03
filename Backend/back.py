@@ -129,12 +129,14 @@ def get_users():
 def get_user():
     email = request.args.get("email")  # Get email from query parameters
 
-
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
 
     # Find user by email, exclude MongoDB "_id" field from response
     user = collection.find_one({"email": email}, {"_id": 0})
 
-
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
     return jsonify(user)
 
