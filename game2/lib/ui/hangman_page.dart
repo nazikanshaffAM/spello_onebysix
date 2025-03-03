@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hangman/ui/results_page.dart';
+import 'package:hangman/ui/settings_page.dart';
 import '../engine/hangman.dart';
 
 const List<String> progressImages = [
@@ -197,6 +198,18 @@ class _HangmanPageState extends State<HangmanPage> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.black),
+            onPressed: () {
+              // Navigate to the settings page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
