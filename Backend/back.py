@@ -101,24 +101,18 @@ def store_user():
     if not all(field in data for field in required_fields):
         return jsonify({"error": "All fields (name, email, age, gender) are required"}), 400
 
+    user = {
+        "name": data["name"],
+        "email": data["email"],
+        "age": data["age"],
+        "gender": data["gender"],
+    }
 
+    # Insert user data into the database
+    result = collection.insert_one(user)
+    user["_id"] = str(result.inserted_id)  # Convert ObjectId to string
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return jsonify({"message": "User data stored successfully!", "user": user})
 
 
 if __name__ == '__main__':
