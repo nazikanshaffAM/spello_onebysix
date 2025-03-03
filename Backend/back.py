@@ -114,6 +114,17 @@ def store_user():
 
     return jsonify({"message": "User data stored successfully!", "user": user})
 
+# Route to get all stored users from the database
+@app.route("/get_users", methods=["GET"])
+def get_users():
+    # Retrieve all users from the database
+    users = collection.find({}, {"_id": 0})  # Exclude MongoDB's default "_id" field
+
+    user_list = list(users)  # Convert cursor to a list
+    return jsonify({"users": user_list})
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
