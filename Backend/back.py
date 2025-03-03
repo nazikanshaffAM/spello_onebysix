@@ -4,7 +4,7 @@ import random
 import vosk
 from rapidfuzz.distance import Levenshtein
 from flask import Flask, request, jsonify
-
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
@@ -79,6 +79,9 @@ def speech_to_text():
 # mongodb connection string
 MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWrites=true&w=majority&appName=spelloDB"
 
+
+# connect to mongoDB
+client = MongoClient(MONGO_URI)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
