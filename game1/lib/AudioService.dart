@@ -42,7 +42,7 @@ class AudioService {
     }
   }
 
-  /// 📡 Sends recorded audio to backend
+  ///  Sends recorded audio to backend
   Future<void> sendAudioToBackend(BuildContext context, GameRules gameRules) async {
     if (_filePath != null && File(_filePath!).existsSync()) {
       print(" Sending audio to backend...");
