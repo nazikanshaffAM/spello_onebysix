@@ -82,6 +82,38 @@ MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWri
 
 # connect to mongoDB
 client = MongoClient(MONGO_URI)
+db = client["spello_database"]  # added database name
+collection = db["sp1"]  # added collection name
+
+
+@app.route("/")
+def home():
+    return jsonify({"message": "Connected MongoDB Successfully"})
+
+
+# add route to store details in the database
+@app.route("/store_user", methods=["POST"])
+def store_user():
+    data = request.json
+
+    # Validate required fields
+    required_fields = ["name", "email", "age", "gender", ]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "All fields (name, email, age, gender) are required"}), 400
+
+    user = {
+        "name": data["name"],
+        "email": data["email"],
+        "age": data["age"],
+        "gender": data["gender"],
+    }
+
+    # Insert user data into the database
+    result = collection.insert_one(user)
+    user["_id"] = str(result.inserted_id)  # Convert ObjectId to string
+
+    return jsonify({"message": "User data stored successfully!", "user": user})
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
