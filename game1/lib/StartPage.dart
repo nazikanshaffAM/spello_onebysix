@@ -51,10 +51,15 @@ class _StartPageState extends State<StartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Settingspage(),
+                          builder: (context) => SettingsPage(
+                            onBackgroundSelected: (String newBackground) {
+                              setState(() {}); // Refresh the UI after returning
+                            },
+                          ),
                         ),
                       );
                     }),
+
                     const SizedBox(height: 20),
                     _buildButton('HOW TO PLAY', () {
                       Navigator.push(

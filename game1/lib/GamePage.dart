@@ -1,24 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'GameRules.dart';
 import 'AudioService.dart';
 
-class GamePage extends StatelessWidget {
+class GamePage extends StatefulWidget {
+  @override
+  _GamePageState createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
   final AudioService _audioService = AudioService();
+  String backgroundImage = 'assets/images/b1.jpg'; // Default background
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBackgroundImage();
+  }
+
+  // Load the selected background from SharedPreferences
+  Future<void> _loadBackgroundImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      backgroundImage = prefs.getString("selectedBackground") ?? 'assets/images/b1.jpg';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => GameRules(context), // ✅ Corrected context usage
+      create: (_) => GameRules(context),
       child: Scaffold(
         body: Consumer<GameRules>(
           builder: (context, gameRules, child) {
             return Stack(
               children: [
-                // 🖼 Background Image
+                // 🖼 Dynamic Background Image
                 Positioned.fill(
                   child: Image.asset(
-                    'assets/images/backgroundEndingPage.png',
+                    backgroundImage,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -89,7 +110,7 @@ class GamePage extends StatelessWidget {
                 Positioned(
                   bottom: 50,
                   right: 20,
-                  child: _buildMicButton(context), // ✅ Pass context
+                  child: _buildMicButton(context),
                 ),
               ],
             );
@@ -108,7 +129,7 @@ class GamePage extends StatelessWidget {
       onLongPressUp: () async {
         await _audioService.stopRecording();
 
-        var gameRules = Provider.of<GameRules>(context, listen: false); // ✅ Get the existing GameRules instance
+        var gameRules = Provider.of<GameRules>(context, listen: false);
         await _audioService.sendAudioToBackend(context, gameRules);
       },
       child: AnimatedContainer(

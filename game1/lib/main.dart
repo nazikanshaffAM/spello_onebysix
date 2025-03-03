@@ -9,9 +9,9 @@ void main() async {
 
   try {
     await backend.startServer(); // Start backend before launching UI
-    print("✅ Backend started successfully.");
+    print(" Backend started successfully.");
   } catch (e) {
-    print("❌ Error starting backend: $e");
+    print(" Error starting backend: $e");
   }
 
   runApp(const VoiceGameApp());
@@ -30,3 +30,7 @@ class VoiceGameApp extends StatelessWidget {
     );
   }
 }
+
+
+
+
