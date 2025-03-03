@@ -1,13 +1,10 @@
 import os
 import json
 import random
-#import vosk
 import vosk
 from rapidfuzz.distance import Levenshtein
 from flask import Flask, request, jsonify
-# from pydub import AudioSegment
-# import io
-from io import BytesIO
+from pymongo import MongoClient
 
 app = Flask(__name__)
 
@@ -76,6 +73,15 @@ def speech_to_text():
         "accuracy": accuracy
     })
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Initializing database
+
+# mongodb connection string
+MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWrites=true&w=majority&appName=spelloDB"
+
+
+# connect to mongoDB
+client = MongoClient(MONGO_URI)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
