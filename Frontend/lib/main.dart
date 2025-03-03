@@ -5,6 +5,7 @@ import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
 import 'package:spello_frontend/pages/HomePages/SubPages/page_under_construction.dart';
+import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
 import 'package:spello_frontend/pages/OnboardingPages/onboarding_screen_two.dart';
 
 void main() {

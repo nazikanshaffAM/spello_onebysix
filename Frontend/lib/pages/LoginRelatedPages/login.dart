@@ -1,6 +1,5 @@
 //its without main have to change and make apath to show this first
 
-
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -20,10 +19,9 @@ class LoginScreen extends StatelessWidget {
               child: Text(
                 "Hello From Spello!",
                 style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 40,
                   color: Colors.white,
-                  fontFamily: 'Fredericka', // Use Fredericka font
+                  fontFamily: 'Fredoka One', // Use Fredericka font
                 ),
               ),
             ),
@@ -37,18 +35,29 @@ class LoginScreen extends StatelessWidget {
             // Google Login Button
             LoginButton(
               text: "Login with Google",
-              icon: "assets/images/google.png", // Replace with Google icon asset
+              icon:
+                  "assets/images/google.png", // Replace with Google icon asset
               color: Colors.white,
               textColor: Colors.black,
+              textStyle: TextStyle(
+                fontFamily: 'Fredoka', // Use Fredoka font
+                fontWeight: FontWeight.bold, // Make text bold
+              ),
             ),
+
             const SizedBox(height: 20),
             // Apple Login Button
             LoginButton(
               text: "Login with Facebook",
-              icon: "assets/images/apple.png", // Replace with Apple icon asset
-              color:  Color.fromARGB(255, 31, 18, 128),
-              textColor: Colors.white,
-            ),
+              icon:
+                  "assets/images/google.png", // Replace with Google icon asset
+              color: Color(0xFF313FFF),
+              textColor: Colors.black,
+              textStyle: TextStyle(
+                fontFamily: 'Fredoka', // Use Fredoka font
+                fontWeight: FontWeight.bold, // Make text bold
+              ),
+            )
           ],
         ),
       ),
@@ -67,6 +76,7 @@ class LoginButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.textColor,
+    required TextStyle textStyle,
   });
 
   @override
