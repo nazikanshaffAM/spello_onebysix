@@ -111,10 +111,11 @@ class _GamePageState extends State<GamePage> {
                   bottom: 45,
                   left: 30,
                   child: Text(
-                    gameRules.currentWord,
+                    gameRules.word,  // This will update when notifyListeners() is called
                     style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
+
 
                 // Microphone Button (Fixed Context Usage)
                 Positioned(

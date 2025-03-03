@@ -48,7 +48,6 @@ class ApiService {
       return null;
     }
   }
-
   // Fetch words from backend (modify this if needed)
   static Future<List<String>> fetchWords() async {
     return [

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
 import 'EndingPage.dart';
@@ -9,32 +8,49 @@ class GameRules extends ChangeNotifier {
   int xp = 0;
   int lives = 3;
   int timeLeft = 30;
-  List<String> words = [];
-  int currentWordIndex = 0;
+  String word = "";  // Store the current word
   bool gameEnded = false;
   bool shouldAnimate = true;
-
-  String get currentWord => words.isNotEmpty ? words[currentWordIndex] : '';
 
   GameRules(this.context) {
     initializeGame();
   }
 
-  // Fetch words and start the game
+  // Fetch the first word
   Future<void> initializeGame() async {
-    String? fetchedWord = await ApiService.fetchTargetWord();
+    word = "Loading..."; // Temporary placeholder
+    notifyListeners(); // Notify UI to update
 
-    if (fetchedWord != null && fetchedWord.isNotEmpty) {
-      words = [fetchedWord]; // Store the fetched word in the list
-    } else {
-      debugPrint("Failed to get a target word from API.");
+    try {
+      String? fetchedWord = await ApiService.fetchTargetWord();
+      if (fetchedWord != null && fetchedWord.isNotEmpty) {
+        word = fetchedWord;
+      } else {
+        word = "default"; // Fallback word
+      }
+    } catch (e) {
+      word = "Error fetching word"; // Error handling
     }
 
-    notifyListeners();
+    notifyListeners(); // Notify UI of the change
     startTimer();
   }
 
 
+  // Fetch a new word from the backend
+  Future<void> fetchNewWord() async {
+    String? fetchedWord = await ApiService.fetchTargetWord();
+
+    if (fetchedWord != null && fetchedWord.isNotEmpty) {
+      word = fetchedWord;
+    } else {
+      word = "default";  // Fallback word
+    }
+
+    notifyListeners();
+  }
+
+  // Countdown Timer
   void startTimer() {
     Future.delayed(Duration(seconds: 1), () {
       if (timeLeft > 0 && lives > 0) {
@@ -47,18 +63,19 @@ class GameRules extends ChangeNotifier {
     });
   }
 
+  // Check pronunciation accuracy
   void checkPronunciation(String filePath) async {
     int? accuracy = await ApiService.uploadAudio(filePath);
 
     if (accuracy != null) {
       if (accuracy >= 75) {
         moveImageToTop();
-        Future.delayed(const Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 1), () async {
           shouldAnimate = false;
           resetImagePosition();
           shouldAnimate = true;
           xp += 100;
-          nextWord();
+          await fetchNewWord(); // Fetch the next word
         });
       } else {
         moveImageHalfway();
@@ -83,22 +100,12 @@ class GameRules extends ChangeNotifier {
       Future.delayed(const Duration(seconds: 1), () {
         position = 600;
         loseLife();
-        notifyListeners();
       });
     }
   }
 
   void resetImagePosition() {
     position = 600;
-    notifyListeners();
-  }
-
-  void nextWord() {
-    if (currentWordIndex < words.length - 1) {
-      currentWordIndex++;
-    } else {
-      endGame();
-    }
     notifyListeners();
   }
 
@@ -113,13 +120,14 @@ class GameRules extends ChangeNotifier {
   void endGame() {
     gameEnded = true;
     notifyListeners();
+
     Future.microtask(() => Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EndingPage(
           correctlyPronouncedWords: xp ~/ 100,
-          totalWords: words.length,
-          accuracy: (xp / (words.length * 100)) * 100,
+          totalWords: xp ~/ 100, // Since each correct word gives 100 XP
+          accuracy: xp / ((xp ~/ 100) * 100) * 100,
           userLevel: xp ~/ 500,
         ),
       ),
