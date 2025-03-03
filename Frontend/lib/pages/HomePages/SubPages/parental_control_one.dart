@@ -24,7 +24,8 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
     super.initState();
     _loadPreferences();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _initTargets();
+      final screenWidth = MediaQuery.of(context).size.width;
+      _initTargets(screenWidth); // Pass screenWidth dynamically
       bool tutorialShown = await _getTutorialShown();
       if (!tutorialShown) {
         _showTutorial();
@@ -55,7 +56,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
     prefs.setBool('tutorialShown', true);
   }
 
-  void _initTargets() {
+  void _initTargets(double screenWidth) {
     targets = [
       TargetFocus(
         identify: "PatTile",
@@ -87,11 +88,11 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
             align: ContentAlign.top,
             child: Text(
               "Click 'Apply' to apply the selected sounds.",
-              style: const TextStyle(
+              style: TextStyle(
+                // Removed const, using dynamic size
                 fontFamily: "Fredoka",
-                fontWeight: FontWeight.bold,
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: screenWidth * 0.05, // Now properly passed
               ),
             ),
           ),
@@ -108,9 +109,9 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
       paddingFocus: 8,
       onFinish: () => debugPrint("Tutorial finished"),
       onClickTarget: (target) =>
-          debugPrint("Target clicked: \${target.identify}"),
+          debugPrint("Target clicked: ${target.identify}"),
       onClickOverlay: (target) =>
-          debugPrint("Overlay clicked: \${target.identify}"),
+          debugPrint("Overlay clicked: ${target.identify}"),
     );
     tutorialCoachMark.show(context: context);
   }
@@ -119,6 +120,8 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final textScaleFactor = MediaQuery.of(context).textScaleFactor;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -140,7 +143,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
               "Select the appropriate sounds",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: screenWidth * 0.055,
+                fontSize: screenWidth * 0.055 * textScaleFactor,
                 fontWeight: FontWeight.bold,
                 fontFamily: "Fredoka",
               ),
@@ -149,7 +152,7 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
           SizedBox(height: screenHeight * 0.02),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
               children: List.generate(
                 21,
                 (index) => ControlPanelTiles(
