@@ -4,7 +4,7 @@ import 'package:mygame/HowToPlayPage.dart';
 import 'package:mygame/SettingsPage.dart';
 
 
-import 'GameRules.dart'; // Added missing game screen import
+
 
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
