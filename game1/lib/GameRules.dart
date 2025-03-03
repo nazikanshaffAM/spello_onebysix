@@ -1,4 +1,3 @@
-// game_rules.dart (Game Logic)
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
@@ -10,13 +9,26 @@ class GameRules extends ChangeNotifier {
   int xp = 0;
   int lives = 3;
   int timeLeft = 30;
-  List<String> words = ["apple", "banana", "cherry","miyuru"];
+  List<String> words = [];
   int currentWordIndex = 0;
   bool gameEnded = false;
+  bool shouldAnimate = true;
 
-  String get currentWord => words[currentWordIndex];
+  String get currentWord => words.isNotEmpty ? words[currentWordIndex] : '';
 
   GameRules(this.context) {
+    initializeGame();
+  }
+
+  // Fetch words and start the game
+  Future<void> initializeGame() async {
+    words = await ApiService.fetchWords();
+
+    if (words.isEmpty) {
+      words = ["default", "words", "if", "API", "fails"];
+    }
+
+    notifyListeners();
     startTimer();
   }
 
@@ -33,15 +45,15 @@ class GameRules extends ChangeNotifier {
   }
 
   void checkPronunciation(String filePath) async {
-    int? accuracy = await ApiService.uploadAudio(filePath); //  Wait for backend response
+    int? accuracy = await ApiService.uploadAudio(filePath);
 
-    if (accuracy != null) { //  Call logic only if accuracy is received
+    if (accuracy != null) {
       if (accuracy >= 75) {
         moveImageToTop();
         Future.delayed(const Duration(seconds: 1), () {
-          shouldAnimate = false; // Disable animation
-          resetImagePosition();  // Instantly reset position
-          shouldAnimate = true;  // Enable animation for next round
+          shouldAnimate = false;
+          resetImagePosition();
+          shouldAnimate = true;
           xp += 100;
           nextWord();
         });
@@ -49,29 +61,24 @@ class GameRules extends ChangeNotifier {
         moveImageHalfway();
       }
     } else {
-      print(" Error: Could not fetch pronunciation accuracy.");
+      print("Error: Could not fetch pronunciation accuracy.");
     }
 
     notifyListeners();
   }
 
-
-
-  bool shouldAnimate = true; // Default to animated movement
-
-
   void moveImageToTop() {
     if (shouldAnimate) {
-      position = -50; // Move to top smoothly
+      position = -50;
     }
     notifyListeners();
   }
 
   void moveImageHalfway() {
     if (shouldAnimate) {
-      position = 200; // Move halfway
+      position = 200;
       Future.delayed(const Duration(seconds: 1), () {
-        position = 500; // Move back to bottom
+        position = 500;
         loseLife();
         notifyListeners();
       });
@@ -79,17 +86,9 @@ class GameRules extends ChangeNotifier {
   }
 
   void resetImagePosition() {
-    position = 500; // Instantly reset to default
+    position = 500;
     notifyListeners();
   }
-
-
-
-  Future<int> testValue() async {
-    await Future.delayed(Duration(milliseconds: 500)); // Simulate network delay
-    return Random().nextInt(51) + 50; // Generates a number between 50 and 100
-  }
-
 
   void nextWord() {
     if (currentWordIndex < words.length - 1) {

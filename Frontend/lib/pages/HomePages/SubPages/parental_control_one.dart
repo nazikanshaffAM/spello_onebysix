@@ -1,5 +1,6 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spello_frontend/util/custom_elevated_button.dart';
 import 'package:spello_frontend/util/parental_control_tile.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -12,24 +13,46 @@ class ParentalControlOne extends StatefulWidget {
 }
 
 class _ParentalControlOneState extends State<ParentalControlOne> {
-  bool parentalToggle = false; // Holds the state of the toggle switch
-
-  // Create GlobalKeys for the two elements to be highlighted.
+  bool parentalToggle = false;
   final GlobalKey _patTileKey = GlobalKey();
   final GlobalKey _applyButtonKey = GlobalKey();
-
-  // Tutorial Coach Mark instance and targets list.
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
 
   @override
   void initState() {
     super.initState();
-    // Schedule the tutorial to run after the first frame.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _loadPreferences();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _initTargets();
-      _showTutorial();
+      bool tutorialShown = await _getTutorialShown();
+      if (!tutorialShown) {
+        _showTutorial();
+        _setTutorialShown();
+      }
     });
+  }
+
+  Future<void> _loadPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      parentalToggle = prefs.getBool('parentalToggle') ?? false;
+    });
+  }
+
+  Future<void> _savePreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('parentalToggle', parentalToggle);
+  }
+
+  Future<bool> _getTutorialShown() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('tutorialShown') ?? false;
+  }
+
+  Future<void> _setTutorialShown() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('tutorialShown', true);
   }
 
   void _initTargets() {
@@ -83,17 +106,12 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
       colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
       textSkip: "SKIP",
       paddingFocus: 8,
-      onFinish: () {
-        debugPrint("Tutorial finished");
-      },
-      onClickTarget: (target) {
-        debugPrint("Target clicked: ${target.identify}");
-      },
-      onClickOverlay: (target) {
-        debugPrint("Overlay clicked: ${target.identify}");
-      },
+      onFinish: () => debugPrint("Tutorial finished"),
+      onClickTarget: (target) =>
+          debugPrint("Target clicked: \${target.identify}"),
+      onClickOverlay: (target) =>
+          debugPrint("Overlay clicked: \${target.identify}"),
     );
-
     tutorialCoachMark.show(context: context);
   }
 
@@ -103,21 +121,20 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
     final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            "PARENTAL CONTROL",
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: "Fredoka One",
-              fontSize: screenWidth * 0.06,
-            ),
+        title: Text(
+          "Parental Control",
+          style: TextStyle(
+            fontFamily: "Fredoka One",
+            fontSize: screenWidth * 0.07,
           ),
         ),
         backgroundColor: const Color(0xFF3A435F),
+        foregroundColor: Colors.white,
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          SizedBox(height: screenHeight * 0.015),
+          SizedBox(height: screenHeight * 0.03),
           Center(
             child: Text(
               "Select the appropriate sounds",
@@ -129,56 +146,20 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
               ),
             ),
           ),
-          SizedBox(height: screenHeight * 0.015),
+          SizedBox(height: screenHeight * 0.02),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                // Attach the GlobalKey to the first tile.
-                ControlPanelTiles(
-                  key: _patTileKey,
-                  tileName: "P (pat)",
-                  isLocked: false,
+              children: List.generate(
+                21,
+                (index) => ControlPanelTiles(
+                  tileName: _getTileName(index),
+                  isLocked: index >= 6,
                 ),
-                ControlPanelTiles(
-                  tileName: "B (bat)",
-                  isLocked: false,
-                ),
-                ControlPanelTiles(
-                  tileName: "T (top)",
-                  isLocked: false,
-                ),
-                ControlPanelTiles(
-                  tileName: "D (dog)",
-                  isLocked: false,
-                ),
-                ControlPanelTiles(
-                  tileName: "K (cat)",
-                  isLocked: false,
-                ),
-                ControlPanelTiles(
-                  tileName: "G (go)",
-                  isLocked: true,
-                ),
-                ControlPanelTiles(tileName: "M (man)", isLocked: true),
-                ControlPanelTiles(tileName: "N (net)", isLocked: true),
-                ControlPanelTiles(tileName: "NG (sing)", isLocked: true),
-                ControlPanelTiles(tileName: "F (fan)", isLocked: true),
-                ControlPanelTiles(tileName: "V (van)", isLocked: true),
-                ControlPanelTiles(tileName: "S (sun)", isLocked: true),
-                ControlPanelTiles(tileName: "Z (zoo)", isLocked: true),
-                ControlPanelTiles(tileName: "SH (shoe)", isLocked: true),
-                ControlPanelTiles(tileName: "ZH (measure)", isLocked: true),
-                ControlPanelTiles(tileName: "L (lamp)", isLocked: true),
-                ControlPanelTiles(tileName: "R (red)", isLocked: true),
-                ControlPanelTiles(tileName: "TH (thin)", isLocked: true),
-                ControlPanelTiles(tileName: "TH (this)", isLocked: true),
-                ControlPanelTiles(tileName: "H (hat)", isLocked: true),
-              ],
+              ),
             ),
           ),
           SizedBox(height: screenHeight * 0.02),
-          // Attach the GlobalKey to the Apply button.
           CustomElevatedButton(
             key: _applyButtonKey,
             buttonLength: screenWidth * 0.7,
@@ -187,11 +168,40 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
             primaryColor: 0xFFFFC000,
             shadowColor: 0xFFD29338,
             textColor: Colors.white,
-            onPressed: () {},
+            onPressed: () {
+              _savePreferences();
+            },
           ),
           SizedBox(height: screenHeight * 0.03),
         ],
       ),
     );
+  }
+
+  String _getTileName(int index) {
+    List<String> sounds = [
+      "P (pat)",
+      "B (bat)",
+      "T (top)",
+      "D (dog)",
+      "K (cat)",
+      "G (go)",
+      "M (man)",
+      "N (net)",
+      "NG (sing)",
+      "F (fan)",
+      "V (van)",
+      "S (sun)",
+      "Z (zoo)",
+      "SH (shoe)",
+      "ZH (measure)",
+      "L (lamp)",
+      "R (red)",
+      "TH (thin)",
+      "TH (this)",
+      "H (hat)",
+      "CH (chip)"
+    ];
+    return sounds[index];
   }
 }
