@@ -34,8 +34,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  http: ^1.1.0  //should in line 20, not sure
-  
+  http: ^1.1.0  
+  #should in line 20, not sure
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices.
