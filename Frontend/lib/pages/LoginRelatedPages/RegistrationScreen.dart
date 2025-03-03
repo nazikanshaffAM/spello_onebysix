@@ -83,6 +83,35 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  // Form key for validation
+final _formKey = GlobalKey<FormState>();
+
+// Function to validate form fields
+String? _validateField(String? value, String fieldName) {
+  if (value == null || value.isEmpty) {
+    return '$fieldName is required';
+  }
+  
+  if (fieldName == 'Email' && !_isValidEmail(value)) {
+    return 'Please enter a valid email address';
+  }
+  
+  if (fieldName == 'Age' && !_isNumeric(value)) {
+    return 'Age must be a number';
+  }
+  
+  return null;
+}
+
+bool _isValidEmail(String email) {
+  // Simple email validation
+  return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+}
+
+bool _isNumeric(String str) {
+  // Check if the string is a valid number
+  return int.tryParse(str) != null;
+}
 
   @override
   void dispose() {
