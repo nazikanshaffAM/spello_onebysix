@@ -83,6 +83,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _genderController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   
+  String _selectedGender = 'Male';
+  final List<String> _genderOptions = ['Male', 'Female', 'Other'];
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
   
