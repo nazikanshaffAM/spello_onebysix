@@ -126,6 +126,17 @@ def get_users():
 
 #get one user based on email
 @app.route("/get_user", methods=["GET"])
+def get_user():
+    email = request.args.get("email")  # Get email from query parameters
+
+
+
+    # Find user by email, exclude MongoDB "_id" field from response
+    user = collection.find_one({"email": email}, {"_id": 0})
+
+
+
+    return jsonify(user)
 
 
 
