@@ -77,33 +77,5 @@ def speech_to_text():
     })
 
 
-
-# @app.route('/speech-to-text', methods=['POST'])
-# def speech_to_text():
-#     audio_file = request.files['audio']
-#
-#     # Convert MP3 to WAV if necessary
-#     if audio_file.filename.endswith('.mp3'):
-#         audio = AudioSegment.from_file(io.BytesIO(audio_file.read()), format="mp3")
-#         audio = audio.set_frame_rate(16000).set_channels(1)  # Ensure 16kHz, mono
-#         wav_io = io.BytesIO()
-#         audio.export(wav_io, format="wav")
-#         audio_data = wav_io.getvalue()
-#     else:
-#         audio_data = audio_file.read()
-#
-#     recognizer.AcceptWaveform(audio_data)
-#     result = json.loads(recognizer.Result())
-#     spoken_word = result.get("text", "").strip()
-#
-#     accuracy = calculate_accuracy(target_word, spoken_word)
-#
-#     return jsonify({
-#         "spoken_word": spoken_word,
-#         "target_word": target_word,
-#         "accuracy": accuracy
-#     })
-
-
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
