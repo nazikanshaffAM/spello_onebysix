@@ -124,6 +124,10 @@ def get_users():
     return jsonify({"users": user_list})
 
 
+#get one user based on email
+@app.route("/get_user", methods=["GET"])
+
+
 
 
 if __name__ == '__main__':
