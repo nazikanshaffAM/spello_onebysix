@@ -66,10 +66,18 @@ class _HomeScreenState extends State<HomeScreen> {
       tutorialCoachMark = TutorialCoachMark(
         targets: targets,
         colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
-        textSkip: "SKIP",
+        textSkip: "skip",
         paddingFocus: 8,
         onFinish: () async {
-          await prefs.setBool('hasSeenTutorial', true);
+          await prefs.setBool(
+              'hasSeenTutorial', true); // Mark as seen when finished
+        },
+        onSkip: () {
+          // Mark as seen when skipped
+          prefs.setBool('hasSeenTutorial', true).then((_) {
+            print("Tutorial skipped and marked as seen.");
+          });
+          return true; // Explicitly return a boolean value
         },
       );
       tutorialCoachMark.show(context: context);

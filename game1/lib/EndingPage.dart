@@ -25,7 +25,7 @@ class EndingPage extends StatelessWidget {
           // Background Image
           Positioned.fill(
             child: Image.asset(
-              'assets/images/backgroundEndingPage.png',
+              'assets/images/endingpage.png',
               fit: BoxFit.cover,
             ),
           ),

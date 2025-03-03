@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'start_screen.dart'; // Import the StartScreen
 
 class ResultPage extends StatelessWidget {
   final double averageAccuracy;
@@ -28,7 +29,13 @@ class ResultPage extends StatelessWidget {
             SizedBox(height: 50),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(context);
+                // Navigate to the StartScreen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StartScreen(),
+                  ),
+                );
               },
               child: Text('Back to Game'),
             ),

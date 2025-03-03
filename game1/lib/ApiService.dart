@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://192.168.58.48:5000";
+  static const String baseUrl = "http://192.168.107.48:5000";
 
   // Upload WAV file and get pronunciation accuracy
   static Future<int?> uploadAudio(String filePath) async {
@@ -33,18 +33,18 @@ class ApiService {
   // Fetch the target word from the backend
   static Future<String?> fetchTargetWord() async {
     try {
-      var uri = Uri.parse("$baseUrl/get-target-word");
-      var response = await http.get(uri);
+      final uri = Uri.parse("$baseUrl/get-target-word");
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
-        return jsonResponse['target_word'];
+        return jsonResponse['target_word']; // Get word from API response
       } else {
-        print("Error: ${response.reasonPhrase}");
-        return null;
+        debugPrint("Error fetching word: ${response.reasonPhrase}");
+        return null; // No fallback needed since backend guarantees a word
       }
     } catch (e) {
-      print("Exception: $e");
+      debugPrint("Exception: $e");
       return null;
     }
   }

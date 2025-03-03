@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spello_frontend/util/added_word_tile.dart';
 import 'package:spello_frontend/util/add_word_dialogbox.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -12,13 +13,9 @@ class ParentalControlTwo extends StatefulWidget {
 
 class _ParentalControlTwoState extends State<ParentalControlTwo> {
   final TextEditingController _controller = TextEditingController();
-  final List<List<dynamic>> wordList = []; // Stores added words
-
-  // GlobalKey for the add button (floating action button)
+  final List<List<dynamic>> wordList = [];
   final GlobalKey _addButtonKey = GlobalKey();
-  // GlobalKey for the first added word tile
   final GlobalKey _firstTileKey = GlobalKey();
-
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
 
@@ -26,6 +23,26 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkAndShowAddButtonTutorial() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool addButtonTutorialShown =
+        prefs.getBool('addButtonTutorialShown') ?? false;
+    if (!addButtonTutorialShown) {
+      await prefs.setBool('addButtonTutorialShown', true);
+      _showAddButtonTutorial();
+    }
+  }
+
+  Future<void> _checkAndShowTileTutorial() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool tileTutorialShown = prefs.getBool('tileTutorialShown') ?? false;
+    if (!tileTutorialShown) {
+      await prefs.setBool('tileTutorialShown', true);
+      _initTileTarget();
+      _showTileTutorial();
+    }
   }
 
   void saveNewWord() {
@@ -36,10 +53,8 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
       });
       _controller.clear();
       Navigator.of(context).pop();
-      // Show tile tutorial for the first added word if it's the first word.
       if (wordList.length == 1) {
-        _initTileTarget();
-        _showTileTutorial();
+        _checkAndShowTileTutorial();
       }
     } else {
       Navigator.of(context).pop();
@@ -48,7 +63,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
 
   void addNewWord() {
     if (wordList.length >= 5) {
-      // Show a snackbar if maximum limit reached.
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -60,7 +74,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
       );
       return;
     }
-
     showDialog(
       context: context,
       builder: (context) {
@@ -79,7 +92,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     });
   }
 
-  // Initialize the tutorial targets for the add button.
   void _initAddButtonTarget() {
     targets = [
       TargetFocus(
@@ -105,7 +117,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     ];
   }
 
-  // Initialize the target for the first added tile.
   void _initTileTarget() {
     targets = [
       TargetFocus(
@@ -131,44 +142,35 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     ];
   }
 
-  void _showTutorial({bool forAddButton = true}) {
-    if (forAddButton) {
-      _initAddButtonTarget();
-    }
+  void _showTutorial() {
     tutorialCoachMark = TutorialCoachMark(
       targets: targets,
       colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
       textSkip: "SKIP",
       paddingFocus: 8,
-      onFinish: () {
-        debugPrint("Tutorial finished");
-      },
-      onClickTarget: (target) {
-        debugPrint("Target clicked: ${target.identify}");
-      },
-      onClickOverlay: (target) {
-        debugPrint("Overlay clicked: ${target.identify}");
-      },
+      onFinish: () => debugPrint("Tutorial finished"),
+      onClickTarget: (target) =>
+          debugPrint("Target clicked: ${target.identify}"),
+      onClickOverlay: (target) =>
+          debugPrint("Overlay clicked: ${target.identify}"),
     );
     tutorialCoachMark.show(context: context);
   }
 
-  // Convenience: Show add button tutorial.
   void _showAddButtonTutorial() {
-    _showTutorial(forAddButton: true);
+    _initAddButtonTarget();
+    _showTutorial();
   }
 
-  // Convenience: Show tile tutorial.
   void _showTileTutorial() {
-    _showTutorial(forAddButton: false);
+    _showTutorial();
   }
 
   @override
   void initState() {
     super.initState();
-    // Show add button tutorial after the first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showAddButtonTutorial();
+      _checkAndShowAddButtonTutorial();
     });
   }
 
@@ -211,57 +213,59 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
           ),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04,
-          vertical: screenHeight * 0.02,
-        ),
-        child: Column(
-          children: [
-            SizedBox(height: screenHeight * 0.02),
-            Text(
-              wordList.isEmpty
-                  ? "No words, please add a new word."
-                  : "Added Words:",
-              style: TextStyle(
-                fontSize: screenWidth * 0.05,
-                color: Colors.white,
-                fontFamily: "Fredoka",
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
+      body: Stack(
+        children: [
+          // ... Existing UI elements (cloud images, etc.)
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.04,
+              vertical: screenHeight * 0.02,
             ),
-            if (wordList.isEmpty)
-              Padding(
-                padding: EdgeInsets.only(
-                  top: screenHeight * 0.05,
-                ),
-                child: Center(
-                  child: Image.asset(
-                    "assets/images/parental_control_two.png",
-                    width: screenWidth * 0.8,
-                    height: screenHeight * 0.4,
-                    fit: BoxFit.contain,
+            child: Column(
+              children: [
+                SizedBox(height: screenHeight * 0.02),
+                Text(
+                  wordList.isEmpty
+                      ? "No words, please add a new word."
+                      : "Added Words:",
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.05,
+                    color: Colors.white,
+                    fontFamily: "Fredoka",
+                    fontWeight: FontWeight.bold,
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            if (wordList.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: wordList.length,
-                  itemBuilder: (context, index) {
-                    // For the first tile, attach the _firstTileKey
-                    final tileKey = index == 0 ? _firstTileKey : null;
-                    return AddedWordTile(
-                      key: tileKey,
-                      taskName: wordList[index][0],
-                      deleteFunction: (context) => deleteWord(index),
-                    );
-                  },
-                ),
-              ),
-          ],
-        ),
+                if (wordList.isEmpty)
+                  Padding(
+                    padding: EdgeInsets.only(top: screenHeight * 0.05),
+                    child: Center(
+                      child: Image.asset(
+                        "assets/images/parental_control_two.png",
+                        width: screenWidth * 0.6,
+                        height: screenHeight * 0.4,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                if (wordList.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: wordList.length,
+                      itemBuilder: (context, index) {
+                        final tileKey = index == 0 ? _firstTileKey : null;
+                        return AddedWordTile(
+                          key: tileKey,
+                          taskName: wordList[index][0],
+                          deleteFunction: (context) => deleteWord(index),
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

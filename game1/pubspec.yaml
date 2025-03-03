@@ -45,6 +45,8 @@ dependencies:
   shelf_router: ^1.1.4
   shelf: ^1.4.2
   shelf_multipart: ^2.0.1
+  shared_preferences: ^2.5.2
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +76,15 @@ flutter:
     - assets/images/emtyheart.png
     - assets/images/heart.png
     - assets/images/backgroundEndingPage.png
+    - assets/images/b1.jpg
+    - assets/images/b2.jpg
+    - assets/images/b3.jpg
+    - assets/images/b4.jpg
+    - assets/images/b5.jpg
+    - assets/images/b6.jpg
+    - assets/images/settingpagebackground.png
+    - assets/images/endingpage.png
+    - assets/images/UFO.json
 
 
   # To add assets to your application, add an assets section, like this:

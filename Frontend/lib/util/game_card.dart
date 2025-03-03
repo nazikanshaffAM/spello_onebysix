@@ -7,12 +7,13 @@ class GameCard extends StatefulWidget {
   final Function onTap;
   final bool isRecommended;
 
-  const GameCard(
-      {super.key,
-      required this.gameName,
-      required this.imageName,
-      required this.onTap,
-      required this.isRecommended});
+  const GameCard({
+    super.key,
+    required this.gameName,
+    required this.imageName,
+    required this.onTap,
+    required this.isRecommended,
+  });
 
   @override
   State<GameCard> createState() => _GameCardState();
@@ -34,6 +35,15 @@ class _GameCardState extends State<GameCard> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(45),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF2E354E)
+                      .withOpacity(0.2), // Shadow color with transparency
+                  spreadRadius: 2, // How much the shadow spreads
+                  // How blurred the shadow is
+                  offset: Offset(0, 4), // Horizontal and vertical offset
+                ),
+              ],
             ),
           ),
         ),
@@ -68,16 +78,19 @@ class _GameCardState extends State<GameCard> {
               height: screenWidth * 0.06,
               width: screenWidth * 0.35,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30), color: Colors.red),
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.red,
+              ),
               child: Padding(
                 padding: const EdgeInsets.only(left: 13, right: 4),
                 child: Text(
                   "Recommended",
                   style: TextStyle(
-                      fontFamily: "Fredoka",
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.04),
+                    fontFamily: "Fredoka",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: screenWidth * 0.04,
+                  ),
                 ),
               ),
             ),
@@ -92,18 +105,18 @@ class _GameCardState extends State<GameCard> {
             child: Text(
               widget.gameName,
               style: TextStyle(
-                  fontSize: screenHeight * 0.022, // Bigger font
-                  fontFamily: "Fredoka",
-                  fontWeight: FontWeight.bold),
+                fontSize: screenHeight * 0.022, // Bigger font
+                fontFamily: "Fredoka",
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
 
         // Positioned Play Button
-        // Positioned Play Button
         Positioned(
           right: screenWidth * 0.04, // Move left
-          top: screenHeight * 0.11, // Move down slightly
+          top: screenHeight * 0.12, // Move down slightly
           child: PlayButton(onTap: widget.onTap),
         ),
       ],
