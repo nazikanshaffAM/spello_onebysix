@@ -143,7 +143,9 @@ bool _isNumeric(String str) {
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
+            child: Form(
+              key: _formKey,
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Back arrow
@@ -240,35 +242,36 @@ bool _isNumeric(String str) {
   }
 
   // Helper method to build text fields
-  Widget _buildTextField(
-    TextEditingController controller,
-    String label, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  // Helper method to build text fields
+Widget _buildTextField(
+  TextEditingController controller,
+  String label, {
+  TextInputType keyboardType = TextInputType.text,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
         ),
+      ],
+    ),
+    child: TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: (value) => _validateField(value, label.replaceAll(':', '')),
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       ),
-    );
-  }
+    ),
+  );
 }
