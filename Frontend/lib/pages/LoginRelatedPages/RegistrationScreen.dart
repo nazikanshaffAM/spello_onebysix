@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -17,6 +19,30 @@ class MyApp extends StatelessWidget {
       ),
       home: const RegistrationScreen(),
     );
+  }
+}
+
+// User model to structure the data
+class User {
+  final String name;
+  final String age;
+  final String gender;
+  final String email;
+
+  User({
+    required this.name,
+    required this.age,
+    required this.gender,
+    required this.email,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'age': age,
+      'gender': gender,
+      'email': email,
+    };
   }
 }
 
