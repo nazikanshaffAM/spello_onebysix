@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hangman/ui/results_page.dart';
 import '../engine/hangman.dart';
@@ -76,10 +78,29 @@ class _HangmanPageState extends State<HangmanPage> {
     setState(() {
       _accuracy = accuracy;
 
+      // Positive feedback messages
+      List<String> positiveFeedback = [
+        "Great work! Keep it up!",
+        "You're doing awesome!",
+        "Nice pronunciation!",
+        "Fantastic effort!",
+        "Keep going, you're nailing it!"
+      ];
+
+      // Negative feedback messages
+      List<String> negativeFeedback = [
+        "Almost there! Try again!",
+        "Don't give up! You got this!",
+        "A little more effort, and you'll ace it!",
+        "Keep practicing! You'll get it!",
+        "Stay focused! Try again!"
+      ];
+
+      // Choose feedback based on accuracy
       if (_accuracy >= 70) {
-        _feedbackMessage = "Good job! Keep going!";
+        _feedbackMessage = positiveFeedback[Random().nextInt(positiveFeedback.length)];
       } else {
-        _feedbackMessage = "You got this! Try again harder.";
+        _feedbackMessage = negativeFeedback[Random().nextInt(negativeFeedback.length)];
       }
     });
   }
