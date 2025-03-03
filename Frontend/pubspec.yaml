@@ -26,6 +26,9 @@ dependencies:
   flutter_slidable: ^4.0.0
   fl_chart: ^0.70.2
   tutorial_coach_mark: ^1.2.13
+  shared_preferences: ^2.3.3
+
+
 
 
 
