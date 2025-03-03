@@ -20,13 +20,19 @@ if not os.path.exists(MODEL_PATH):
 model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
-
-
+#creating a dictionary to store targeted words
+session_data = {}
 
 
 #API endpoint to send the target word to frontend
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
+    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin",
+                        "Fish", "Water", "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
+    random.shuffle(target_word_list)
+    target_word = random.choice(target_word_list)
+    session_data['target_word'] = target_word
+
     return jsonify({"target_word": target_word})
 
 
