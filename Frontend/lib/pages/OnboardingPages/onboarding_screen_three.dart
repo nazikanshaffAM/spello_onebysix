@@ -12,6 +12,39 @@ class OnboardingScreenThree extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          Positioned(
+            top: screenHeight * 0.05,
+            left: screenWidth * 0.3,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.28,
+            left: screenWidth * 0.75,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.43,
+            right: screenWidth * 0.8,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
           // "Speak & Play" text positioned using percentages
           Positioned(
             top: screenHeight * 0.12, // 10% from the top
@@ -27,21 +60,12 @@ class OnboardingScreenThree extends StatelessWidget {
           ),
           // Star image positioned responsively
           Positioned(
-            top: screenHeight * 0.18,
-            left: screenWidth * 0.13,
-            child: Image.asset(
-              "assets/images/clipboard.png",
-              height: screenHeight * 0.4, // 40% of screen height
-              width: screenWidth * 0.5, // 60% of screen width
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.002,
-            left: screenWidth * 0.23,
+            top: screenHeight * 0.14,
+            left: screenWidth * 0.15,
             child: Image.asset(
               "assets/images/onboarding_screen_three.png",
-              height: screenHeight * 0.8, // 40% of screen height
-              width: screenWidth * 0.9, // 60% of screen width
+              height: screenHeight * 0.5, // 40% of screen height
+              width: screenWidth * 0.65, // 60% of screen width
             ),
           ),
 

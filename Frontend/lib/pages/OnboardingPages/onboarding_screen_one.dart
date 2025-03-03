@@ -12,6 +12,40 @@ class OnboardingScreenOne extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          Positioned(
+            top: screenHeight * 0.05,
+            left: screenWidth * 0,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: screenHeight * 0.2,
+            left: screenWidth * 0.8,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.4,
+            left: screenWidth * 0,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
           // "Speak & Play" text positioned using percentages
           Positioned(
             top: screenHeight * 0.12, // 10% from the top
