@@ -73,6 +73,12 @@ def speech_to_text():
         "accuracy": accuracy
     })
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Initializing database
+
+# mongodb connection string
+MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWrites=true&w=majority&appName=spelloDB"
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
