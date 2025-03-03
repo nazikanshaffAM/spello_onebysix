@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.194.48:5000";
+  static const String baseUrl = "http://192.168.58.48:5000";
 
   // Upload WAV file and get pronunciation accuracy
   static Future<int?> uploadAudio(String filePath) async {
@@ -32,6 +30,24 @@ class ApiService {
     }
   }
 
+  // Fetch the target word from the backend
+  static Future<String?> fetchTargetWord() async {
+    try {
+      var uri = Uri.parse("$baseUrl/get-target-word");
+      var response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        return jsonResponse['target_word'];
+      } else {
+        print("Error: ${response.reasonPhrase}");
+        return null;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return null;
+    }
+  }
   // Fetch words from backend (modify this if needed)
   static Future<List<String>> fetchWords() async {
     return [
@@ -48,3 +64,4 @@ class ApiService {
     ]; // Hardcoded words (modify if API is implemented)
   }
 }
+
