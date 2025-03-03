@@ -1,13 +1,10 @@
 import os
 import json
 import random
-#import vosk
 import vosk
 from rapidfuzz.distance import Levenshtein
 from flask import Flask, request, jsonify
-# from pydub import AudioSegment
-# import io
-from io import BytesIO
+
 
 app = Flask(__name__)
 
