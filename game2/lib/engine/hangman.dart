@@ -4,7 +4,12 @@ import 'dart:math';
 class HangmanGame {
   static const int maxLives = 7;
 
-  final String wordToPronounce = "Octopus"; // Placeholder word
+  final List<String> wordPool = [
+    "Octopus", "Elephant", "Giraffe", "Penguin", "Dolphin",
+    "Crocodile", "Kangaroo", "Butterfly", "Tornado", "Volcano"
+  ]; // Example word list
+
+  late String wordToPronounce;
   int _livesLeft;
   int _letterIndex = 0;
   int _accuracy = 0;
@@ -38,6 +43,8 @@ class HangmanGame {
     _onWordChange = StreamController<String>.broadcast();
     _onProgressChange = StreamController<int>.broadcast();
     _onAccuracyChange = StreamController<int>.broadcast();
+
+    _selectNewWord(); // Pick a random word at the start
   }
 
   void newGame() {
@@ -47,10 +54,18 @@ class HangmanGame {
     _totalAccuracy = 0;
     _wordsPlayed = 0;
     wordPerformance.clear();
+
+    _selectNewWord(); // Pick a new word for each new game
+
     _onLivesChange.add(_livesLeft);
     _onProgressChange.add(0);
     _onWordChange.add(wordForDisplay);
     _onAccuracyChange.add(_accuracy);
+  }
+
+  void _selectNewWord() {
+    final random = Random();
+    wordToPronounce = wordPool[random.nextInt(wordPool.length)];
   }
 
   void pronounceWord() {
