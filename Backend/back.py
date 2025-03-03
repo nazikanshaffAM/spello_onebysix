@@ -1,68 +1,109 @@
 import os
-import queue
-import sounddevice as sd
-import vosk
 import json
 import random
+#import vosk
+import vosk
 from rapidfuzz.distance import Levenshtein
+from flask import Flask, request, jsonify
+# from pydub import AudioSegment
+# import io
+from io import BytesIO
 
-try:
-    # Set the path to the downloaded model
-    MODEL_PATH = "vosk-model-small-en-us-0.15"
+app = Flask(__name__)
 
-    # Load Vosk Model
-    if not os.path.exists(MODEL_PATH):
-        raise ValueError("Model not found! Please download and extract it.")
-
-    model = vosk.Model(MODEL_PATH)
-    recognizer = vosk.KaldiRecognizer(model,16000)  # rate is to make reading fast and accurate as much as possible 16kHz
-
-    # Audio Recording Settings
-    q = queue.Queue()
+# path to the downloaded model
+MODEL_PATH = "vosk-model-small-en-us-0.15"
 
 
-    def callback(indata, frames, time, status):
-        if status:
-            print(status)
-        q.put(bytes(indata))  # Store audio data
+# Load Vosk Model
+if not os.path.exists(MODEL_PATH):
+    raise ValueError("Model not found! Please download and extract it.")
 
 
-    WORDS = ["water bottle","redeem", "cow","shit got real","pakistan"]
-    TARGET_WORD = random.choice(WORDS)
+model = vosk.Model(MODEL_PATH)
+recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
+
+def get_random_target_word():
+    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin", "Fish", "Water",
+             "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
+    random.shuffle(target_word_list)
+    return random.choice(target_word_list)
+
+#get one target word from the list
+target_word = get_random_target_word()
 
 
 
-    # Function to calculate similarity percentage
-    def calculate_accuracy(target, spoken):
-        if not spoken:
-            return 0  # No spoken word detected
-        distance = Levenshtein.distance(target, spoken)
-        max_length = max(len(target), len(spoken))
-        accuracy = ((max_length - distance) / max_length) * 100
-        return round(accuracy, 2)
+#API endpoint to send the target word to frontend
+@app.route('/get-target-word', methods=['GET'])
+def get_target_word():
+    return jsonify({"target_word": target_word})
 
 
-    # Start Recording
-    with sd.RawInputStream(samplerate=16000, blocksize=8000, dtype='int16',
-                           channels=1, callback=callback):
-        print("Speak the word:", TARGET_WORD)
 
-        while True:
-            data = q.get()
-            if recognizer.AcceptWaveform(data):
-                result = json.loads(recognizer.Result())
-                spoken_word = result["text"].strip()
 
-                # Calculate accuracy
-                accuracy = calculate_accuracy(TARGET_WORD, spoken_word)
+# Function to calculate similarity percentage
+def calculate_accuracy(target, spoken):
+    if not spoken:
+        return 0  # No spoken word detected
+    distance = Levenshtein.distance(target, spoken)
+    max_length = max(len(target), len(spoken))
+    accuracy = ((max_length - distance) / max_length) * 100
+    return round(accuracy, 2)
 
-                if accuracy == 100:
-                    print("Correct! Well done!")
-                    print(f"Accuracy: {accuracy}%")
-                    break
-                else:
-                    print(f"Incorrect. You said: '{spoken_word}' instead of '{TARGET_WORD}'")
-                    print(f"Accuracy: {accuracy}%")
-                    print("Try again!")
-except KeyboardInterrupt:
-    print("Program terminated!")
+
+# API Endpoint to receive audio
+@app.route('/speech-to-text', methods=['POST'])
+def speech_to_text():
+    # Get audio data from the request (expecting audio in WAV format)
+    audio_file = request.files['audio']
+
+    # Read the audio file
+    audio_data = audio_file.read()
+
+    # Process audio with Vosk model
+    recognizer.AcceptWaveform(audio_data)
+    result = json.loads(recognizer.Result())
+    spoken_word = result.get("text", "").strip().capitalize()
+
+    # Calculate accuracy
+    accuracy = calculate_accuracy(target_word, spoken_word)
+
+    # Return the accuracy to the client
+    return jsonify({
+        "spoken_word": spoken_word,
+        "target_word": target_word,
+        "accuracy": accuracy
+    })
+
+
+
+# @app.route('/speech-to-text', methods=['POST'])
+# def speech_to_text():
+#     audio_file = request.files['audio']
+#
+#     # Convert MP3 to WAV if necessary
+#     if audio_file.filename.endswith('.mp3'):
+#         audio = AudioSegment.from_file(io.BytesIO(audio_file.read()), format="mp3")
+#         audio = audio.set_frame_rate(16000).set_channels(1)  # Ensure 16kHz, mono
+#         wav_io = io.BytesIO()
+#         audio.export(wav_io, format="wav")
+#         audio_data = wav_io.getvalue()
+#     else:
+#         audio_data = audio_file.read()
+#
+#     recognizer.AcceptWaveform(audio_data)
+#     result = json.loads(recognizer.Result())
+#     spoken_word = result.get("text", "").strip()
+#
+#     accuracy = calculate_accuracy(target_word, spoken_word)
+#
+#     return jsonify({
+#         "spoken_word": spoken_word,
+#         "target_word": target_word,
+#         "accuracy": accuracy
+#     })
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)

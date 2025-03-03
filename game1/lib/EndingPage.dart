@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mygame/StartPage.dart';
+
+import 'GamePage.dart';
 
 class EndingPage extends StatelessWidget {
   final int correctlyPronouncedWords;
@@ -27,15 +30,15 @@ class EndingPage extends StatelessWidget {
             ),
           ),
 
-          // Gameplay details & buttons
+          // Gameplay Summary & Buttons
           Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Gameplay Details Card
+                // Game Summary Card
                 Card(
                   elevation: 8,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -44,14 +47,15 @@ class EndingPage extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        const Text(
                           "Game Summary",
                           style: TextStyle(
-                            fontSize: 22,
+                            fontFamily: 'Orbitron',
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
                         Text("Correct Words: $correctlyPronouncedWords / $totalWords",
                             style: const TextStyle(fontSize: 18)),
                         Text("Accuracy: ${accuracy.toStringAsFixed(2)}%",
@@ -62,54 +66,60 @@ class EndingPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
                 // Buttons
-                Column(
-                  children: [
-                    // Play Again Button
-                    ElevatedButton(
-                      onPressed: () {
-                        // Restart Game Logic
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                      ),
-                      child: const Text("Play Again", style: TextStyle(fontSize: 18)),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Go to Start Page Button
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Navigates back to start page
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                      ),
-                      child: const Text("Go to Start Page", style: TextStyle(fontSize: 18)),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Go to Main Flutter App (Placeholder)
-                    ElevatedButton(
-                      onPressed: () {
-                        // Placeholder for future navigation
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-                      ),
-                      child: const Text("Go to Main App", style: TextStyle(fontSize: 18)),
-                    ),
-                  ],
-                ),
+                _buildButton("PLAY AGAIN", () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => GamePage()),
+                  );
+                }),
+                const SizedBox(height: 16),
+                _buildButton("GO TO START PAGE", () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StartPage()),
+                  );
+                }),
+                const SizedBox(height: 16),
+                _buildButton("GO TO MAIN APP", () {
+                  // Placeholder for main app navigation
+                }),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF6B96AB),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 3,
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontFamily: 'Orbitron',
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          shadows: [
+            Shadow(
+              color: Colors.black26,
+              offset: Offset(2, 2),
+              blurRadius: 2,
+            )
+          ],
+        ),
       ),
     );
   }
