@@ -5,7 +5,7 @@ import 'EndingPage.dart';
 
 class GameRules extends ChangeNotifier {
   BuildContext context;
-  double position = 500;
+  double position = 600;
   int xp = 0;
   int lives = 3;
   int timeLeft = 30;
@@ -22,15 +22,18 @@ class GameRules extends ChangeNotifier {
 
   // Fetch words and start the game
   Future<void> initializeGame() async {
-    words = await ApiService.fetchWords();
+    String? fetchedWord = await ApiService.fetchTargetWord();
 
-    if (words.isEmpty) {
-      words = ["default", "words", "if", "API", "fails"];
+    if (fetchedWord != null && fetchedWord.isNotEmpty) {
+      words = [fetchedWord]; // Store the fetched word in the list
+    } else {
+      debugPrint("Failed to get a target word from API.");
     }
 
     notifyListeners();
     startTimer();
   }
+
 
   void startTimer() {
     Future.delayed(Duration(seconds: 1), () {
@@ -78,7 +81,7 @@ class GameRules extends ChangeNotifier {
     if (shouldAnimate) {
       position = 200;
       Future.delayed(const Duration(seconds: 1), () {
-        position = 500;
+        position = 600;
         loseLife();
         notifyListeners();
       });
@@ -86,7 +89,7 @@ class GameRules extends ChangeNotifier {
   }
 
   void resetImagePosition() {
-    position = 500;
+    position = 600;
     notifyListeners();
   }
 

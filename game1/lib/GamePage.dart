@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'GameRules.dart';
@@ -43,7 +44,16 @@ class _GamePageState extends State<GamePage> {
                     fit: BoxFit.cover,
                   ),
                 ),
-
+                 /// UFO Animation at Top Middle
+                Positioned(
+                  top: -60,  // Adjust based on your design
+                  left: MediaQuery.of(context).size.width / 15- 50,  // Centered horizontally
+                  child: Lottie.asset(
+                    'assets/images/UFO.json',
+                    width: 450,
+                    height: 450,
+                  ),
+                ),
                 // XP Display
                 Positioned(
                   top: 30,
