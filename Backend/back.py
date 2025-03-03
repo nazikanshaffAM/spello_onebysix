@@ -61,6 +61,7 @@ def speech_to_text():
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
     spoken_word = result.get("text", "").strip().capitalize()
+    target_word = session_data.get('target_word', '')
 
     # Calculate accuracy
     accuracy = calculate_accuracy(target_word, spoken_word)
