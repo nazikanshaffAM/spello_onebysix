@@ -55,7 +55,7 @@ flutter:
     - assets/images/clipboard.png
     - assets/images/onboarding_screen_one.png
     - assets/images/onboarding_screen_two.png
-  
+    - assets/images/onboarding_screen_three.png
     - assets/images/cloud.png
     - assets/images/parental_control.png
     - assets/images/start.png
