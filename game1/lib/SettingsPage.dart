@@ -53,7 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/settingpagebackground.png',
               fit: BoxFit.cover,
             ),
           ),
