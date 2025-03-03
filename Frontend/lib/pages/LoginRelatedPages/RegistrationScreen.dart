@@ -127,14 +127,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   // Function to handle form submission
-  void _handleSubmit() {
-    // TODO: Add your form submission logic here
-    // You can access the values using:
-    // _nameController.text
-    // _ageController.text
-    // _genderController.text
-    // _emailController.text
+  // Function to handle form submission
+void _handleSubmit() async {
+  // Validate form
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Create user object
+    final user = User(
+      name: _nameController.text,
+      age: _ageController.text,
+      gender: _genderController.text,
+      email: _emailController.text,
+    );
+
+    try {
+      // Send data to API
+      final success = await ApiService.registerUser(user);
+      
+      // Update loading state
+      setState(() {
+        _isLoading = false;
+      });
+      
+      // Handle response (will add dialog in next commit)
+      print(success ? 'Registration successful' : 'Registration failed');
+      
+    } catch (e) {
+      // Handle errors
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error: $e');
+    }
   }
+}
 
   @override
   Widget build(BuildContext context) {
