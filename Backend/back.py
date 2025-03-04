@@ -236,6 +236,18 @@ def calculate_score(accuracy, level):
         else:
             return 0
 
+@app.route('/play-game', methods=['POST'])
+def play_game():
+    # Get email from form data or JSON
+    email = request.form.get('email') if request.form else request.json.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user = collection.find_one({'email': email})
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
