@@ -94,28 +94,35 @@ def calculate_accuracy(target, spoken):
 # API Endpoint to receive audio
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
-    # Get audio data from the request (expecting audio in WAV format)
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
     audio_file = request.files['audio']
+    if audio_file.filename == '':
+        return jsonify({"error": "Empty file uploaded"}), 400
 
-    # Read the audio file
     audio_data = audio_file.read()
+    if not audio_data:
+        return jsonify({"error": "Audio data missing"}), 400
 
-    # Process audio with Vosk model
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
     spoken_word = result.get("text", "").strip().capitalize()
     target_word = session_data.get('target_word', '')
 
-    # Calculate accuracy
+    # Store the spoken word in session_data for use in play-game route
+    session_data['spoken_word'] = spoken_word
+
     accuracy = calculate_accuracy(target_word, spoken_word)
 
-    # Return the accuracy to the client
+    # Store accuracy in session_data for use in play-game route
+    session_data['accuracy'] = accuracy
+
     return jsonify({
         "spoken_word": spoken_word,
         "target_word": target_word,
         "accuracy": accuracy
     })
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Initializing database
 
@@ -211,6 +218,102 @@ def delete_last_user():
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
 
+# game logics--Hangman
+
+def calculate_score(accuracy, level):
+    if level == 1:
+        if accuracy > 75:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 4)
+        else:
+            return 0
+    elif level >= 2:
+        if accuracy > 85:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 2)
+        else:
+            return 0
+
+@app.route('/play-game', methods=['POST'])
+def play_game():
+    # Get email from form data or JSON
+    email = request.form.get('email') if request.form else request.json.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user = collection.find_one({'email': email})
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Retrieve the spoken word and accuracy from session_data (set by speech_to_text)
+    spoken_word = session_data.get('spoken_word', '').strip().capitalize()
+    accuracy = session_data.get('accuracy', 0)
+
+    if not spoken_word:
+        return jsonify({'error': 'No spoken word found. Please provide speech input first.'}), 400
+
+    target_word = session_data.get('target_word', '')
+    level = user.get('level', 1)
+    score = calculate_score(accuracy, level)
+
+    # Increment total score
+    total_score = user.get('total_score', 0) + score
+
+    # Track attempts and lives
+    attempts = user.get('attempts', 0) + 1
+    lives = user.get('lives', 5)
+
+    if accuracy < 50:
+        lives -= 1
+
+    # Check if score exceeds threshold for level up
+    if total_score >= 2000 and level == 1:
+        level = 2
+
+    # If 5 successful or failed attempts are reached, save the game state and reset lives
+    if attempts >= 5 or lives <= 0:
+        collection.update_one({'email': email}, {'$set': {
+            'total_score': total_score,
+            'level': level,
+            'attempts': 0,
+            'lives': 5,
+            'scores': user.get('scores', []) + [
+                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]}
+        })
+        # Reset game state: New target word, reset attempts/lives for the next round
+        session_data['target_word'] = ''
+        session_data['spoken_word'] = ''
+        return jsonify({
+            'message': 'Game over or successful round. Game reset. New target word is ready.',
+            'total_score': total_score,
+            'level': level,
+            'spoken_word': spoken_word,
+            'target_word': target_word,
+            'accuracy': accuracy
+        })
+
+    # Save progress after each attempt
+    collection.update_one({'email': email}, {'$set': {
+        'attempts': attempts,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'scores': user.get('scores', []) + [
+            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]
+    }})
+
+    return jsonify({
+        'accuracy': accuracy,
+        'score': score,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'spoken_word': spoken_word,
+        'target_word': target_word
+    })
 
 
 
