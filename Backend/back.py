@@ -269,6 +269,33 @@ def play_game():
     if accuracy < 50:
         lives -= 1
 
+    # Check if score exceeds threshold for level up
+    if total_score >= 2000 and level == 1:
+        level = 2
+
+    # If 5 successful or failed attempts are reached, save the game state and reset lives
+    if attempts >= 5 or lives <= 0:
+        collection.update_one({'email': email}, {'$set': {
+            'total_score': total_score,
+            'level': level,
+            'attempts': 0,
+            'lives': 5,
+            'scores': user.get('scores', []) + [
+                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]}
+        })
+        # Reset game state: New target word, reset attempts/lives for the next round
+        session_data['target_word'] = ''
+        session_data['spoken_word'] = ''
+        return jsonify({
+            'message': 'Game over or successful round. Game reset. New target word is ready.',
+            'total_score': total_score,
+            'level': level,
+            'spoken_word': spoken_word,
+            'target_word': target_word,
+            'accuracy': accuracy
+        })
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
