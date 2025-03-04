@@ -218,7 +218,23 @@ def delete_last_user():
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
 
+# game logics--Hangman
 
+def calculate_score(accuracy, level):
+    if level == 1:
+        if accuracy > 75:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 4)
+        else:
+            return 0
+    elif level >= 2:
+        if accuracy > 85:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 2)
+        else:
+            return 0
 
 
 if __name__ == '__main__':
