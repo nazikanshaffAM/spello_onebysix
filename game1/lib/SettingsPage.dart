@@ -51,14 +51,15 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/settingpagebackground.png',
-              fit: BoxFit.cover,
-            ),
+          Positioned.fill(child: Container(color: Colors.black),
+            //child: Image.asset(
+              //'assets/images/settingpagebackground.png',
+              //fit: BoxFit.cover,
+            //),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -5,14 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../game1/assets/images/UFO.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/GamePage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GamePage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/GameRules.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GameRules.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/assets/images/background.png" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/assets/images/background.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/assets/images/backgroundEndingPage.png" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/assets/images/startpagebackground.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/assets/images/emtyheart.png" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/assets/images/emtyheart.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/assets/images/endingpage.png" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/assets/images/endingpage.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/assets/images/heart.png" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/assets/images/heart.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/lib/SettingsPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/SettingsPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/lib/StartPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/StartPage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../game1/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +65,7 @@
       <workItem from="1740726669341" duration="21000" />
       <workItem from="1740922997654" duration="2733000" />
       <workItem from="1740974037808" duration="8869000" />
-      <workItem from="1741003081676" duration="2487000" />
+      <workItem from="1741003081676" duration="7040000" />
     </task>
     <servers />
   </component>
@@ -73,6 +73,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741018780829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741029859791" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
