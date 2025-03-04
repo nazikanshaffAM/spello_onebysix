@@ -47,136 +47,141 @@ class User {
 
 // API service
 class ApiService {
-  static const String baseUrl = 'https://dummy-api-endpoint.com/api';
+  static const String baseUrl = 'http://192.168.8.163:5000';
 
   static Future<bool> registerUser(User user) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/register'),
+        Uri.parse('$baseUrl/store_user'),),
         headers: {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(user.toJson()),
       );
 
-      // For demonstration purposes, we're considering any status code in the 200 range as success
-      return response.statusCode >= 200 && response.statusCode < 300;
-    } catch (e) {
-      print('Error registering user: $e');
-      // In a real app, you might want to handle specific exceptions differently
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print('Registration Response: ${response.body}');
+        return true;ue;
+      } else {
+        print('Registration failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');onse body: ${response.body}');
+        return false;   return false;
+      }   }
+    } catch (e) {   } catch (e) {
+      print('Error registering user: $e');      print('Error registering user: $e');
       return false;
     }
-  }
+  }  }
 }
 
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+class RegistrationScreen extends StatefulWidget {lass RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});  const RegistrationScreen({super.key});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  // Create controllers to handle text input
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  // Create controllers to handle text input// Create controllers to handle text input
+  final TextEditingController _nameController = TextEditingController();eController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();er();
+  final TextEditingController _genderController = TextEditingController();r _genderController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();ller = TextEditingController();
   
-  String _selectedGender = 'Male';
-  final List<String> _genderOptions = ['Male', 'Female', 'Other'];
-  // Form key for validation
-  final _formKey = GlobalKey<FormState>();
+  String _selectedGender = 'Male';Gender = 'Male';
+  final List<String> _genderOptions = ['Male', 'Female', 'Other'];erOptions = ['Male', 'Female', 'Other'];
+  // Form key for validation  // Form key for validation
+  final _formKey = GlobalKey<FormState>();e>();
   
   // Loading state
   bool _isLoading = false;
 
-  // Function to validate form fields
-  String? _validateField(String? value, String fieldName) {
+  // Function to validate form fields Function to validate form fields
+  String? _validateField(String? value, String fieldName) {) {
     if (value == null || value.isEmpty) {
-      return '$fieldName is required';
-    }
+      return '$fieldName is required'; return '$fieldName is required';
+    }}
     
-    if (fieldName == 'Email' && !_isValidEmail(value)) {
-      return 'Please enter a valid email address';
-    }
+    if (fieldName == 'Email' && !_isValidEmail(value)) {ValidEmail(value)) {
+      return 'Please enter a valid email address'; return 'Please enter a valid email address';
+    }}
     
-    if (fieldName == 'Age' && !_isNumeric(value)) {
-      return 'Age must be a number';
+    if (fieldName == 'Age' && !_isNumeric(value)) { if (fieldName == 'Age' && !_isNumeric(value)) {
+      return 'Age must be a number';      return 'Age must be a number';
     }
     
     return null;
   }
 
-  bool _isValidEmail(String email) {
+  bool _isValidEmail(String email) {il) {
     // Simple email validation
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
-  bool _isNumeric(String str) {
-    // Check if the string is a valid number
+  bool _isNumeric(String str) {umeric(String str) {
+    // Check if the string is a valid numbere string is a valid number
     return int.tryParse(str) != null;
   }
 
   @override
   void dispose() {
-    // Dispose controllers when the widget is removed
-    _nameController.dispose();
-    _ageController.dispose();
+    // Dispose controllers when the widget is removedollers when the widget is removed
+    _nameController.dispose(); _nameController.dispose();
+    _ageController.dispose();    _ageController.dispose();
     _genderController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
-  // Function to handle form submission
-  // Function to handle form submission
-void _handleSubmit() async {
-  // Validate form
-  if (_formKey.currentState!.validate()) {
+  // Function to handle form submissionhandle form submission
+  // Function to handle form submissionform submission
+void _handleSubmit() async {andleSubmit() async {
+  // Validate form  // Validate form
+  if (_formKey.currentState!.validate()) {te!.validate()) {
     setState(() {
       _isLoading = true;
     });
 
     // Create user object
-    final user = User(
-      name: _nameController.text,
-      age: _ageController.text,
-      gender: _genderController.text,
+    final user = User(nal user = User(
+      name: _nameController.text,      name: _nameController.text,
+      age: _ageController.text,: _ageController.text,
+      gender: _genderController.text,roller.text,
       email: _emailController.text,
     );
 
     try {
       // Send data to API
-      final success = await ApiService.registerUser(user);
+      final success = await ApiService.registerUser(user);al success = await ApiService.registerUser(user);
       
       // Update loading state
       setState(() {
-        _isLoading = false;
+        _isLoading = false;  _isLoading = false;
       });
       
-      // Handle response (will add dialog in next commit)
-      print(success ? 'Registration successful' : 'Registration failed');
+      // Handle response (will add dialog in next commit)ponse (will add dialog in next commit)
+      print(success ? 'Registration successful' : 'Registration failed');stration successful' : 'Registration failed');
       
     } catch (e) {
-      // Handle errors
-      setState(() {
-        _isLoading = false;
+      // Handle errors // Handle errors
+      setState(() {   setState(() {
+        _isLoading = false;       _isLoading = false;
       });
-      print('Error: $e');
+      print('Error: $e');Error: $e');
     }
   }
 }
 void _showSuccessDialog() {
   showDialog(
-    context: context,
+    context: context,t,
     builder: (context) => AlertDialog(
-      title: const Text('Success'),
-      content: const Text('Registration completed successfully!'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('OK'),
-        ),
+      title: const Text('Success'),,
+      content: const Text('Registration completed successfully!'),ent: const Text('Registration completed successfully!'),
+      actions: [tions: [
+        TextButton(  TextButton(
+          onPressed: () => Navigator.pop(context),      onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),         child: const Text('OK'),
+        ),        ),
       ],
     ),
   );
@@ -184,56 +189,56 @@ void _showSuccessDialog() {
 
 void _showErrorDialog() {
   showDialog(
-    context: context,
+    context: context,t,
     builder: (context) => AlertDialog(
       title: const Text('Error'),
-      content: const Text('Failed to register. Please try again later.'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('OK'),
-        ),
+      content: const Text('Failed to register. Please try again later.'),ent: const Text('Failed to register. Please try again later.'),
+      actions: [tions: [
+        TextButton(  TextButton(
+          onPressed: () => Navigator.pop(context),      onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),         child: const Text('OK'),
+        ),        ),
       ],
     ),
   );
 }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {uild(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF8092CC), // Changed from gradient to solid color
+          color: const Color(0xFF8092CC), // Changed from gradient to solid colorolor(0xFF8092CC), // Changed from gradient to solid color
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),EdgeInsets.all(20.0),
             child: Form(
-              key: _formKey,
+              key: _formKey,Key,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.stretch,ossAxisAlignment.stretch,
                 children: [
                   // Back arrow
                   Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        // TODO: Add navigation logic to go back
-                        Navigator.pop(context);
-                      },
+                    alignment: Alignment.topLeft,t,
+                    child: IconButton(d: IconButton(
+                      icon: const Icon(Icons.arrow_back),icon: const Icon(Icons.arrow_back),
+                      onPressed: () {  onPressed: () {
+                        // TODO: Add navigation logic to go back                        // TODO: Add navigation logic to go back
+                        Navigator.pop(context););
+                      },                      },
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 20),ht: 20),
 
                   // Title
                   const Text(
-                    'Register now to get started!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    'Register now to get started!',egister now to get started!',
+                    style: TextStyle(style: TextStyle(
+                      fontSize: 28,                      fontSize: 28,
+                      fontWeight: FontWeight.bold,bold,
+                      color: Colors.white,                      color: Colors.white,
                     ),
                   ),
 
@@ -241,20 +246,20 @@ void _showErrorDialog() {
 
                   Expanded(
                     child: ListView(
-                      children: [
-                        _buildTextField(_nameController, 'Name:'),
-                        const SizedBox(height: 20),
-                        _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
+                      children: [ildren: [
+                        _buildTextField(_nameController, 'Name:'),ameController, 'Name:'),
+                        const SizedBox(height: 20), 20),
+                        _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),_buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
                         const SizedBox(height: 20),
                         
-                        // Gender dropdown
+                        // Gender dropdown// Gender dropdown
                         _buildDropdownField(),
                         
-                        const SizedBox(height: 20),
-                        _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
-                        
-                        // Add some extra space at the bottom for better scrolling
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 20),const SizedBox(height: 20),
+                        _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),  _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
+                             
+                        // Add some extra space at the bottom for better scrollingdd some extra space at the bottom for better scrolling
+                        const SizedBox(height: 40),  const SizedBox(height: 40),
                       ],
                     ),
                   )
@@ -263,128 +268,133 @@ void _showErrorDialog() {
                     children: [
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleSubmit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          onPressed: _isLoading ? null : _handleSubmit,,
+                          style: ElevatedButton.styleFrom(e: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber,backgroundColor: Colors.amber,
+                            padding: const EdgeInsets.symmetric(vertical: 15),EdgeInsets.symmetric(vertical: 15),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10), BorderRadius.circular(10),
                             ),
                           ),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
-                              : const Text(
-                                  'NEXT',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ? const CircularProgressIndicator(color: Colors.white)color: Colors.white)
+                              : const Text(t Text(
+                                  'NEXT','NEXT',
+                                  style: TextStyle(        style: TextStyle(
+                                    fontSize: 16,            fontSize: 16,
+                                    fontWeight: FontWeight.bold,FontWeight.bold,
+                                  ),   ),
                                 ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 20),SizedBox(width: 20),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : () {
                             Navigator.pop(context);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                          style: ElevatedButton.styleFrom(e: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 15),dgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),orderRadius.circular(10),
                             ),
                           ),
                           child: const Text(
-                            'BACK',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+                            'BACK',ACK',
+                            style: TextStyle(style: TextStyle(
+                              fontSize: 16,    fontSize: 16,
+                              fontWeight: FontWeight.bold,      fontWeight: FontWeight.bold,
+                              color: Colors.black54,        color: Colors.black54,
+                            ),        ),
+                          ),        ),
+                        ),        ),
+                      ),        ),
+                    ],        ],
+                  ),        ),
+                ],        ],
+              ),        ),
+            ),         ),
+          ),          ),
         ),
       ),
     );
   }
 
-  // Helper method to build text fields
-  Widget _buildTextField(
-    TextEditingController controller,
+  // Helper method to build text fieldselper method to build text fields
+  Widget _buildTextField(eld(
+    TextEditingController controller,ller,
     String label, {
-    TextInputType keyboardType = TextInputType.text,
+    TextInputType keyboardType = TextInputType.text,ext,
   }) {
-    return Container(
+    return Container((
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+        color: Colors.white,e,
+        borderRadius: BorderRadius.circular(10),ular(10),
+        boxShadow: [hadow: [
+          BoxShadow(BoxShadow(
+            color: Colors.black.withOpacity(0.1),    color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 2),t(0, 2),
           ),
         ],
       ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        validator: (value) => _validateField(value, label.replaceAll(':', '')),
-        decoration: InputDecoration(
+        validator: (value) => _validateField(value, label.replaceAll(':', '')),ield(value, label.replaceAll(':', '')),
+        decoration: InputDecoration(ration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        ),
+          border: OutlineInputBorder(border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),    borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,      borderSide: BorderSide.none,
+          ),       ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        ),        ),
       ),
     );
   }
 
 
  // Helper method to build gender dropdown
-  Widget _buildDropdownField() {
-    return Container(
+  Widget _buildDropdownField() {ownField() {
+    return Container((
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+        color: Colors.white,e,
+        borderRadius: BorderRadius.circular(10),ular(10),
+        boxShadow: [hadow: [
+          BoxShadow(BoxShadow(
+            color: Colors.black.withOpacity(0.1),    color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      child: DropdownButtonFormField<String>(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),metric(horizontal: 20, vertical: 5),
+      child: DropdownButtonFormField<String>(d: DropdownButtonFormField<String>(
         value: _selectedGender,
         decoration: const InputDecoration(
-          labelText: 'Gender:',
-          border: InputBorder.none,
+          labelText: 'Gender:',er:',
+          border: InputBorder.none,ne,
         ),
-        items: _genderOptions.map((String gender) {
-          return DropdownMenuItem<String>(
+        items: _genderOptions.map((String gender) {erOptions.map((String gender) {
+          return DropdownMenuItem<String>(g>(
             value: gender,
-            child: Text(gender),
+            child: Text(gender),ender),
           );
-        }).toList(),
-        onChanged: (String? newValue) {
-          if (newValue != null) {
-            setState(() {
-              _selectedGender = newValue;
-            });
-          }
-        },
+        }).toList(),st(),
+        onChanged: (String? newValue) {hanged: (String? newValue) {
+          if (newValue != null) {if (newValue != null) {
+            setState(() {    setState(() {
+              _selectedGender = newValue;        _selectedGender = newValue;
+            });         });
+          }         }
+
+
+
+
+
+}  }    );      ),        },        },
       ),
     );
   }
