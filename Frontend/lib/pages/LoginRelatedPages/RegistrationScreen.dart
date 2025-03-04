@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 10, 87, 151), // Option 2: Use primaryColor instead
+        primaryColor: const Color.fromARGB(255, 10, 87, 151),
       ),
       home: const RegistrationScreen(),
     );
@@ -47,23 +47,29 @@ class User {
 
 // API service
 class ApiService {
-  static const String baseUrl = 'https://dummy-api-endpoint.com/api';
+  
+  static const String baseUrl = 'http://192.168.8.163:5000';
 
   static Future<bool> registerUser(User user) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/register'),
+        Uri.parse('$baseUrl/store_user'),
         headers: {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(user.toJson()),
       );
 
-      // For demonstration purposes, we're considering any status code in the 200 range as success
-      return response.statusCode >= 200 && response.statusCode < 300;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print('Registration Response: ${response.body}');
+        return true;
+      } else {
+        print('Registration failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return false;
+      }
     } catch (e) {
       print('Error registering user: $e');
-      // In a real app, you might want to handle specific exceptions differently
       return false;
     }
   }
@@ -80,8 +86,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   // Create controllers to handle text input
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  
+  // Gender dropdown value
+  String _selectedGender = 'Male';
+  final List<String> _genderOptions = ['Male', 'Female', 'Other'];
   
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
@@ -121,87 +130,98 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     // Dispose controllers when the widget is removed
     _nameController.dispose();
     _ageController.dispose();
-    _genderController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
   // Function to handle form submission
-  // Function to handle form submission
-void _handleSubmit() async {
-  // Validate form
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Create user object
-    final user = User(
-      name: _nameController.text,
-      age: _ageController.text,
-      gender: _genderController.text,
-      email: _emailController.text,
-    );
-
-    try {
-      // Send data to API
-      final success = await ApiService.registerUser(user);
-      
-      // Update loading state
+  void _handleSubmit() async {
+    // Validate form
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
-      
-      // Handle response (will add dialog in next commit)
-      print(success ? 'Registration successful' : 'Registration failed');
-      
-    } catch (e) {
-      // Handle errors
-      setState(() {
-        _isLoading = false;
-      });
-      print('Error: $e');
+
+      // Create user object
+      final user = User(
+        name: _nameController.text,
+        age: _ageController.text,
+        gender: _selectedGender,
+        email: _emailController.text,
+      );
+
+      try {
+        // Send data to API
+        final success = await ApiService.registerUser(user);
+        
+        // Update loading state
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Show appropriate dialog based on result
+        if (success) {
+          _showSuccessDialog();
+          // Clear form fields after successful registration
+          _nameController.clear();
+          _ageController.clear();
+          _emailController.clear();
+          setState(() {
+            _selectedGender = 'Male';
+          });
+        } else {
+          _showErrorDialog();
+        }
+        
+      } catch (e) {
+        // Handle errors
+        setState(() {
+          _isLoading = false;
+        });
+        print('Error: $e');
+        _showErrorDialog();
+      }
     }
   }
-}
-void _showSuccessDialog() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Success'),
-      content: const Text('Registration completed successfully!'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('OK'),
-        ),
-      ],
-    ),
-  );
-}
 
-void _showErrorDialog() {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Error'),
-      content: const Text('Failed to register. Please try again later.'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('OK'),
-        ),
-      ],
-    ),
-  );
-}
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Success'),
+        content: const Text('Registration completed successfully!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: const Text('Failed to register. Please try again later.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF8092CC), // Changed from gradient to solid color
+          color: const Color(0xFF8092CC),
         ),
         child: SafeArea(
           child: Padding(
@@ -217,7 +237,7 @@ void _showErrorDialog() {
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        // TODO: Add navigation logic to go back
+                        // Navigate back
                         Navigator.pop(context);
                       },
                     ),
@@ -235,18 +255,28 @@ void _showErrorDialog() {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
-                  // Form fields
-                  _buildTextField(_nameController, 'Name:'),
-                  const SizedBox(height: 20),
-                  _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
-                  const SizedBox(height: 20),
-                  _buildTextField(_genderController, 'Gender:'),
-                  const SizedBox(height: 20),
-                  _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
-
-                  const Spacer(),
+                  // Form fields in a ListView to handle keyboard overflow
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        _buildTextField(_nameController, 'Name:'),
+                        const SizedBox(height: 20),
+                        _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
+                        const SizedBox(height: 20),
+                        
+                        // Gender dropdown
+                        _buildDropdownField(),
+                        
+                        const SizedBox(height: 20),
+                        _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
+                        
+                        // Add some extra space at the bottom for better scrolling
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  ),
 
                   // Buttons
                   Row(
@@ -336,6 +366,44 @@ void _showErrorDialog() {
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
+      ),
+    );
+  }
+  
+  // Helper method to build gender dropdown
+  Widget _buildDropdownField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: DropdownButtonFormField<String>(
+        value: _selectedGender,
+        decoration: const InputDecoration(
+          labelText: 'Gender:',
+          border: InputBorder.none,
+        ),
+        items: _genderOptions.map((String gender) {
+          return DropdownMenuItem<String>(
+            value: gender,
+            child: Text(gender),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedGender = newValue;
+            });
+          }
+        },
       ),
     );
   }
