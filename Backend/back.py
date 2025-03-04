@@ -46,16 +46,26 @@ for sound, words in sound_word_lists.items():
         word_sound_mapping[word].append(sound)
 
 
-#API endpoint to send the target word to frontend
+#API endpoint to send the target word to frontend based on selected sounds
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
-    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin",
-                        "Fish", "Water", "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
-    random.shuffle(target_word_list)
-    target_word = random.choice(target_word_list)
-    session_data['target_word'] = target_word
+    # Get selected sounds from query parameters
+    selected_sounds = request.args.get('sounds', '').lower().split(',')
 
-    return jsonify({"target_word": target_word})
+    # Filter words that contain at least one of the selected sounds
+    filtered_words = []
+
+    if not selected_sounds or selected_sounds[0] == '':
+        # If no sounds are selected, use all words
+        filtered_words = list(word_sound_mapping.keys())
+    else:
+        # Filter words containing the selected sounds
+        for snd in selected_sounds:
+            if snd in sound_word_lists:
+                filtered_words.extend(sound_word_lists[snd])
+
+                # Remove duplicates
+                filtered_words = list(set(filtered_words))
 
 
 
