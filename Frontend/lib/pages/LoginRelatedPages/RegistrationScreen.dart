@@ -239,17 +239,25 @@ void _showErrorDialog() {
 
                   const SizedBox(height: 40),
 
-                  // Form fields
-                  _buildTextField(_nameController, 'Name:'),
-                  const SizedBox(height: 20),
-                  _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
-                  const SizedBox(height: 20),
-                  _buildTextField(_genderController, 'Gender:'),
-                  const SizedBox(height: 20),
-                  _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
-
-                  const Spacer(),
-
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        _buildTextField(_nameController, 'Name:'),
+                        const SizedBox(height: 20),
+                        _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
+                        const SizedBox(height: 20),
+                        
+                        // Gender dropdown
+                        _buildDropdownField(),
+                        
+                        const SizedBox(height: 20),
+                        _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
+                        
+                        // Add some extra space at the bottom for better scrolling
+                        const SizedBox(height: 40),
+                      ],
+                    ),
+                  )
                   // Buttons
                   Row(
                     children: [
@@ -338,6 +346,45 @@ void _showErrorDialog() {
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
+      ),
+    );
+  }
+
+
+ // Helper method to build gender dropdown
+  Widget _buildDropdownField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      child: DropdownButtonFormField<String>(
+        value: _selectedGender,
+        decoration: const InputDecoration(
+          labelText: 'Gender:',
+          border: InputBorder.none,
+        ),
+        items: _genderOptions.map((String gender) {
+          return DropdownMenuItem<String>(
+            value: gender,
+            child: Text(gender),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedGender = newValue;
+            });
+          }
+        },
       ),
     );
   }
