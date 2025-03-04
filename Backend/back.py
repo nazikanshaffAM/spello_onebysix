@@ -64,10 +64,21 @@ def get_target_word():
             if snd in sound_word_lists:
                 filtered_words.extend(sound_word_lists[snd])
 
-                # Remove duplicates
-                filtered_words = list(set(filtered_words))
+        # Remove duplicates
+        filtered_words = list(set(filtered_words))
 
+    # If no words match the criteria, use all words
+    if not filtered_words:
+        filtered_words = list(word_sound_mapping.keys())
 
+    # Choose a random word from the filtered list
+    target_word = random.choice(filtered_words)
+    session_data['target_word'] = target_word
+
+    return jsonify({
+        "target_word": target_word,
+        "contains_sounds": word_sound_mapping[target_word]
+    })
 
 
 # Function to calculate similarity percentage
