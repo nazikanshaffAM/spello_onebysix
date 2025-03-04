@@ -94,28 +94,35 @@ def calculate_accuracy(target, spoken):
 # API Endpoint to receive audio
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
-    # Get audio data from the request (expecting audio in WAV format)
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
     audio_file = request.files['audio']
+    if audio_file.filename == '':
+        return jsonify({"error": "Empty file uploaded"}), 400
 
-    # Read the audio file
     audio_data = audio_file.read()
+    if not audio_data:
+        return jsonify({"error": "Audio data missing"}), 400
 
-    # Process audio with Vosk model
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
     spoken_word = result.get("text", "").strip().capitalize()
     target_word = session_data.get('target_word', '')
 
-    # Calculate accuracy
+    # Store the spoken word in session_data for use in play-game route
+    session_data['spoken_word'] = spoken_word
+
     accuracy = calculate_accuracy(target_word, spoken_word)
 
-    # Return the accuracy to the client
+    # Store accuracy in session_data for use in play-game route
+    session_data['accuracy'] = accuracy
+
     return jsonify({
         "spoken_word": spoken_word,
         "target_word": target_word,
         "accuracy": accuracy
     })
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Initializing database
 
