@@ -86,6 +86,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initTargets() {
     targets = List.generate(gridItems.length, (index) {
+      // Curated prompts for each grid item
+      String prompt;
+      switch (gridItems[index]['label']) {
+        case 'Start Practice':
+          prompt = "Begin your practice sessions here. Tap to start!";
+          break;
+        case 'Parental\nControl':
+          prompt =
+              "Customize your childs gameplay with specific sounds and words. Tap to Customize!";
+          break;
+        case 'Dashboard':
+          prompt = "View your progress and insights. Tap to check it out!";
+          break;
+        case 'Notifications':
+          prompt =
+              "Stay updated with important alerts. Tap to see notifications!";
+          break;
+        case 'Settings':
+          prompt = "Customize your app experience. Tap to adjust settings!";
+          break;
+        case 'Help Center':
+          prompt = "Get assistance and support. Tap to access help!";
+          break;
+        default:
+          prompt = "Tap here for ${gridItems[index]['label']}";
+      }
+
       return TargetFocus(
         identify: gridItems[index]['label'],
         keyTarget: _gridItemKeys[index],
@@ -93,14 +120,22 @@ class _HomeScreenState extends State<HomeScreen> {
         radius: 8,
         contents: [
           TargetContent(
-            align: index % 2 == 0 ? ContentAlign.bottom : ContentAlign.top,
-            child: Text(
-              "Tap here for ${gridItems[index]['label']}",
-              style: const TextStyle(
+            align: ContentAlign.bottom,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                prompt,
+                style: const TextStyle(
                   color: Colors.white,
+                  fontFamily: "Fredoka",
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  fontFamily: "Fredoka"),
+                ),
+              ),
             ),
           ),
         ],
