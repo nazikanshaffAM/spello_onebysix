@@ -46,6 +46,7 @@ dependencies:
   shelf: ^1.4.2
   shelf_multipart: ^2.0.1
   shared_preferences: ^2.5.2
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +84,7 @@ flutter:
     - assets/images/b6.jpg
     - assets/images/settingpagebackground.png
     - assets/images/endingpage.png
+    - assets/images/UFO.json
 
 
   # To add assets to your application, add an assets section, like this:

@@ -24,18 +24,61 @@ recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 session_data = {}
 
 
-#API endpoint to send the target word to frontend
+# comprehensive word list organized by sounds (first five sounds: p, b, t, d, k)
+sound_word_lists = {
+    "p": [ "Pencil", "Paper",  "Park", "Pink", "Pillow", "Happy", "Apple", "Capture", "Monkey", "Ship" ],
+
+    "b": [ "Book",  "Ball", "Balloon", "Banana", "Basket", "Rabbit", "Robot", "Cabbage", "About", "Crab"  ],
+
+    "t": [ "Table", "Turtle", "Tiger", "Talk", "Taxi", "Water", "Button", "Kettle", "Battery",  "Cat"  ],
+
+    "d": [ "Dog", "Door", "Desk", "Dance", "Dish", "Hidden", "Ladder", "Garden", "Shadow", "Bird" ],
+
+    "k": [ "King", "Kite", "Key","Kitchen", "Kangaroo", "Monkey", "Cookie", "Pocket", "Basket", "Bark" ]
+}
+
+# Create a word sound mapping dictionary for easy lookup
+word_sound_mapping = {}
+for sound, words in sound_word_lists.items():
+    for word in words:
+        if word not in word_sound_mapping:
+            word_sound_mapping[word] = []
+        word_sound_mapping[word].append(sound)
+
+
+#API endpoint to send the target word to frontend based on selected sounds
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
-    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin",
-                        "Fish", "Water", "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
-    random.shuffle(target_word_list)
-    target_word = random.choice(target_word_list)
+    # Get selected sounds from query parameters
+    selected_sounds = request.args.get('sounds', '').lower().split(',')
+
+    # Filter words that contain at least one of the selected sounds
+    filtered_words = []
+
+    if not selected_sounds or selected_sounds[0] == '':
+        # If no sounds are selected, use all words
+        filtered_words = list(word_sound_mapping.keys())
+    else:
+        # Filter words containing the selected sounds
+        for snd in selected_sounds:
+            if snd in sound_word_lists:
+                filtered_words.extend(sound_word_lists[snd])
+
+        # Remove duplicates
+        filtered_words = list(set(filtered_words))
+
+    # If no words match the criteria, use all words
+    if not filtered_words:
+        filtered_words = list(word_sound_mapping.keys())
+
+    # Choose a random word from the filtered list
+    target_word = random.choice(filtered_words)
     session_data['target_word'] = target_word
 
-    return jsonify({"target_word": target_word})
-
-
+    return jsonify({
+        "target_word": target_word,
+        # "contains_sounds": word_sound_mapping[target_word]
+    })
 
 
 # Function to calculate similarity percentage
@@ -51,28 +94,35 @@ def calculate_accuracy(target, spoken):
 # API Endpoint to receive audio
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
-    # Get audio data from the request (expecting audio in WAV format)
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
     audio_file = request.files['audio']
+    if audio_file.filename == '':
+        return jsonify({"error": "Empty file uploaded"}), 400
 
-    # Read the audio file
     audio_data = audio_file.read()
+    if not audio_data:
+        return jsonify({"error": "Audio data missing"}), 400
 
-    # Process audio with Vosk model
     recognizer.AcceptWaveform(audio_data)
     result = json.loads(recognizer.Result())
     spoken_word = result.get("text", "").strip().capitalize()
     target_word = session_data.get('target_word', '')
 
-    # Calculate accuracy
+    # Store the spoken word in session_data for use in play-game route
+    session_data['spoken_word'] = spoken_word
+
     accuracy = calculate_accuracy(target_word, spoken_word)
 
-    # Return the accuracy to the client
+    # Store accuracy in session_data for use in play-game route
+    session_data['accuracy'] = accuracy
+
     return jsonify({
         "spoken_word": spoken_word,
         "target_word": target_word,
         "accuracy": accuracy
     })
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Initializing database
 
@@ -168,6 +218,102 @@ def delete_last_user():
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
 
+# game logics--Hangman
+
+def calculate_score(accuracy, level):
+    if level == 1:
+        if accuracy > 75:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 4)
+        else:
+            return 0
+    elif level >= 2:
+        if accuracy > 85:
+            return 100
+        elif accuracy >= 50:
+            return int((accuracy - 50) * 2)
+        else:
+            return 0
+
+@app.route('/play-game', methods=['POST'])
+def play_game():
+    # Get email from form data or JSON
+    email = request.form.get('email') if request.form else request.json.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user = collection.find_one({'email': email})
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Retrieve the spoken word and accuracy from session_data (set by speech_to_text)
+    spoken_word = session_data.get('spoken_word', '').strip().capitalize()
+    accuracy = session_data.get('accuracy', 0)
+
+    if not spoken_word:
+        return jsonify({'error': 'No spoken word found. Please provide speech input first.'}), 400
+
+    target_word = session_data.get('target_word', '')
+    level = user.get('level', 1)
+    score = calculate_score(accuracy, level)
+
+    # Increment total score
+    total_score = user.get('total_score', 0) + score
+
+    # Track attempts and lives
+    attempts = user.get('attempts', 0) + 1
+    lives = user.get('lives', 5)
+
+    if accuracy < 50:
+        lives -= 1
+
+    # Check if score exceeds threshold for level up
+    if total_score >= 2000 and level == 1:
+        level = 2
+
+    # If 5 successful or failed attempts are reached, save the game state and reset lives
+    if attempts >= 5 or lives <= 0:
+        collection.update_one({'email': email}, {'$set': {
+            'total_score': total_score,
+            'level': level,
+            'attempts': 0,
+            'lives': 5,
+            'scores': user.get('scores', []) + [
+                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]}
+        })
+        # Reset game state: New target word, reset attempts/lives for the next round
+        session_data['target_word'] = ''
+        session_data['spoken_word'] = ''
+        return jsonify({
+            'message': 'Game over or successful round. Game reset. New target word is ready.',
+            'total_score': total_score,
+            'level': level,
+            'spoken_word': spoken_word,
+            'target_word': target_word,
+            'accuracy': accuracy
+        })
+
+    # Save progress after each attempt
+    collection.update_one({'email': email}, {'$set': {
+        'attempts': attempts,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'scores': user.get('scores', []) + [
+            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]
+    }})
+
+    return jsonify({
+        'accuracy': accuracy,
+        'score': score,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'spoken_word': spoken_word,
+        'target_word': target_word
+    })
 
 
 
