@@ -24,6 +24,20 @@ recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 session_data = {}
 
 
+# comprehensive word list organized by sounds (first five sounds: p, b, t, d, k)
+sound_word_lists = {
+    "p": [ "Pencil", "Paper",  "Park", "Pink", "Pillow", "Happy", "Apple", "Capture", "Monkey", "Ship" ],
+
+    "b": [ "Book",  "Ball", "Balloon", "Banana", "Basket", "Rabbit", "Robot", "Cabbage", "About", "Crab"  ],
+
+    "t": [ "Table", "Turtle", "Tiger", "Talk", "Taxi", "Water", "Button", "Kettle", "Battery",  "Cat"  ],
+
+    "d": [ "Dog", "Door", "Desk", "Dance", "Dish", "Hidden", "Ladder", "Garden", "Shadow", "Bird" ],
+
+    "k": [ "King", "Kite", "Key","Kitchen", "Kangaroo", "Monkey", "Cookie", "Pocket", "Basket", "Bark" ]
+}
+
+
 #API endpoint to send the target word to frontend
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
