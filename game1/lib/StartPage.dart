@@ -30,7 +30,7 @@ class _StartPageState extends State<StartPage> {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/images/background.png',
+                  'assets/images/startpagebackground.png',
                   fit: BoxFit.cover,
                 ),
               ),
