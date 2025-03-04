@@ -24,18 +24,61 @@ recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 session_data = {}
 
 
-#API endpoint to send the target word to frontend
+# comprehensive word list organized by sounds (first five sounds: p, b, t, d, k)
+sound_word_lists = {
+    "p": [ "Pencil", "Paper",  "Park", "Pink", "Pillow", "Happy", "Apple", "Capture", "Monkey", "Ship" ],
+
+    "b": [ "Book",  "Ball", "Balloon", "Banana", "Basket", "Rabbit", "Robot", "Cabbage", "About", "Crab"  ],
+
+    "t": [ "Table", "Turtle", "Tiger", "Talk", "Taxi", "Water", "Button", "Kettle", "Battery",  "Cat"  ],
+
+    "d": [ "Dog", "Door", "Desk", "Dance", "Dish", "Hidden", "Ladder", "Garden", "Shadow", "Bird" ],
+
+    "k": [ "King", "Kite", "Key","Kitchen", "Kangaroo", "Monkey", "Cookie", "Pocket", "Basket", "Bark" ]
+}
+
+# Create a word sound mapping dictionary for easy lookup
+word_sound_mapping = {}
+for sound, words in sound_word_lists.items():
+    for word in words:
+        if word not in word_sound_mapping:
+            word_sound_mapping[word] = []
+        word_sound_mapping[word].append(sound)
+
+
+#API endpoint to send the target word to frontend based on selected sounds
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
-    target_word_list = ["Think", "This", "Rabbit", "Lemon", "Snake", "Ship", "Cheese", "Juice", "Zebra", "Violin",
-                        "Fish", "Water", "Yellow", "Sing", "Tiger", "Dinosaur", "Pencil", "Banana", "Kite", "Goat"]
-    random.shuffle(target_word_list)
-    target_word = random.choice(target_word_list)
+    # Get selected sounds from query parameters
+    selected_sounds = request.args.get('sounds', '').lower().split(',')
+
+    # Filter words that contain at least one of the selected sounds
+    filtered_words = []
+
+    if not selected_sounds or selected_sounds[0] == '':
+        # If no sounds are selected, use all words
+        filtered_words = list(word_sound_mapping.keys())
+    else:
+        # Filter words containing the selected sounds
+        for snd in selected_sounds:
+            if snd in sound_word_lists:
+                filtered_words.extend(sound_word_lists[snd])
+
+        # Remove duplicates
+        filtered_words = list(set(filtered_words))
+
+    # If no words match the criteria, use all words
+    if not filtered_words:
+        filtered_words = list(word_sound_mapping.keys())
+
+    # Choose a random word from the filtered list
+    target_word = random.choice(filtered_words)
     session_data['target_word'] = target_word
 
-    return jsonify({"target_word": target_word})
-
-
+    return jsonify({
+        "target_word": target_word,
+        "contains_sounds": word_sound_mapping[target_word]
+    })
 
 
 # Function to calculate similarity percentage
