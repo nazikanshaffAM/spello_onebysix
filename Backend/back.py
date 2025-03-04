@@ -259,6 +259,16 @@ def play_game():
     level = user.get('level', 1)
     score = calculate_score(accuracy, level)
 
+    # Increment total score
+    total_score = user.get('total_score', 0) + score
+
+    # Track attempts and lives
+    attempts = user.get('attempts', 0) + 1
+    lives = user.get('lives', 5)
+
+    if accuracy < 50:
+        lives -= 1
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
