@@ -77,7 +77,7 @@ def get_target_word():
 
     return jsonify({
         "target_word": target_word,
-        "contains_sounds": word_sound_mapping[target_word]
+        # "contains_sounds": word_sound_mapping[target_word]
     })
 
 
