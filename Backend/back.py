@@ -248,6 +248,17 @@ def play_game():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    # Retrieve the spoken word and accuracy from session_data (set by speech_to_text)
+    spoken_word = session_data.get('spoken_word', '').strip().capitalize()
+    accuracy = session_data.get('accuracy', 0)
+
+    if not spoken_word:
+        return jsonify({'error': 'No spoken word found. Please provide speech input first.'}), 400
+
+    target_word = session_data.get('target_word', '')
+    level = user.get('level', 1)
+    score = calculate_score(accuracy, level)
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
