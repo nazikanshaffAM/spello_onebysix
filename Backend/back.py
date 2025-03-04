@@ -37,6 +37,14 @@ sound_word_lists = {
     "k": [ "King", "Kite", "Key","Kitchen", "Kangaroo", "Monkey", "Cookie", "Pocket", "Basket", "Bark" ]
 }
 
+# Create a word sound mapping dictionary for easy lookup
+word_sound_mapping = {}
+for sound, words in sound_word_lists.items():
+    for word in words:
+        if word not in word_sound_mapping:
+            word_sound_mapping[word] = []
+        word_sound_mapping[word].append(sound)
+
 
 #API endpoint to send the target word to frontend
 @app.route('/get-target-word', methods=['GET'])
