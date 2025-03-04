@@ -295,6 +295,26 @@ def play_game():
             'accuracy': accuracy
         })
 
+    # Save progress after each attempt
+    collection.update_one({'email': email}, {'$set': {
+        'attempts': attempts,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'scores': user.get('scores', []) + [
+            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]
+    }})
+
+    return jsonify({
+        'accuracy': accuracy,
+        'score': score,
+        'lives': lives,
+        'total_score': total_score,
+        'level': level,
+        'spoken_word': spoken_word,
+        'target_word': target_word
+    })
+
 
 
 if __name__ == '__main__':
