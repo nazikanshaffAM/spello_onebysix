@@ -5,9 +5,44 @@ class HangmanGame {
   static const int maxLives = 7;
 
   final List<String> wordPool = [
-    "Octopus", "Elephant", "Giraffe", "Penguin", "Dolphin",
-    "Crocodile", "Kangaroo", "Butterfly", "Tornado", "Volcano"
-  ]; // Example word list
+    "Cat", "Pin", "Bun", "Red", "Sin",
+    "Bat", "Sim", "Wow", "Cow", "Dim",
+    "Ant", "Art", "Ask", "Bad", "Bag",
+    "Bar", "Bat", "Bed", "Bet", "Bit",
+    "Bot", "But", "Buy", "Cab", "Cap",
+    "Car", "Cat", "Cot", "Cut", "Dad",
+    "Day", "Dig", "Dot", "Dry", "Dub",
+    "Due", "Dug", "Ear", "Eat", "Egg",
+    "End", "Era", "Eve", "Eye", "Fan",
+    "Far", "Fat", "Fix", "Fly", "Fog",
+    "For", "Fox", "Fun", "Gem", "Get",
+    "Gig", "Gin", "God", "Got", "Gun",
+    "Gut", "Hat", "Haw", "Hey", "Hit",
+    "Hot", "How", "Hum", "Jam", "Jet",
+    "Jog", "Joy", "Jug", "Key", "Kid",
+    "Kin", "Kit", "Let", "Lie", "Lip",
+    "Log", "Low", "Man", "Map", "Mat",
+    "Mix", "Mop", "Not", "Now", "Nut",
+    "Oar", "Odd", "Off", "Ohm", "Oil",
+    "Old", "Ony", "Opt", "Our", "Out",
+    "Owl", "Own", "Pad", "Pal", "Pan",
+    "Pat", "Pen", "Pet", "Pie", "Pig",
+    "Pin", "Pit", "Pop", "Pot", "Pro",
+    "Pug", "Pun", "Put", "Rad", "Ram",
+    "Rat", "Ray", "Red", "Rep", "Rib",
+    "Rig", "Rip", "Rod", "Rug", "Run",
+    "Sad", "Sag", "Sat", "Saw", "Say",
+    "Set", "Sew", "She", "Shy", "Sip",
+    "Sit", "Sky", "Sly", "Sob", "Son",
+    "Sun", "Tap", "Tar", "Tat", "Tie",
+    "Tip", "Top", "Toy", "Try", "Tub",
+    "Tug", "Use", "Van", "Vat", "Vet",
+    "Vex", "Vet", "Wag", "War", "Was",
+    "Way", "Web", "Wet", "Who", "Why",
+    "Won", "Wow", "Yap", "Yen", "Yes",
+    "Yet", "You", "Zip"
+  ];
+  // Example word list
 
   late String wordToPronounce;
   int _livesLeft;
