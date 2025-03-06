@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://192.168.107.48:5000";
+  static const String baseUrl = "http://192.168.158.48:5000";
 
   // Upload WAV file and get pronunciation accuracy
   static Future<int?> uploadAudio(String filePath) async {
