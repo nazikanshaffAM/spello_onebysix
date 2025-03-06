@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import the services package
 import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/gameResults.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';

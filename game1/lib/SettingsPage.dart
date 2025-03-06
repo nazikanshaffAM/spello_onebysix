@@ -32,7 +32,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadSelectedBackground() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedBackground = prefs.getString("selectedBackground") ?? backgroundImages[0];
+      selectedBackground =
+          prefs.getString("selectedBackground") ?? backgroundImages[0];
     });
   }
 
@@ -64,16 +65,21 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 const Text(
                   "Select Background",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2, // 2 columns
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 1.2, // Adjust aspect ratio for better fit
+                      childAspectRatio:
+                          1.5, // Adjust aspect ratio for better fit
                     ),
                     itemCount: backgroundImages.length,
                     itemBuilder: (context, index) {
