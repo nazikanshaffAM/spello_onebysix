@@ -20,7 +20,6 @@ class _GamePageState extends State<GamePage> {
     _loadBackgroundImage();
   }
 
-  // Load the selected background from SharedPreferences
   Future<void> _loadBackgroundImage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -30,6 +29,9 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return ChangeNotifierProvider(
       create: (_) => GameRules(context),
       child: Scaffold(
@@ -37,90 +39,90 @@ class _GamePageState extends State<GamePage> {
           builder: (context, gameRules, child) {
             return Stack(
               children: [
-                //  Dynamic Background Image
                 Positioned.fill(
                   child: Image.asset(
                     backgroundImage,
                     fit: BoxFit.cover,
                   ),
                 ),
-                 /// UFO Animation at Top Middle
                 Positioned(
-                  top: -60,  // Adjust based on your design
-                  left: MediaQuery.of(context).size.width / 15- 50,  // Centered horizontally
+                  top: -(screenHeight * 0.24),
+                  left: screenWidth * 0.03,
                   child: Lottie.asset(
                     'assets/images/UFO.json',
-                    width: 450,
-                    height: 450,
+                    width: screenWidth * 0.9,
+                    height: screenHeight * 0.9,
                   ),
                 ),
-                // XP Display
                 Positioned(
-                  top: 30,
-                  left: 20,
-                  child: Text("XP: ${gameRules.xp}",
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold,color: Colors.white)),
+                  top: screenHeight * 0.05,
+                  left: screenWidth * 0.05,
+                  child: Text(
+                    "XP: ${gameRules.xp}",
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.08,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-
-                // Life Display
                 Positioned(
-                  top: 40,
-                  right: 20,
+                  top: screenHeight * 0.05,
+                  right: screenWidth * 0.05,
                   child: Row(
                     children: List.generate(3, (index) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 3.9),
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
                         child: Image.asset(
                           index < gameRules.lives
                               ? 'assets/images/heart.png'
                               : 'assets/images/emtyheart.png',
-                          width: 25,
+                          width: screenWidth * 0.06,
                         ),
                       );
                     }),
                   ),
                 ),
-
-                // Timer Display
                 Positioned(
-                  top: 30,
-                  left: MediaQuery.of(context).size.width / 2.2 - 30,
+                  top: screenHeight * 0.05,
+                  left: screenWidth * 0.5 - (screenWidth * 0.08),
                   child: Text(
                     "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold,color: Colors.white),
-                  )
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.08,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-
-                // Character Animation
                 gameRules.shouldAnimate
                     ? AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
                   top: gameRules.position,
-                  left: MediaQuery.of(context).size.width / 2 - 50,
-                  child: Image.asset('assets/images/character.png', width: 100),
+                  left: screenWidth * 0.5 - 50,
+                  child: Image.asset('assets/images/character.png', width: screenWidth * 0.15),
                 )
                     : Positioned(
                   top: gameRules.position,
-                  left: MediaQuery.of(context).size.width / 2 - 50,
-                  child: Image.asset('assets/images/character.png', width: 100),
+                  left: screenWidth * 0.5 - 50,
+                  child: Image.asset('assets/images/character.png', width: screenWidth * 0.15),
                 ),
-
-                // Word Display
                 Positioned(
-                  bottom: 45,
-                  left: 30,
+                  bottom: screenHeight * 0.1,
+                  left: screenWidth * 0.08,
                   child: Text(
-                    gameRules.word,  // This will update when notifyListeners() is called
-                    style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.white),
+                    gameRules.word,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-
-
-                // Microphone Button (Fixed Context Usage)
                 Positioned(
-                  bottom: 50,
-                  right: 20,
+                  bottom: screenHeight * 0.08,
+                  right: screenWidth * 0.05,
                   child: _buildMicButton(context),
                 ),
               ],
@@ -131,22 +133,21 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  /// 🎤 Hold to record, release to stop & send
   Widget _buildMicButton(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return GestureDetector(
       onLongPress: () async {
         await _audioService.startRecording();
       },
       onLongPressUp: () async {
         await _audioService.stopRecording();
-
         var gameRules = Provider.of<GameRules>(context, listen: false);
         await _audioService.sendAudioToBackend(context, gameRules);
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
-        height: 70,
-        width: 70,
+        height: screenWidth * 0.18,
+        width: screenWidth * 0.18,
         decoration: BoxDecoration(
           color: Colors.red,
           shape: BoxShape.circle,
@@ -154,7 +155,7 @@ class _GamePageState extends State<GamePage> {
             BoxShadow(color: Colors.redAccent, blurRadius: 10, spreadRadius: 2),
           ],
         ),
-        child: Icon(Icons.mic, size: 35, color: Colors.white),
+        child: Icon(Icons.mic, size: screenWidth * 0.09, color: Colors.white),
       ),
     );
   }
