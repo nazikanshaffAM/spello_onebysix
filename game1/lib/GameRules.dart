@@ -13,6 +13,7 @@ class GameRules extends ChangeNotifier {
   bool gameEnded = false;
   bool shouldAnimate = true;
 
+
   // Add a list of alien images
   List<String> aliens = [
     'assets/images/alien1.png',

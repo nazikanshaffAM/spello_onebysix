@@ -13,6 +13,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   final AudioService _audioService = AudioService();
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
+  bool _isRecording = false; // Track if the mic button is pressed
 
   @override
   void initState() {
@@ -156,27 +157,44 @@ class _GamePageState extends State<GamePage> {
 
   Widget _buildMicButton(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onLongPress: () async {
+        // Start recording when the button is held
+        setState(() {
+          _isRecording = true;
+        });
         await _audioService.startRecording();
       },
       onLongPressUp: () async {
+        // Stop recording and reset the button state
+        setState(() {
+          _isRecording = false;
+        });
         await _audioService.stopRecording();
         var gameRules = Provider.of<GameRules>(context, listen: false);
         await _audioService.sendAudioToBackend(context, gameRules);
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
-        height: screenWidth * 0.18,
-        width: screenWidth * 0.18,
+        height: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
+        width: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
         decoration: BoxDecoration(
-          color: Colors.red,
+          color: _isRecording ? Colors.green : Colors.red, // Change color on press
           shape: BoxShape.circle,
           boxShadow: [
-            BoxShadow(color: Colors.redAccent, blurRadius: 10, spreadRadius: 2),
+            BoxShadow(
+              color: _isRecording ? Colors.greenAccent : Colors.redAccent, // Shadow color change
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
           ],
         ),
-        child: Icon(Icons.mic, size: screenWidth * 0.09, color: Colors.white),
+        child: Icon(
+          Icons.mic,
+          size: _isRecording ? screenWidth * 0.12 : screenWidth * 0.09, // Bigger icon when recording
+          color: Colors.white,
+        ),
       ),
     );
   }
