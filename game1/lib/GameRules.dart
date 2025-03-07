@@ -82,7 +82,16 @@ class GameRules extends ChangeNotifier {
           resetImagePosition();
           shouldAnimate = true;
           xp += 100;
-          await ApiService.fetchTargetWord(); // Fetch the next word
+
+          // Fetch the next word after pronunciation check
+          String? fetchedWord = await ApiService.fetchTargetWord();
+          if (fetchedWord != null && fetchedWord.isNotEmpty) {
+            word = fetchedWord;
+          } else {
+            word = "default"; // Fallback word if the new word fetch fails
+          }
+
+          notifyListeners();  // Make sure to notify listeners after updating the word
         });
       } else {
         moveImageHalfway();
@@ -93,6 +102,7 @@ class GameRules extends ChangeNotifier {
 
     notifyListeners();
   }
+
 
   void moveImageToTop() {
     if (shouldAnimate) {
