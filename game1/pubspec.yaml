@@ -86,6 +86,13 @@ flutter:
     - assets/images/settingpagebackground.png
     - assets/images/endingpage.png
     - assets/images/UFO.json
+    - assets/images/alien1.png
+    - assets/images/alien2.png
+    - assets/images/alien3.png
+    - assets/images/alien4.png
+    - assets/images/alien5.png
+    - assets/images/alien6.png
+    - assets/images/alien7.png
 
 
   # To add assets to your application, add an assets section, like this:
