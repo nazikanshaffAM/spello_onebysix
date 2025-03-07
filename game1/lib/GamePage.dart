@@ -93,11 +93,12 @@ class _GamePageState extends State<GamePage> {
                       style: TextStyle(
                         fontSize: screenWidth * 0.08,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: gameRules.timeLeft <= 10 ? Colors.red : Colors.green, // Changes color dynamically
                       ),
                     ),
                   ),
                 ),
+
 
 
                 AnimatedPositioned(
