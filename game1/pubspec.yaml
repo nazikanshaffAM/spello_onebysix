@@ -71,7 +71,6 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/images/background.png
     - assets/images/character.png
     - assets/images/ufo.png
     - assets/images/emtyheart.png
@@ -83,8 +82,6 @@ flutter:
     - assets/images/b4.jpg
     - assets/images/b5.jpg
     - assets/images/b6.jpg
-    - assets/images/settingpagebackground.png
-    - assets/images/endingpage.png
     - assets/images/UFO.json
     - assets/images/alien1.png
     - assets/images/alien2.png
@@ -93,6 +90,7 @@ flutter:
     - assets/images/alien5.png
     - assets/images/alien6.png
     - assets/images/alien7.png
+    - assets/images/background.png
 
 
   # To add assets to your application, add an assets section, like this:

@@ -47,7 +47,7 @@ class _StartPageState extends State<StartPage> {
                       );
                     }),
                     const SizedBox(height: 20),
-                    _buildButton('SETTINGS', () {
+                    _buildButton('MAP', () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -80,34 +80,41 @@ class _StartPageState extends State<StartPage> {
   }
 
   Widget _buildButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF6B96AB),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+    return SizedBox(
+      width: 200, // Set a fixed width
+      height: 60, // Set a fixed height
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.pink,//const Color(0xFF6B96AB),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          elevation: 3,
         ),
-        elevation: 3,
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'Orbitron',
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-          shadows: [
-            Shadow(
-              color: Colors.black26,
-              offset: Offset(2, 2),
-              blurRadius: 2,
-            )
-          ],
+        child: FittedBox( // Ensures the text scales to fit within the button
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontFamily: 'Orbitron',
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  offset: Offset(2, 2),
+                  blurRadius: 2,
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
 }
 
 

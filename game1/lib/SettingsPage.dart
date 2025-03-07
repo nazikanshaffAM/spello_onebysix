@@ -20,6 +20,15 @@ class _SettingsPageState extends State<SettingsPage> {
     "assets/images/b6.jpg",
   ];
 
+  List<String> backgroundNames = [
+    "Space Adventure",
+    "Mystic Forest",
+    "Cyber Grid",
+    "Neon City",
+    "Dark Galaxy",
+    "Retro Arcade"
+  ];
+
   String selectedBackground = "";
 
   @override
@@ -51,15 +60,11 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: Container(color: Colors.black),
-            //child: Image.asset(
-              //'assets/images/settingpagebackground.png',
-              //fit: BoxFit.cover,
-            //),
+          Positioned.fill(
+            child: Container(color: Colors.black),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding: const EdgeInsets.all(5),
                               color: Colors.black.withOpacity(0.5),
                               child: Text(
-                                "Background ${index + 1}",
+                                backgroundNames[index], // Displaying background name
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
