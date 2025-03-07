@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../game1/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/ApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/ApiService.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.yaml" afterDir="false" />
-    </list>
+    <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,7 +60,7 @@
       <workItem from="1741064196765" duration="3117000" />
       <workItem from="1741168597416" duration="1345000" />
       <workItem from="1741274487401" duration="712000" />
-      <workItem from="1741286955535" duration="647000" />
+      <workItem from="1741286955535" duration="1248000" />
     </task>
     <servers />
   </component>
