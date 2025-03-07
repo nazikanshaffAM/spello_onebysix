@@ -68,8 +68,8 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.05,
-                  right: screenWidth * 0.05,
+                  top: screenHeight * 0.06,
+                  right: screenWidth * 0.04,
                   child: Row(
                     children: List.generate(3, (index) {
                       return Padding(
@@ -78,38 +78,39 @@ class _GamePageState extends State<GamePage> {
                           index < gameRules.lives
                               ? 'assets/images/heart.png'
                               : 'assets/images/emtyheart.png',
-                          width: screenWidth * 0.06,
+                          width: screenWidth * 0.07,
                         ),
                       );
                     }),
                   ),
                 ),
-                Positioned(
-                  top: screenHeight * 0.05,
-                  left: screenWidth * 0.5 - (screenWidth * 0.08),
-                  child: Text(
-                    "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.08,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                Align(
+                  alignment: Alignment.topCenter, // Centers horizontally
+                  child: Padding(
+                    padding: EdgeInsets.only(top: screenHeight * 0.05), // Adjust vertical position
+                    child: Text(
+                      "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.08,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-                // Alien images to fly
-                gameRules.shouldAnimate
-                    ? AnimatedPositioned(
+
+
+                AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
-                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
-                )
-                    : Positioned(
-                  top: gameRules.position,
-                  left: screenWidth * 0.5 - 50,
-                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
+                  child: Opacity(
+                    opacity: gameRules.alienOpacity,  // Use the opacity from the GameRules
+                    child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
+                  ),
                 ),
+
                 Positioned(
                   bottom: screenHeight * 0.1,
                   left: screenWidth * 0.08,
