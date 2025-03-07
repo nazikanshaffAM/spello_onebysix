@@ -95,18 +95,19 @@ class _GamePageState extends State<GamePage> {
                     ),
                   ),
                 ),
+                // Alien images to fly
                 gameRules.shouldAnimate
                     ? AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
-                  child: Image.asset('assets/images/character.png', width: screenWidth * 0.15),
+                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
                 )
                     : Positioned(
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
-                  child: Image.asset('assets/images/character.png', width: screenWidth * 0.15),
+                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
                 ),
                 Positioned(
                   bottom: screenHeight * 0.1,
@@ -124,6 +125,26 @@ class _GamePageState extends State<GamePage> {
                   bottom: screenHeight * 0.08,
                   right: screenWidth * 0.05,
                   child: _buildMicButton(context),
+                ),
+                // Alien images at the bottom
+                Positioned(
+                  bottom: 20,
+                  left: screenWidth * 0.04,
+                  child: Row(
+                    children: gameRules.aliens.map((alienImage) {
+                      int index = gameRules.aliens.indexOf(alienImage);
+                      return GestureDetector(
+                        onTap: () {
+                          gameRules.setSelectedAlien(index);
+                        },
+                        child: Image.asset(
+                          alienImage,
+                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.1,
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
               ],
             );

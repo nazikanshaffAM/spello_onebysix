@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ApiService.dart';
 import 'EndingPage.dart';
+import 'dart:math';
 
 class GameRules extends ChangeNotifier {
   BuildContext context;
@@ -12,14 +13,28 @@ class GameRules extends ChangeNotifier {
   bool gameEnded = false;
   bool shouldAnimate = true;
 
+  // Add a list of alien images
+  List<String> aliens = [
+    'assets/images/alien1.png',
+    'assets/images/alien2.png',
+    'assets/images/alien3.png',
+    'assets/images/alien4.png',
+    'assets/images/alien5.png',
+    'assets/images/alien6.png',
+    'assets/images/alien7.png',
+  ];
+
+  // Track selected alien
+  String selectedAlienImage = 'assets/images/alien1.png';
+
   GameRules(this.context) {
     initializeGame();
   }
 
   // Fetch the first word
   Future<void> initializeGame() async {
-    word = "Loading..."; // Temporary placeholder
-    notifyListeners(); // Notify UI to update
+    word = "Loading..."; // Temporary placeholder untile the words are loading from the backend
+    notifyListeners(); //
 
     try {
       String? fetchedWord = await ApiService.fetchTargetWord();
@@ -32,21 +47,13 @@ class GameRules extends ChangeNotifier {
       word = "Error fetching word"; // Error handling
     }
 
-    notifyListeners(); // Notify UI of the change
+    notifyListeners();
     startTimer();
   }
 
-
-  // Fetch a new word from the backend
-  Future<void> fetchNewWord() async {
-    String? fetchedWord = await ApiService.fetchTargetWord();
-
-    if (fetchedWord != null && fetchedWord.isNotEmpty) {
-      word = fetchedWord;
-    } else {
-      word = "default";  // Fallback word
-    }
-
+  // Set selected alien (randomly or based on user input)
+  void setSelectedAlien(int index) {
+    selectedAlienImage = aliens[index];
     notifyListeners();
   }
 
@@ -75,7 +82,7 @@ class GameRules extends ChangeNotifier {
           resetImagePosition();
           shouldAnimate = true;
           xp += 100;
-          await fetchNewWord(); // Fetch the next word
+          await ApiService.fetchTargetWord(); // Fetch the next word
         });
       } else {
         moveImageHalfway();
