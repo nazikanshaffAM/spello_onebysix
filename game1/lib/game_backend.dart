@@ -8,7 +8,7 @@ import 'package:shelf_router/shelf_router.dart';
 class GameBackend {
   /// Function to handle audio upload
   String getWritablePath() {
-    final directory = Directory.systemTemp; // Use a writable temp directory
+    final directory = Directory.systemTemp;
     return '${directory.path}/uploaded_audio.wav';
   }
 

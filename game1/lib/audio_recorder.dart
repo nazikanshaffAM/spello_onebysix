@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:mygame/game_rules.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'api_service.dart'; // Import the API service to send the file
+import 'api_service.dart';
 
 class AudioService {
   final AudioRecorder _recorder = AudioRecorder();
@@ -47,7 +47,7 @@ class AudioService {
     if (_filePath != null && File(_filePath!).existsSync()) {
       print(" Sending audio to backend...");
       await ApiService.uploadAudio(_filePath!);
-      gameRules.checkPronunciation(_filePath!); // ✅ Use the correct instance
+      gameRules.checkPronunciation(_filePath!); //
     } else {
       print(" No audio file found to send.");
     }

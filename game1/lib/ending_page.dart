@@ -4,19 +4,13 @@ import 'game_page.dart';
 
 class EndingPage extends StatelessWidget {
   final int correctlyPronouncedWords;
-  final int totalWords;
-  final double accuracy;
-  final int userLevel;
-  final int totalAttempts;  // Total number of attempts made
-  final int livesLeft;      // Total lives left before timeout
+  //final double accuracy;
+  final int livesLeft;
 
   const EndingPage({
     super.key,
     required this.correctlyPronouncedWords,
-    required this.totalWords,
-    required this.accuracy,
-    required this.userLevel,
-    required this.totalAttempts,
+    //required this.accuracy,
     required this.livesLeft,
   });
 
@@ -24,9 +18,6 @@ class EndingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate XP (100 XP for each correct word)
     final int totalXP = correctlyPronouncedWords * 100;
-
-    // Calculate the accuracy (total accuracy / total attempts)
-    final double calculatedAccuracy = (accuracy / totalAttempts) * 100;
 
     return Scaffold(
       body: Stack(
@@ -62,7 +53,7 @@ class EndingPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // Game Summary Card
+                // Game Summary
                 Card(
                   elevation: 8,
                   color: Colors.white.withOpacity(0.8),
@@ -84,17 +75,13 @@ class EndingPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          "Correct Words: $correctlyPronouncedWords / $totalWords",
+                          "Correct Words: $correctlyPronouncedWords",
                           style: TextStyle(fontSize: 20, color: Colors.black87),
                         ),
-                        Text(
-                          "Accuracy: ${calculatedAccuracy.toStringAsFixed(2)}%",
-                          style: TextStyle(fontSize: 20, color: Colors.black87),
-                        ),
-                        Text(
-                          "Current Level: $userLevel",
-                          style: TextStyle(fontSize: 20, color: Colors.black87),
-                        ),
+                        //Text(
+                          //"Accuracy: ${accuracy.toStringAsFixed(2)}%",
+                          //style: TextStyle(fontSize: 20, color: Colors.black87),
+                        //),
                         const SizedBox(height: 16),
                         Text(
                           "Total XP: $totalXP",
@@ -121,7 +108,7 @@ class EndingPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
 
-                // Buttons for navigating
+
                 _buildFixedSizeButton("PLAY AGAIN", () {
                   Navigator.pushReplacement(
                     context,
@@ -147,10 +134,10 @@ class EndingPage extends StatelessWidget {
     );
   }
 
-  // Ensure the button size is fixed, regardless of text length
+
   Widget _buildFixedSizeButton(String text, VoidCallback onPressed) {
     return Container(
-      width: 250, // Fixed width for all buttons
+      width: 250,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

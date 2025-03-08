@@ -13,7 +13,7 @@ class GamePage extends StatefulWidget {
 class GamePageState extends State<GamePage> {
   final AudioService _audioService = AudioService();
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
-  bool _isRecording = false; // Track if the mic button is pressed
+  bool _isRecording = false;
 
 
   @override
@@ -86,15 +86,15 @@ class GamePageState extends State<GamePage> {
                   ),
                 ),
                 Align(
-                  alignment: Alignment.topCenter, // Centers horizontally
+                  alignment: Alignment.topCenter,
                   child: Padding(
-                    padding: EdgeInsets.only(top: screenHeight * 0.05), // Adjust vertical position
+                    padding: EdgeInsets.only(top: screenHeight * 0.05),
                     child: Text(
                       "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
                       style: TextStyle(
                         fontSize: screenWidth * 0.08,
                         fontWeight: FontWeight.bold,
-                        color: gameRules.timeLeft <= 10 ? Colors.red : Colors.green, // Changes color dynamically
+                        color: gameRules.timeLeft <= 10 ? Colors.red : Colors.green,
                       ),
                     ),
                   ),
@@ -108,7 +108,7 @@ class GamePageState extends State<GamePage> {
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
                   child: Opacity(
-                    opacity: gameRules.alienOpacity,  // Use the opacity from the GameRules
+                    opacity: gameRules.alienOpacity,
                     child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
                   ),
                 ),
@@ -130,6 +130,7 @@ class GamePageState extends State<GamePage> {
                   right: screenWidth * 0.05,
                   child: _buildMicButton(context),
                 ),
+
                 // Alien images at the bottom
                 Positioned(
                   bottom: 20,
@@ -187,7 +188,7 @@ class GamePageState extends State<GamePage> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: _isRecording ? Colors.greenAccent : Colors.redAccent, // Shadow color change
+              color: _isRecording ? Colors.greenAccent : Colors.redAccent,
               blurRadius: 10,
               spreadRadius: 2,
             ),

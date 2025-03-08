@@ -48,7 +48,7 @@ class ApiService {
       return null;
     }
   }
-  // Fetch words from backend (modify this if needed)
+  // Fetch words from backend (for testing)
   static Future<List<String>> fetchWords() async {
     return [
       "Think",
@@ -61,7 +61,7 @@ class ApiService {
       "Juice",
       "Zebra",
       "Violin"
-    ]; // Hardcoded words (modify if API is implemented)
+    ]; // Hardcoded words
   }
 }
 

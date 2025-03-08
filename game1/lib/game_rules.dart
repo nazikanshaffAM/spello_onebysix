@@ -15,9 +15,6 @@ class GameRules extends ChangeNotifier {
   double alienOpacity = 1.0;
 
 
-
-
-
   // Add a list of alien images
   List<String> aliens = [
     'assets/images/alien1.png',
@@ -38,7 +35,7 @@ class GameRules extends ChangeNotifier {
 
   // Fetch the first word
   Future<void> initializeGame() async {
-    word = "Loading..."; // Temporary placeholder untile the words are loading from the backend
+    word = "Loading..."; // Temporary placeholder until the words are loading from the backend
     notifyListeners(); //
 
     try {
@@ -49,7 +46,7 @@ class GameRules extends ChangeNotifier {
         word = "default"; // Fallback word
       }
     } catch (e) {
-      word = "Error fetching word"; // Error handling
+      word = "Error fetching word";
     }
 
     notifyListeners();
@@ -58,12 +55,12 @@ class GameRules extends ChangeNotifier {
 
   // Function to update the opacity
   void updateAlienOpacity(double opacity) {
-    // Ensure opacity is within the valid range (0.0 to 1.0)
+
     alienOpacity = opacity.clamp(0.0, 1.0);
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
-  // Set selected alien (randomly or based on user input)
+  // Set selected alien
   void setSelectedAlien(int index) {
     selectedAlienImage = aliens[index];
     notifyListeners();
@@ -154,32 +151,30 @@ class GameRules extends ChangeNotifier {
     }
     notifyListeners();
   }
-
+//game logic for end the game
   void endGame() {
     gameEnded = true;
     notifyListeners();
 
-    // Assuming `totalAttempts` and `correctlyPronouncedWords` are available.
-    int totalAttempts = 30; // Replace with your actual total attempts value
+
     int correctlyPronouncedWords = xp ~/ 100; // Each correct word gives 100 XP
 
-    double accuracy = (correctlyPronouncedWords / totalAttempts) * 100;
-    int userLevel = xp ~/ 500; // Assuming level increases by 500 XP
+    // Calculate accuracy based on the number of correctly pronounced words vs total attempts
+    //int totalAttempts = 30; //
+    //double accuracy = (correctlyPronouncedWords / totalAttempts) * 100;
 
-    // Navigate to EndingPage with the correct values
+    // Navigate to EndingPage with only the correct data
     Future.microtask(() => Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EndingPage(
           correctlyPronouncedWords: correctlyPronouncedWords,
-          totalWords: totalAttempts, // Total number of words attempted
-          accuracy: accuracy,
-          userLevel: userLevel,
-          totalAttempts: totalAttempts,
-          livesLeft: lives, // Make sure you have the correct value for livesLeft
+          //accuracy: accuracy,
+          livesLeft: lives,
         ),
       ),
     ));
   }
+
 
 }

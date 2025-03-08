@@ -4,8 +4,6 @@ import 'package:mygame/how_to_play_page.dart';
 import 'package:mygame/settings_page.dart';
 
 
-
-
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
 
@@ -42,7 +40,7 @@ class _StartPageState extends State<StartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GamePage(), // Navigate to the game
+                          builder: (context) => GamePage(),
                         ),
                       );
                     }),
@@ -81,8 +79,8 @@ class _StartPageState extends State<StartPage> {
 
   Widget _buildButton(String text, VoidCallback onPressed) {
     return SizedBox(
-      width: 200, // Set a fixed width
-      height: 60, // Set a fixed height
+      width: 200,
+      height: 60,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -93,7 +91,7 @@ class _StartPageState extends State<StartPage> {
           ),
           elevation: 3,
         ),
-        child: FittedBox( // Ensures the text scales to fit within the button
+        child: FittedBox(
           child: Text(
             text,
             style: const TextStyle(

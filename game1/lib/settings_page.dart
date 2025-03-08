@@ -76,10 +76,10 @@ class SettingsPageState extends State<SettingsPage> {
                 Expanded(
                   child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 columns
+                      crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 1.2, // Adjust aspect ratio for better fit
+                      childAspectRatio: 1.2,
                     ),
                     itemCount: backgroundImages.length,
                     itemBuilder: (context, index) {
