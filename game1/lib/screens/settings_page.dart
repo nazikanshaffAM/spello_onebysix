@@ -7,10 +7,10 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.onBackgroundSelected});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> {
   List<String> backgroundImages = [
     "assets/images/b1.jpg",
     "assets/images/b2.jpg",
@@ -76,10 +76,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 Expanded(
                   child: GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 columns
+                      crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio: 1.2, // Adjust aspect ratio for better fit
+                      childAspectRatio: 1.2,
                     ),
                     itemCount: backgroundImages.length,
                     itemBuilder: (context, index) {

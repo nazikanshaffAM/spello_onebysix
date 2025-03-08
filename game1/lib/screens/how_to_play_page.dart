@@ -12,7 +12,7 @@ class HowtoPlayPage extends StatelessWidget {
       ),
       body: const Center(
         child: Text(
-          'miyuru',
+          'need to implement',
           style: TextStyle(fontSize: 24),
         ),
       ),

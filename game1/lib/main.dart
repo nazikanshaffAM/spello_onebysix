@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'StartPage.dart';
-import 'game_backend.dart';
+import 'screens/game_start_page.dart';
+
 
 
 

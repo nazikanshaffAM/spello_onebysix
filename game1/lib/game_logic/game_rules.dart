@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ApiService.dart';
-import 'EndingPage.dart';
-import 'dart:math';
+import '../service/api_service.dart';
+import '../screens/ending_page.dart';
+
 
 class GameRules extends ChangeNotifier {
   BuildContext context;
@@ -35,7 +35,7 @@ class GameRules extends ChangeNotifier {
 
   // Fetch the first word
   Future<void> initializeGame() async {
-    word = "Loading..."; // Temporary placeholder untile the words are loading from the backend
+    word = "Loading..."; // Temporary placeholder until the words are loading from the backend
     notifyListeners(); //
 
     try {
@@ -46,7 +46,7 @@ class GameRules extends ChangeNotifier {
         word = "default"; // Fallback word
       }
     } catch (e) {
-      word = "Error fetching word"; // Error handling
+      word = "Error fetching word";
     }
 
     notifyListeners();
@@ -55,12 +55,12 @@ class GameRules extends ChangeNotifier {
 
   // Function to update the opacity
   void updateAlienOpacity(double opacity) {
-    // Ensure opacity is within the valid range (0.0 to 1.0)
+
     alienOpacity = opacity.clamp(0.0, 1.0);
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
-  // Set selected alien (randomly or based on user input)
+  // Set selected alien
   void setSelectedAlien(int index) {
     selectedAlienImage = aliens[index];
     notifyListeners();
@@ -151,21 +151,30 @@ class GameRules extends ChangeNotifier {
     }
     notifyListeners();
   }
-
+//game logic for end the game
   void endGame() {
     gameEnded = true;
     notifyListeners();
 
+
+    int correctlyPronouncedWords = xp ~/ 100; // Each correct word gives 100 XP
+
+    // Calculate accuracy based on the number of correctly pronounced words vs total attempts
+    //int totalAttempts = 30; //
+    //double accuracy = (correctlyPronouncedWords / totalAttempts) * 100;
+
+    // Navigate to EndingPage with only the correct data
     Future.microtask(() => Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EndingPage(
-          correctlyPronouncedWords: xp ~/ 100,
-          totalWords: xp ~/ 100, // Since each correct word gives 100 XP
-          accuracy: xp / ((xp ~/ 100) * 100) * 100,
-          userLevel: xp ~/ 500,
+          correctlyPronouncedWords: correctlyPronouncedWords,
+          //accuracy: accuracy,
+          livesLeft: lives,
         ),
       ),
     ));
   }
+
+
 }
