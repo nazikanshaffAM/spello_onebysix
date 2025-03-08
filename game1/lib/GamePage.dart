@@ -13,6 +13,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   final AudioService _audioService = AudioService();
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
+  bool _isRecording = false; // Track if the mic button is pressed
 
   @override
   void initState() {
@@ -67,8 +68,8 @@ class _GamePageState extends State<GamePage> {
                   ),
                 ),
                 Positioned(
-                  top: screenHeight * 0.05,
-                  right: screenWidth * 0.05,
+                  top: screenHeight * 0.06,
+                  right: screenWidth * 0.04,
                   child: Row(
                     children: List.generate(3, (index) {
                       return Padding(
@@ -77,38 +78,40 @@ class _GamePageState extends State<GamePage> {
                           index < gameRules.lives
                               ? 'assets/images/heart.png'
                               : 'assets/images/emtyheart.png',
-                          width: screenWidth * 0.06,
+                          width: screenWidth * 0.07,
                         ),
                       );
                     }),
                   ),
                 ),
-                Positioned(
-                  top: screenHeight * 0.05,
-                  left: screenWidth * 0.5 - (screenWidth * 0.08),
-                  child: Text(
-                    "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.08,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                Align(
+                  alignment: Alignment.topCenter, // Centers horizontally
+                  child: Padding(
+                    padding: EdgeInsets.only(top: screenHeight * 0.05), // Adjust vertical position
+                    child: Text(
+                      "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.08,
+                        fontWeight: FontWeight.bold,
+                        color: gameRules.timeLeft <= 10 ? Colors.red : Colors.green, // Changes color dynamically
+                      ),
                     ),
                   ),
                 ),
-                // Alien images to fly
-                gameRules.shouldAnimate
-                    ? AnimatedPositioned(
+
+
+
+                AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
-                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
-                )
-                    : Positioned(
-                  top: gameRules.position,
-                  left: screenWidth * 0.5 - 50,
-                  child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
+                  child: Opacity(
+                    opacity: gameRules.alienOpacity,  // Use the opacity from the GameRules
+                    child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
+                  ),
                 ),
+
                 Positioned(
                   bottom: screenHeight * 0.1,
                   left: screenWidth * 0.08,
@@ -156,27 +159,44 @@ class _GamePageState extends State<GamePage> {
 
   Widget _buildMicButton(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onLongPress: () async {
+        // Start recording when the button is held
+        setState(() {
+          _isRecording = true;
+        });
         await _audioService.startRecording();
       },
       onLongPressUp: () async {
+        // Stop recording and reset the button state
+        setState(() {
+          _isRecording = false;
+        });
         await _audioService.stopRecording();
         var gameRules = Provider.of<GameRules>(context, listen: false);
         await _audioService.sendAudioToBackend(context, gameRules);
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
-        height: screenWidth * 0.18,
-        width: screenWidth * 0.18,
+        height: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
+        width: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
         decoration: BoxDecoration(
-          color: Colors.red,
+          color: _isRecording ? Colors.green : Colors.red, // Change color on press
           shape: BoxShape.circle,
           boxShadow: [
-            BoxShadow(color: Colors.redAccent, blurRadius: 10, spreadRadius: 2),
+            BoxShadow(
+              color: _isRecording ? Colors.greenAccent : Colors.redAccent, // Shadow color change
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
           ],
         ),
-        child: Icon(Icons.mic, size: screenWidth * 0.09, color: Colors.white),
+        child: Icon(
+          Icons.mic,
+          size: _isRecording ? screenWidth * 0.12 : screenWidth * 0.09, // Bigger icon when recording
+          color: Colors.white,
+        ),
       ),
     );
   }

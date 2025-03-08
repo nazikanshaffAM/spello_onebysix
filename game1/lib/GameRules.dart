@@ -12,6 +12,8 @@ class GameRules extends ChangeNotifier {
   String word = "";  // Store the current word
   bool gameEnded = false;
   bool shouldAnimate = true;
+  double alienOpacity = 1.0;
+
 
   // Add a list of alien images
   List<String> aliens = [
@@ -51,6 +53,13 @@ class GameRules extends ChangeNotifier {
     startTimer();
   }
 
+  // Function to update the opacity
+  void updateAlienOpacity(double opacity) {
+    // Ensure opacity is within the valid range (0.0 to 1.0)
+    alienOpacity = opacity.clamp(0.0, 1.0);
+    notifyListeners(); // Notify listeners to update the UI
+  }
+
   // Set selected alien (randomly or based on user input)
   void setSelectedAlien(int index) {
     selectedAlienImage = aliens[index];
@@ -78,9 +87,9 @@ class GameRules extends ChangeNotifier {
       if (accuracy >= 75) {
         moveImageToTop();
         Future.delayed(const Duration(seconds: 1), () async {
-          shouldAnimate = false;
+          //updateAlienOpacity(0.0);
           resetImagePosition();
-          shouldAnimate = true;
+          //updateAlienOpacity(1.0);
           xp += 100;
 
           // Fetch the next word after pronunciation check
@@ -91,7 +100,7 @@ class GameRules extends ChangeNotifier {
             word = "default"; // Fallback word if the new word fetch fails
           }
 
-          notifyListeners();  // Make sure to notify listeners after updating the word
+          notifyListeners();
         });
       } else {
         moveImageHalfway();
@@ -105,15 +114,21 @@ class GameRules extends ChangeNotifier {
 
 
   void moveImageToTop() {
-    if (shouldAnimate) {
-      position = -50;
-    }
-    notifyListeners();
+      position = 200;
+      notifyListeners();
+
+      // Wait for animation to complete before setting opacity to 0
+      Future.delayed(Duration(seconds: 1), () {
+        alienOpacity = 0.0;  // Hide the image
+        notifyListeners();
+      });
+
   }
+
 
   void moveImageHalfway() {
     if (shouldAnimate) {
-      position = 200;
+      position = 500;
       Future.delayed(const Duration(seconds: 1), () {
         position = 600;
         loseLife();
@@ -122,8 +137,11 @@ class GameRules extends ChangeNotifier {
   }
 
   void resetImagePosition() {
-    position = 600;
-    notifyListeners();
+    position = 600; // Move back to the bottom
+    Future.delayed(Duration(seconds: 1), () {
+      alienOpacity = 1.0;  // show the image
+      notifyListeners();
+    });
   }
 
   void loseLife() {
