@@ -15,6 +15,9 @@ class GameRules extends ChangeNotifier {
   double alienOpacity = 1.0;
 
 
+
+
+
   // Add a list of alien images
   List<String> aliens = [
     'assets/images/alien1.png',
@@ -156,16 +159,27 @@ class GameRules extends ChangeNotifier {
     gameEnded = true;
     notifyListeners();
 
+    // Assuming `totalAttempts` and `correctlyPronouncedWords` are available.
+    int totalAttempts = 30; // Replace with your actual total attempts value
+    int correctlyPronouncedWords = xp ~/ 100; // Each correct word gives 100 XP
+
+    double accuracy = (correctlyPronouncedWords / totalAttempts) * 100;
+    int userLevel = xp ~/ 500; // Assuming level increases by 500 XP
+
+    // Navigate to EndingPage with the correct values
     Future.microtask(() => Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EndingPage(
-          correctlyPronouncedWords: xp ~/ 100,
-          totalWords: xp ~/ 100, // Since each correct word gives 100 XP
-          accuracy: xp / ((xp ~/ 100) * 100) * 100,
-          userLevel: xp ~/ 500,
+          correctlyPronouncedWords: correctlyPronouncedWords,
+          totalWords: totalAttempts, // Total number of words attempted
+          accuracy: accuracy,
+          userLevel: userLevel,
+          totalAttempts: totalAttempts,
+          livesLeft: lives, // Make sure you have the correct value for livesLeft
         ),
       ),
     ));
   }
+
 }

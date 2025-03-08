@@ -15,6 +15,7 @@ class GamePageState extends State<GamePage> {
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
   bool _isRecording = false; // Track if the mic button is pressed
 
+
   @override
   void initState() {
     super.initState();
