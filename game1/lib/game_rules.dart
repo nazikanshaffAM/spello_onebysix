@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ApiService.dart';
-import 'EndingPage.dart';
-import 'dart:math';
+import 'api_service.dart';
+import 'ending_page.dart';
+
 
 class GameRules extends ChangeNotifier {
   BuildContext context;

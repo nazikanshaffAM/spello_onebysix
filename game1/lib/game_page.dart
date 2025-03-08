@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'GameRules.dart';
-import 'AudioService.dart';
+import 'game_rules.dart';
+import 'audio_recorder.dart';
 
 class GamePage extends StatefulWidget {
   @override
-  _GamePageState createState() => _GamePageState();
+  GamePageState createState() => GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class GamePageState extends State<GamePage> {
   final AudioService _audioService = AudioService();
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
   bool _isRecording = false; // Track if the mic button is pressed

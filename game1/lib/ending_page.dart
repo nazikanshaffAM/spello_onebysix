@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mygame/StartPage.dart';
+import 'package:mygame/game_start_page.dart';
 
-import 'GamePage.dart';
+import 'game_page.dart';
 
 class EndingPage extends StatelessWidget {
   final int correctlyPronouncedWords;

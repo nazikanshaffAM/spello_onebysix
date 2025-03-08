@@ -46,7 +46,7 @@ class GameBackend {
   Future<void> startServer() async {
     _router.post('/upload-audio', uploadAudio);
 
-    final handler = Pipeline().addMiddleware(logRequests()).addHandler(_router);
+    final handler = Pipeline().addMiddleware(logRequests()).addHandler(_router.call);
 
     try {
       final server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 8080);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mygame/GamePage.dart';
-import 'package:mygame/HowToPlayPage.dart';
-import 'package:mygame/SettingsPage.dart';
+import 'package:mygame/game_page.dart';
+import 'package:mygame/how_to_play_page.dart';
+import 'package:mygame/settings_page.dart';
 
 
 

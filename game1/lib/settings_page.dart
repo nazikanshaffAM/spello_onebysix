@@ -7,10 +7,10 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.onBackgroundSelected});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> {
   List<String> backgroundImages = [
     "assets/images/b1.jpg",
     "assets/images/b2.jpg",

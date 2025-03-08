@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:mygame/GameRules.dart';
+import 'package:mygame/game_rules.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'ApiService.dart'; // Import the API service to send the file
+import 'api_service.dart'; // Import the API service to send the file
 
 class AudioService {
   final AudioRecorder _recorder = AudioRecorder();
