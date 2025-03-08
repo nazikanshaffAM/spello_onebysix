@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mygame/game_page.dart';
-import 'package:mygame/how_to_play_page.dart';
-import 'package:mygame/settings_page.dart';
+import 'package:mygame/screens/game_page.dart';
+import 'package:mygame/screens/how_to_play_page.dart';
+import 'package:mygame/screens/settings_page.dart';
 
 
 class StartPage extends StatefulWidget {

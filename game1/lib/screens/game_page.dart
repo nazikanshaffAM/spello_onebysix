@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'game_rules.dart';
-import 'audio_recorder.dart';
+import '../game_logic/game_rules.dart';
+import '../game_logic/audio_recorder.dart';
 
 class GamePage extends StatefulWidget {
   @override

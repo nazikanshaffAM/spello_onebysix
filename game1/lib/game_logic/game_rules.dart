@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
-import 'ending_page.dart';
+import '../service/api_service.dart';
+import '../screens/ending_page.dart';
 
 
 class GameRules extends ChangeNotifier {

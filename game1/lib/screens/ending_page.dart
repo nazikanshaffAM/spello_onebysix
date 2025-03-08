@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mygame/game_start_page.dart';
+import 'package:mygame/screens/game_start_page.dart';
 import 'game_page.dart';
 
 class EndingPage extends StatelessWidget {
