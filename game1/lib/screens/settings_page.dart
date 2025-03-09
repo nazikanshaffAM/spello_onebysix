@@ -7,10 +7,10 @@ class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.onBackgroundSelected});
 
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> {
   List<String> backgroundImages = [
     "assets/images/b1.jpg",
     "assets/images/b2.jpg",
@@ -18,6 +18,15 @@ class _SettingsPageState extends State<SettingsPage> {
     "assets/images/b4.jpg",
     "assets/images/b5.jpg",
     "assets/images/b6.jpg",
+  ];
+
+  List<String> backgroundNames = [
+    "Space Adventure",
+    "Mystic Forest",
+    "Cyber Grid",
+    "Neon City",
+    "Dark Galaxy",
+    "Retro Arcade"
   ];
 
   String selectedBackground = "";
@@ -53,10 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/settingpagebackground.png',
-              fit: BoxFit.cover,
-            ),
+            child: Container(color: Colors.black),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -73,13 +79,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 columns
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
-                      childAspectRatio:
-                          1.5, // Adjust aspect ratio for better fit
+                      childAspectRatio: 1.2,
                     ),
                     itemCount: backgroundImages.length,
                     itemBuilder: (context, index) {
@@ -110,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               padding: const EdgeInsets.all(5),
                               color: Colors.black.withOpacity(0.5),
                               child: Text(
-                                "Background ${index + 1}",
+                                backgroundNames[index], // Displaying background name
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),

@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../game1/assets/images/UFO.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../game1/lib/ApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/ApiService.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../game1/lib/GamePage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GamePage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../game1/lib/GameRules.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GameRules.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,20 +26,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.back.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "C:/Users/miyur/OneDrive - University of Westminster/Desktop/Backend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.back.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/miyur/OneDrive - University of Westminster/Desktop/Backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -65,7 +61,12 @@
       <workItem from="1740726669341" duration="21000" />
       <workItem from="1740922997654" duration="2733000" />
       <workItem from="1740974037808" duration="8869000" />
-      <workItem from="1741003081676" duration="2487000" />
+      <workItem from="1741003081676" duration="7040000" />
+      <workItem from="1741064196765" duration="3117000" />
+      <workItem from="1741168597416" duration="1345000" />
+      <workItem from="1741274487401" duration="712000" />
+      <workItem from="1741286955535" duration="1248000" />
+      <workItem from="1741328416420" duration="683000" />
     </task>
     <servers />
   </component>
@@ -73,6 +74,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741018780829" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741328418415" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

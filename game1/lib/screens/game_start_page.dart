@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mygame/GamePage.dart';
-import 'package:mygame/HowToPlayPage.dart';
-import 'package:mygame/SettingsPage.dart';
-
-
+import 'package:mygame/screens/game_page.dart';
+import 'package:mygame/screens/how_to_play_page.dart';
+import 'package:mygame/screens/settings_page.dart';
 
 
 class StartPage extends StatefulWidget {
@@ -30,7 +28,7 @@ class _StartPageState extends State<StartPage> {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/images/background.png',
+                  'assets/images/startpagebackground.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -42,12 +40,12 @@ class _StartPageState extends State<StartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GamePage(), // Navigate to the game
+                          builder: (context) => GamePage(),
                         ),
                       );
                     }),
                     const SizedBox(height: 20),
-                    _buildButton('SETTINGS', () {
+                    _buildButton('MAP', () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -80,34 +78,41 @@ class _StartPageState extends State<StartPage> {
   }
 
   Widget _buildButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF6B96AB),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+    return SizedBox(
+      width: 200,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.pink,//const Color(0xFF6B96AB),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          elevation: 3,
         ),
-        elevation: 3,
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontFamily: 'Orbitron',
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-          shadows: [
-            Shadow(
-              color: Colors.black26,
-              offset: Offset(2, 2),
-              blurRadius: 2,
-            )
-          ],
+        child: FittedBox(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontFamily: 'Orbitron',
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  offset: Offset(2, 2),
+                  blurRadius: 2,
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
 }
 
 

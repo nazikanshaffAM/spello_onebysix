@@ -6,17 +6,17 @@ import 'package:hangman/ui/settings_page.dart';
 import '../engine/hangman.dart';
 
 const List<String> progressImages = [
-  'data_repo/img/progress_0.png',
-  'data_repo/img/progress_1.png',
-  'data_repo/img/progress_2.png',
-  'data_repo/img/progress_3.png',
-  'data_repo/img/progress_4.png',
-  'data_repo/img/progress_5.png',
-  'data_repo/img/progress_6.png',
-  'data_repo/img/progress_7.png', // Losing stage (progress_7)
+  'data_repo/img/prog0.png',
+  'data_repo/img/prog1.png',
+  'data_repo/img/prog2.png',
+  'data_repo/img/prog3.png',
+  'data_repo/img/prog4.png',
+  'data_repo/img/prog5.png',
+  'data_repo/img/prog6.png',
+  'data_repo/img/prog7.png', // Losing stage (progress_7)
 ];
 
-const String victoryImage = 'data_repo/img/victory.png';
+const String victoryImage = 'data_repo/img/progvic.png';
 
 const TextStyle activeWordStyle = TextStyle(
   fontSize: 30.0,
