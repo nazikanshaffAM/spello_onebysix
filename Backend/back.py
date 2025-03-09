@@ -78,6 +78,9 @@ def get_target_word():
         # Remove duplicates
         filtered_words = list(set(filtered_words))
 
+    # Add custom words to the filtered list
+    filtered_words.extend(custom_words)
+
     # If no words match the criteria, use all words
     if not filtered_words:
         filtered_words = list(word_sound_mapping.keys())
@@ -134,6 +137,18 @@ def speech_to_text():
         "target_word": target_word,
         "accuracy": accuracy
     })
+
+@app.route("/add-custom-word", methods=["POST"])
+def add_custom_word():
+    data = request.json
+    email = data.get("email")
+    custom_word = data.get("custom_word")
+
+
+    return jsonify({"message": f"Custom word '{custom_word}' added successfully!"})
+
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Initializing database
 
