@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import the services package
 import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/gameResults.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
 import 'package:spello_frontend/pages/HomePages/SubPages/page_under_construction.dart';
-import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
-import 'package:spello_frontend/pages/OnboardingPages/onboarding_screen_two.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
