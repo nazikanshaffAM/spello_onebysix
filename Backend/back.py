@@ -144,6 +144,21 @@ def add_custom_word():
     email = data.get("email")
     custom_word = data.get("custom_word")
 
+    if not email or not custom_word:
+        return jsonify({"error": "Email and custom_word are required"}), 400
+
+    # Find the user and update their custom words
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Add custom word to the user's profile
+    if "custom_words" not in user:
+        collection.update_one({"email": email}, {"$set": {"custom_words": [custom_word]}})
+    else:
+        # Avoid adding duplicates
+        if custom_word not in user["custom_words"]:
+            collection.update_one({"email": email}, {"$push": {"custom_words": custom_word}})
 
     return jsonify({"message": f"Custom word '{custom_word}' added successfully!"})
 
