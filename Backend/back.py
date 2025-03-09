@@ -51,6 +51,17 @@ for sound, words in sound_word_lists.items():
 def get_target_word():
     # Get selected sounds from query parameters
     selected_sounds = request.args.get('sounds', '').lower().split(',')
+    email = request.args.get('email')  # Get email from query parameters to fetch custom words
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Retrieve custom words from the user's profile
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    custom_words = user.get("custom_words", [])
 
     # Filter words that contain at least one of the selected sounds
     filtered_words = []
