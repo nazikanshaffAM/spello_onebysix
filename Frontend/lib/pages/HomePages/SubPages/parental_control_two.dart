@@ -18,10 +18,13 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   final GlobalKey _firstTileKey = GlobalKey();
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
+  final ScrollController _scrollController =
+      ScrollController(); // Add ScrollController
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose(); // Dispose the ScrollController
     super.dispose();
   }
 
@@ -101,14 +104,21 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.top,
-            child: Text(
-              "Press the button to add a word for practice.",
-              style: const TextStyle(
-                fontFamily: "Fredoka",
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 16,
+            align: ContentAlign.top, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "Press the button to add a word for practice.",
+                style: const TextStyle(
+                  fontFamily: "Fredoka",
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -126,14 +136,21 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
-            child: Text(
-              "Swipe left to delete.",
-              style: const TextStyle(
-                fontFamily: "Fredoka",
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 16,
+            align: ContentAlign.bottom, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "Swipe left to delete.",
+                style: const TextStyle(
+                  fontFamily: "Fredoka",
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -146,7 +163,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     tutorialCoachMark = TutorialCoachMark(
       targets: targets,
       colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
-      textSkip: "SKIP",
       paddingFocus: 8,
       onFinish: () => debugPrint("Tutorial finished"),
       onClickTarget: (target) =>
@@ -155,6 +171,17 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
           debugPrint("Overlay clicked: ${target.identify}"),
     );
     tutorialCoachMark.show(context: context);
+
+    // Scroll to reveal the delete part of the first tile
+    if (wordList.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          100, // Adjust this value to reveal the delete part
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      });
+    }
   }
 
   void _showAddButtonTutorial() {
@@ -215,7 +242,41 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
       ),
       body: Stack(
         children: [
-          // ... Existing UI elements (cloud images, etc.)
+          // Cloud Images
+          Positioned(
+            top: screenHeight * 0.05,
+            left: screenWidth * 0.6,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.2,
+            right: screenWidth * 0.7,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenHeight * 0.38,
+            left: screenWidth * 0.33,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          // Main Content
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: screenWidth * 0.04,
@@ -251,6 +312,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                 if (wordList.isNotEmpty)
                   Expanded(
                     child: ListView.builder(
+                      controller: _scrollController, // Add ScrollController
                       itemCount: wordList.length,
                       itemBuilder: (context, index) {
                         final tileKey = index == 0 ? _firstTileKey : null;

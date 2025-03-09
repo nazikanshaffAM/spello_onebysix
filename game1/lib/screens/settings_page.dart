@@ -41,7 +41,8 @@ class SettingsPageState extends State<SettingsPage> {
   Future<void> _loadSelectedBackground() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedBackground = prefs.getString("selectedBackground") ?? backgroundImages[0];
+      selectedBackground =
+          prefs.getString("selectedBackground") ?? backgroundImages[0];
     });
   }
 
@@ -70,7 +71,10 @@ class SettingsPageState extends State<SettingsPage> {
               children: [
                 const Text(
                   "Select Background",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 10),
                 Expanded(
