@@ -3,26 +3,27 @@ import json
 import random
 import vosk
 from rapidfuzz.distance import Levenshtein
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from pymongo import MongoClient
-
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app, supports_credentials=True)  # Enable credentials for session cookies
+app.secret_key = 'spello_secret_key'  # Required for session management
+
 
 # path to the downloaded model
 MODEL_PATH = "vosk-model-small-en-us-0.15"
 
-
 # Load Vosk Model
 if not os.path.exists(MODEL_PATH):
     raise ValueError("Model not found! Please download and extract it.")
-
 
 model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
 #creating a dictionary to store targeted words
 session_data = {}
-
 
 # comprehensive word list organized by sounds (first five sounds: p, b, t, d, k)
 sound_word_lists = {
@@ -51,10 +52,12 @@ for sound, words in sound_word_lists.items():
 def get_target_word():
     # Get selected sounds from query parameters
     selected_sounds = request.args.get('sounds', '').lower().split(',')
-    email = request.args.get('email')  # Get email from query parameters to fetch custom words
+
+    # Get email from session instead of from query parameters
+    email = session.get('user_email')
 
     if not email:
-        return jsonify({"error": "Email is required"}), 400
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
 
     # Retrieve custom words from the user's profile
     user = collection.find_one({"email": email})
@@ -91,7 +94,6 @@ def get_target_word():
 
     return jsonify({
         "target_word": target_word,
-        # "contains_sounds": word_sound_mapping[target_word]
     })
 
 
@@ -108,6 +110,11 @@ def calculate_accuracy(target, spoken):
 # API Endpoint to receive audio
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
+    # Check if user is logged in
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
@@ -140,12 +147,16 @@ def speech_to_text():
 
 @app.route("/add-custom-word", methods=["POST"])
 def add_custom_word():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
     data = request.json
-    email = data.get("email")
     custom_word = data.get("custom_word")
 
-    if not email or not custom_word:
-        return jsonify({"error": "Email and custom_word are required"}), 400
+    if not custom_word:
+        return jsonify({"error": "Custom word is required"}), 400
 
     # Find the user and update their custom words
     user = collection.find_one({"email": email})
@@ -164,15 +175,18 @@ def add_custom_word():
 
 
 
-
 @app.route("/remove-custom-word", methods=["POST"])
 def remove_custom_word():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
     data = request.json
-    email = data.get("email")
     custom_word = data.get("custom_word")
 
-    if not email or not custom_word:
-        return jsonify({"error": "Email and custom_word are required"}), 400
+    if not custom_word:
+        return jsonify({"error": "Custom word is required"}), 400
 
     # Find the user and update their custom words
     user = collection.find_one({"email": email})
@@ -206,62 +220,194 @@ def home():
     return jsonify({"message": "Connected MongoDB Successfully"})
 
 
-# add route to store details in the database
-@app.route("/store_user", methods=["POST"])
-def store_user():
+
+# registering user
+@app.route('/register', methods=['POST'])  # to register
+def register():
     data = request.json
 
     # Validate required fields
-    required_fields = ["name", "email", "age", "gender", ]
+    required_fields = ["name", "email", "password"]
     if not all(field in data for field in required_fields):
-        return jsonify({"error": "All fields (name, email, age, gender) are required"}), 400
+        return jsonify({"error": "Name, email, and password are required"}), 400
 
+    # Optional fields
+    age = data.get('age', '')
+    gender = data.get('gender', '')
+
+    email = data.get('email')
+    password = data.get('password')
+    name = data.get('name', '')
+
+    # Check if user already exists
+    if collection.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+
+    # Hash the password
+    hashed_password = generate_password_hash(password)
+
+    # Create user object
     user = {
-        "name": data["name"],
-        "email": data["email"],
-        "age": data["age"],
-        "gender": data["gender"],
+        'email': email,
+        'password': hashed_password,
+        'name': name,
+        'age': age,
+        'gender': gender,
+        'custom_words': [],
+        'total_score': 0,
+        'level': 1,
+        'attempts': 0,
+        'lives': 5,
+        'scores': []
     }
 
-    # Insert user data into the database
+    # Insert new user
     result = collection.insert_one(user)
-    user["_id"] = str(result.inserted_id)  # Convert ObjectId to string
 
-    return jsonify({"message": "User data stored successfully!", "user": user})
+    # Create response without password
+    user_response = {
+        'name': name,
+        'email': email,
+        'age': age,
+        'gender': gender,
+        '_id': str(result.inserted_id)
+    }
 
-# Route to get all stored users from the database
-@app.route("/get_users", methods=["GET"])
+    return jsonify({
+        'message': 'User registered successfully',
+        'user': user_response
+    }), 201
+
+
+# login
+@app.route('/login', methods=['POST'])  # to login
+def login():
+    data = request.json
+
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({'message': 'Email and password are required'}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # Find user in database
+    user = collection.find_one({'email': email})
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    # Check password
+    if check_password_hash(user['password'], password):
+        # Store email in session after successful login
+        session['user_email'] = email
+
+        # Don't send password in response
+        user_data = {
+            'email': user['email'],
+            'name': user.get('name', ''),
+            'age': user.get('age', ''),
+            'gender': user.get('gender', '')
+        }
+        return jsonify({
+            'message': 'Login successful',
+            'user': user_data
+        }), 200
+    else:
+        return jsonify({'message': 'Invalid password'}), 401
+
+
+# Route to logout user
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Remove user email from session
+    session.pop('user_email', None)
+    return jsonify({'message': 'Logged out successfully'}), 200
+
+
+# add route to store details in the database
+@app.route('/get_users', methods=['GET'])  # to get all the user details
 def get_users():
-    # Retrieve all users from the database
-    users = collection.find({}, {"_id": 0})  # Exclude MongoDB's default "_id" field
+    # Retrieve all users but exclude passwords and convert ObjectId to string
+    users_cursor = collection.find({}, {"password": 0})
 
-    user_list = list(users)  # Convert cursor to a list
-    return jsonify({"users": user_list})
+    # Convert cursor to list and handle ObjectId
+    users_list = []
+    for user in users_cursor:
+        user['_id'] = str(user['_id'])  # Convert ObjectId to string
+        users_list.append(user)
+
+    return jsonify({"users": users_list})
 
 
 #get one user based on email
-@app.route("/get_user", methods=["GET"])
+@app.route('/get_user', methods=['GET'])  # get user accordint to email
 def get_user():
-    email = request.args.get("email")  # Get email from query parameters
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        # If not in session, try from query parameters
+        email = request.args.get("email")
 
     if not email:
-        return jsonify({"error": "Email is required"}), 400
+        return jsonify({"error": "Email is required or user not logged in"}), 400
 
-    # Find user by email, exclude MongoDB "_id" field from response
-    user = collection.find_one({"email": email}, {"_id": 0})
+    # Find user by email, exclude password from response
+    user = collection.find_one({"email": email}, {"password": 0})
 
     if not user:
         return jsonify({"error": "User not found"}), 404
 
+    # Convert ObjectId to string
+    user['_id'] = str(user['_id'])
+
     return jsonify(user)
 
 
+@app.route('/delete_user', methods=['DELETE'])  # to delete user according to email
+def delete_user():
+    # Get email from session for currently logged in user
+    email = session.get('user_email')
+    if not email:
+        # If not in session, try from query parameters
+        email = request.args.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required or user not logged in"}), 400
+
+    # Find the user first to return their info
+    user = collection.find_one({"email": email})
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Delete the user
+    result = collection.delete_one({"email": email})
+
+    if result.deleted_count == 1:
+        # If the deleted user was the logged in user, clear session
+        if session.get('user_email') == email:
+            session.pop('user_email', None)
+
+        # Create a response excluding the password
+        deleted_user = {
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "age": user.get("age"),
+            "gender": user.get("gender")
+        }
+        return jsonify({
+            "message": "User deleted successfully",
+            "deleted_user": deleted_user
+        })
+    else:
+        return jsonify({"error": "Failed to delete the user"}), 500
+
+
+
 # Route to delete the last inserted user
-@app.route("/delete_last_user", methods=["DELETE"])
+@app.route('/delete_last_user', methods=['DELETE'])  # to delete last user
 def delete_last_user():
     # Find the last inserted user
-    # Note: This assumes your MongoDB documents have a natural insertion order
-    # For a more reliable approach, you might want to add a timestamp field
     last_user = collection.find_one({}, sort=[("_id", -1)])
 
     if not last_user:
@@ -271,14 +417,20 @@ def delete_last_user():
     result = collection.delete_one({"_id": last_user["_id"]})
 
     if result.deleted_count == 1:
+        # If the deleted user was the logged in user, clear session
+        if session.get('user_email') == last_user.get("email"):
+            session.pop('user_email', None)
+
+        # Create a response excluding the password
+        deleted_user = {
+            "name": last_user.get("name"),
+            "email": last_user.get("email"),
+            "age": last_user.get("age"),
+            "gender": last_user.get("gender")
+        }
         return jsonify({
             "message": "Last user deleted successfully",
-            "deleted_user": {
-                "name": last_user.get("name"),
-                "email": last_user.get("email"),
-                "age": last_user.get("age"),
-                "gender": last_user.get("gender")
-            }
+            "deleted_user": deleted_user
         })
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
@@ -303,11 +455,11 @@ def calculate_score(accuracy, level):
 
 @app.route('/play-game', methods=['POST'])
 def play_game():
-    # Get email from form data or JSON
-    email = request.form.get('email') if request.form else request.json.get('email')
+    # Get email from session instead of form data
+    email = session.get('user_email')
 
     if not email:
-        return jsonify({'error': 'Email is required'}), 400
+        return jsonify({'error': 'User not logged in. Please log in first.'}), 401
 
     user = collection.find_one({'email': email})
     if not user:
