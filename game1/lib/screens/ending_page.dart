@@ -25,7 +25,7 @@ class EndingPage extends StatelessWidget {
           // Background Image
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background.png',
+              'assets/images/b11.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -112,7 +112,7 @@ class EndingPage extends StatelessWidget {
                 _buildFixedSizeButton("PLAY AGAIN", () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => GamePage()),
+                    MaterialPageRoute(builder: (context) => Game1()),
                   );
                 }),
                 const SizedBox(height: 16),
@@ -141,7 +141,7 @@ class EndingPage extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF6B96AB),
+          backgroundColor: const Color(0xFF0E3955),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),

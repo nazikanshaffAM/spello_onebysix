@@ -5,12 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../game_logic/game_rules.dart';
 import '../game_logic/audio_recorder.dart';
 
-class GamePage extends StatefulWidget {
+class Game1 extends StatefulWidget {
   @override
-  GamePageState createState() => GamePageState();
+  Game1State createState() => Game1State();
 }
 
-class GamePageState extends State<GamePage> {
+class Game1State extends State<Game1> {
   final AudioService _audioService = AudioService();
   String backgroundImage = 'assets/images/b1.jpg'; // Default background
   bool _isRecording = false;

@@ -75,13 +75,18 @@ flutter:
     - assets/images/ufo.png
     - assets/images/emtyheart.png
     - assets/images/heart.png
-    - assets/images/startpagebackground.png
     - assets/images/b1.jpg
     - assets/images/b2.jpg
     - assets/images/b3.jpg
     - assets/images/b4.jpg
     - assets/images/b5.jpg
     - assets/images/b6.jpg
+    - assets/images/b7.png
+    - assets/images/b8.png
+    - assets/images/b9.png
+    - assets/images/b10.png
+    - assets/images/b11.png
+    - assets/images/b12.png
     - assets/images/UFO.json
     - assets/images/alien1.png
     - assets/images/alien2.png
@@ -90,7 +95,8 @@ flutter:
     - assets/images/alien5.png
     - assets/images/alien6.png
     - assets/images/alien7.png
-    - assets/images/background.png
+    - assets/images/newb1.png
+    - assets/images/newb2.png
 
 
   # To add assets to your application, add an assets section, like this:
