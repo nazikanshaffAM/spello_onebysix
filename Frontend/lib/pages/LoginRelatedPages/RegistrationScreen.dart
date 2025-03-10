@@ -14,25 +14,27 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 10, 87, 151),
+        primaryColor: const Color.fromRGBO(10, 87, 151, 1),
       ),
       home: const RegistrationScreen(),
     );
   }
 }
-
+///////////////////////////////////////////////////////////////////
 // User model to structure the data
 class User {
   final String name;
   final String age;
   final String gender;
   final String email;
+  final String password;
 
   User({
     required this.name,
     required this.age,
     required this.gender,
     required this.email,
+    required this.password,
   });
 
   Map<String, dynamic> toJson() {
@@ -41,6 +43,7 @@ class User {
       'age': age,
       'gender': gender,
       'email': email,
+      'password': password,
     };
   }
 }
@@ -53,7 +56,7 @@ class ApiService {
   static Future<bool> registerUser(User user) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/store_user'),
+        Uri.parse('$baseUrl/register'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -87,6 +90,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   
   // Gender dropdown value
   String _selectedGender = 'Male';
@@ -97,6 +101,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   
   // Loading state
   bool _isLoading = false;
+  
+  // Password visibility
+  bool _obscurePassword = true;
 
   // Function to validate form fields
   String? _validateField(String? value, String fieldName) {
@@ -110,6 +117,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     
     if (fieldName == 'Age' && !_isNumeric(value)) {
       return 'Age must be a number';
+    }
+    
+    if (fieldName == 'Password' && value.length < 6) {
+      return 'Password must be at least 6 characters';
     }
     
     return null;
@@ -131,6 +142,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _nameController.dispose();
     _ageController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -148,6 +160,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         age: _ageController.text,
         gender: _selectedGender,
         email: _emailController.text,
+        password: _passwordController.text,
       );
 
       try {
@@ -166,6 +179,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           _nameController.clear();
           _ageController.clear();
           _emailController.clear();
+          _passwordController.clear();
           setState(() {
             _selectedGender = 'Male';
           });
@@ -272,6 +286,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         const SizedBox(height: 20),
                         _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
                         
+                        const SizedBox(height: 20),
+                        _buildPasswordField(),
+                        
                         // Add some extra space at the bottom for better scrolling
                         const SizedBox(height: 40),
                       ],
@@ -370,6 +387,47 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
   
+  // Helper method to build password field
+  Widget _buildPasswordField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: _obscurePassword,
+        validator: (value) => _validateField(value, 'Password'),
+        decoration: InputDecoration(
+          labelText: 'Password:',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+              color: Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+  
   // Helper method to build gender dropdown
   Widget _buildDropdownField() {
     return Container(
@@ -407,4 +465,4 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
   }
-}
+} 
