@@ -220,6 +220,66 @@ def home():
     return jsonify({"message": "Connected MongoDB Successfully"})
 
 
+
+# registering user
+@app.route('/register', methods=['POST'])  # to register
+def register():
+    data = request.json
+
+    # Validate required fields
+    required_fields = ["name", "email", "password"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Name, email, and password are required"}), 400
+
+    # Optional fields
+    age = data.get('age', '')
+    gender = data.get('gender', '')
+
+    email = data.get('email')
+    password = data.get('password')
+    name = data.get('name', '')
+
+    # Check if user already exists
+    if collection.find_one({'email': email}):
+        return jsonify({'message': 'User already exists'}), 409
+
+    # Hash the password
+    hashed_password = generate_password_hash(password)
+
+    # Create user object
+    user = {
+        'email': email,
+        'password': hashed_password,
+        'name': name,
+        'age': age,
+        'gender': gender,
+        'custom_words': [],
+        'total_score': 0,
+        'level': 1,
+        'attempts': 0,
+        'lives': 5,
+        'scores': []
+    }
+
+    # Insert new user
+    result = collection.insert_one(user)
+
+    # Create response without password
+    user_response = {
+        'name': name,
+        'email': email,
+        'age': age,
+        'gender': gender,
+        '_id': str(result.inserted_id)
+    }
+
+    return jsonify({
+        'message': 'User registered successfully',
+        'user': user_response
+    }), 201
+
+
+
 # add route to store details in the database
 @app.route("/store_user", methods=["POST"])
 def store_user():
