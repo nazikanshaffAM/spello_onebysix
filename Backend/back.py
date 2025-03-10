@@ -177,12 +177,16 @@ def add_custom_word():
 
 @app.route("/remove-custom-word", methods=["POST"])
 def remove_custom_word():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
     data = request.json
-    email = data.get("email")
     custom_word = data.get("custom_word")
 
-    if not email or not custom_word:
-        return jsonify({"error": "Email and custom_word are required"}), 400
+    if not custom_word:
+        return jsonify({"error": "Custom word is required"}), 400
 
     # Find the user and update their custom words
     user = collection.find_one({"email": email})
