@@ -3,7 +3,7 @@ import json
 import random
 import vosk
 from rapidfuzz.distance import Levenshtein
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_cors import CORS
@@ -363,12 +363,51 @@ def get_user():
     return jsonify(user)
 
 
+@app.route('/delete_user', methods=['DELETE'])  # to delete user according to email
+def delete_user():
+    # Get email from session for currently logged in user
+    email = session.get('user_email')
+    if not email:
+        # If not in session, try from query parameters
+        email = request.args.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required or user not logged in"}), 400
+
+    # Find the user first to return their info
+    user = collection.find_one({"email": email})
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Delete the user
+    result = collection.delete_one({"email": email})
+
+    if result.deleted_count == 1:
+        # If the deleted user was the logged in user, clear session
+        if session.get('user_email') == email:
+            session.pop('user_email', None)
+
+        # Create a response excluding the password
+        deleted_user = {
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "age": user.get("age"),
+            "gender": user.get("gender")
+        }
+        return jsonify({
+            "message": "User deleted successfully",
+            "deleted_user": deleted_user
+        })
+    else:
+        return jsonify({"error": "Failed to delete the user"}), 500
+
+
+
 # Route to delete the last inserted user
-@app.route("/delete_last_user", methods=["DELETE"])
+@app.route('/delete_last_user', methods=['DELETE'])  # to delete last user
 def delete_last_user():
     # Find the last inserted user
-    # Note: This assumes your MongoDB documents have a natural insertion order
-    # For a more reliable approach, you might want to add a timestamp field
     last_user = collection.find_one({}, sort=[("_id", -1)])
 
     if not last_user:
@@ -378,14 +417,20 @@ def delete_last_user():
     result = collection.delete_one({"_id": last_user["_id"]})
 
     if result.deleted_count == 1:
+        # If the deleted user was the logged in user, clear session
+        if session.get('user_email') == last_user.get("email"):
+            session.pop('user_email', None)
+
+        # Create a response excluding the password
+        deleted_user = {
+            "name": last_user.get("name"),
+            "email": last_user.get("email"),
+            "age": last_user.get("age"),
+            "gender": last_user.get("gender")
+        }
         return jsonify({
             "message": "Last user deleted successfully",
-            "deleted_user": {
-                "name": last_user.get("name"),
-                "email": last_user.get("email"),
-                "age": last_user.get("age"),
-                "gender": last_user.get("gender")
-            }
+            "deleted_user": deleted_user
         })
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
@@ -410,11 +455,11 @@ def calculate_score(accuracy, level):
 
 @app.route('/play-game', methods=['POST'])
 def play_game():
-    # Get email from form data or JSON
-    email = request.form.get('email') if request.form else request.json.get('email')
+    # Get email from session instead of form data
+    email = session.get('user_email')
 
     if not email:
-        return jsonify({'error': 'Email is required'}), 400
+        return jsonify({'error': 'User not logged in. Please log in first.'}), 401
 
     user = collection.find_one({'email': email})
     if not user:
