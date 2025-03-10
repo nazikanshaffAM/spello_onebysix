@@ -279,6 +279,43 @@ def register():
     }), 201
 
 
+# login
+@app.route('/login', methods=['POST'])  # to login
+def login():
+    data = request.json
+
+    if not data or not data.get('email') or not data.get('password'):
+        return jsonify({'message': 'Email and password are required'}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # Find user in database
+    user = collection.find_one({'email': email})
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    # Check password
+    if check_password_hash(user['password'], password):
+        # Store email in session after successful login
+        session['user_email'] = email
+
+        # Don't send password in response
+        user_data = {
+            'email': user['email'],
+            'name': user.get('name', ''),
+            'age': user.get('age', ''),
+            'gender': user.get('gender', '')
+        }
+        return jsonify({
+            'message': 'Login successful',
+            'user': user_data
+        }), 200
+    else:
+        return jsonify({'message': 'Invalid password'}), 401
+
+
 
 # add route to store details in the database
 @app.route("/store_user", methods=["POST"])
