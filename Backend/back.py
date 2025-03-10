@@ -52,10 +52,12 @@ for sound, words in sound_word_lists.items():
 def get_target_word():
     # Get selected sounds from query parameters
     selected_sounds = request.args.get('sounds', '').lower().split(',')
-    email = request.args.get('email')  # Get email from query parameters to fetch custom words
+
+    # Get email from session instead of from query parameters
+    email = session.get('user_email')
 
     if not email:
-        return jsonify({"error": "Email is required"}), 400
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
 
     # Retrieve custom words from the user's profile
     user = collection.find_one({"email": email})
@@ -92,7 +94,6 @@ def get_target_word():
 
     return jsonify({
         "target_word": target_word,
-        # "contains_sounds": word_sound_mapping[target_word]
     })
 
 
@@ -109,6 +110,11 @@ def calculate_accuracy(target, spoken):
 # API Endpoint to receive audio
 @app.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
+    # Check if user is logged in
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
