@@ -316,38 +316,27 @@ def login():
         return jsonify({'message': 'Invalid password'}), 401
 
 
+# Route to logout user
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Remove user email from session
+    session.pop('user_email', None)
+    return jsonify({'message': 'Logged out successfully'}), 200
+
 
 # add route to store details in the database
-@app.route("/store_user", methods=["POST"])
-def store_user():
-    data = request.json
-
-    # Validate required fields
-    required_fields = ["name", "email", "age", "gender", ]
-    if not all(field in data for field in required_fields):
-        return jsonify({"error": "All fields (name, email, age, gender) are required"}), 400
-
-    user = {
-        "name": data["name"],
-        "email": data["email"],
-        "age": data["age"],
-        "gender": data["gender"],
-    }
-
-    # Insert user data into the database
-    result = collection.insert_one(user)
-    user["_id"] = str(result.inserted_id)  # Convert ObjectId to string
-
-    return jsonify({"message": "User data stored successfully!", "user": user})
-
-# Route to get all stored users from the database
-@app.route("/get_users", methods=["GET"])
+@app.route('/get_users', methods=['GET'])  # to get all the user details
 def get_users():
-    # Retrieve all users from the database
-    users = collection.find({}, {"_id": 0})  # Exclude MongoDB's default "_id" field
+    # Retrieve all users but exclude passwords and convert ObjectId to string
+    users_cursor = collection.find({}, {"password": 0})
 
-    user_list = list(users)  # Convert cursor to a list
-    return jsonify({"users": user_list})
+    # Convert cursor to list and handle ObjectId
+    users_list = []
+    for user in users_cursor:
+        user['_id'] = str(user['_id'])  # Convert ObjectId to string
+        users_list.append(user)
+
+    return jsonify({"users": users_list})
 
 
 #get one user based on email
