@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spello_frontend/util/custom_elevated_button.dart';
 
-class AddWordDialogbox extends StatelessWidget {
+class AddWordDialogbox extends StatefulWidget {
   AddWordDialogbox({
     super.key,
     required this.controller,
@@ -14,6 +14,34 @@ class AddWordDialogbox extends StatelessWidget {
   final VoidCallback onCancel;
 
   @override
+  State<AddWordDialogbox> createState() => _AddWordDialogboxState();
+}
+
+class _AddWordDialogboxState extends State<AddWordDialogbox> {
+  String _errorMessage = ''; // To store the error message
+
+  void _validateAndSave() {
+    final input = widget.controller.text.trim();
+
+    // Check if the input contains more than one word
+    if (input.split(' ').length > 1) {
+      setState(() {
+        _errorMessage =
+            'Please enter only one word at a time.'; // Error message
+      });
+    } else if (input.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please enter a word.'; // Error message for empty input
+      });
+    } else {
+      setState(() {
+        _errorMessage = ''; // Clear error message if input is valid
+      });
+      widget.onSave(); // Call the onSave callback
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Use MediaQuery for responsive sizing.
     final screenHeight = MediaQuery.of(context).size.height;
@@ -23,12 +51,13 @@ class AddWordDialogbox extends StatelessWidget {
       backgroundColor:
           const Color(0xFF5A6C81), // Three shades lighter than dark blue.
       content: SizedBox(
-        height: screenHeight * 0.2,
+        height: screenHeight *
+            0.25, // Increased height to accommodate error message
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextField(
-              controller: controller,
+              controller: widget.controller,
               style: const TextStyle(
                 color: Color(0xFF3A435F), // Input text color
                 fontFamily: "Fredoka One",
@@ -48,6 +77,17 @@ class AddWordDialogbox extends StatelessWidget {
                 ),
               ),
             ),
+            if (_errorMessage.isNotEmpty) // Display error message if not empty
+              Padding(
+                padding: EdgeInsets.only(top: screenHeight * 0.01),
+                child: Text(
+                  _errorMessage,
+                  style: const TextStyle(
+                    color: Colors.red, // Error message color
+                    fontFamily: "Fredoka One",
+                  ),
+                ),
+              ),
             Padding(
               padding: EdgeInsets.only(top: screenHeight * 0.008),
               child: Row(
@@ -60,7 +100,7 @@ class AddWordDialogbox extends StatelessWidget {
                     primaryColor: 0xFFFFC000,
                     shadowColor: 0xFFD29338,
                     textColor: Colors.white,
-                    onPressed: onCancel,
+                    onPressed: widget.onCancel,
                   ),
                   SizedBox(width: screenWidth * 0.04),
                   CustomElevatedButton(
@@ -71,7 +111,7 @@ class AddWordDialogbox extends StatelessWidget {
                     primaryColor: 0xFFFFC000,
                     shadowColor: 0xFFD29338,
                     textColor: Colors.white,
-                    onPressed: onSave,
+                    onPressed: _validateAndSave, // Use the validation function
                   )
                 ],
               ),

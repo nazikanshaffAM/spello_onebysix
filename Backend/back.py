@@ -51,6 +51,17 @@ for sound, words in sound_word_lists.items():
 def get_target_word():
     # Get selected sounds from query parameters
     selected_sounds = request.args.get('sounds', '').lower().split(',')
+    email = request.args.get('email')  # Get email from query parameters to fetch custom words
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    # Retrieve custom words from the user's profile
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    custom_words = user.get("custom_words", [])
 
     # Filter words that contain at least one of the selected sounds
     filtered_words = []
@@ -66,6 +77,9 @@ def get_target_word():
 
         # Remove duplicates
         filtered_words = list(set(filtered_words))
+
+    # Add custom words to the filtered list
+    filtered_words.extend(custom_words)
 
     # If no words match the criteria, use all words
     if not filtered_words:
@@ -123,6 +137,57 @@ def speech_to_text():
         "target_word": target_word,
         "accuracy": accuracy
     })
+
+@app.route("/add-custom-word", methods=["POST"])
+def add_custom_word():
+    data = request.json
+    email = data.get("email")
+    custom_word = data.get("custom_word")
+
+    if not email or not custom_word:
+        return jsonify({"error": "Email and custom_word are required"}), 400
+
+    # Find the user and update their custom words
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Add custom word to the user's profile
+    if "custom_words" not in user:
+        collection.update_one({"email": email}, {"$set": {"custom_words": [custom_word]}})
+    else:
+        # Avoid adding duplicates
+        if custom_word not in user["custom_words"]:
+            collection.update_one({"email": email}, {"$push": {"custom_words": custom_word}})
+
+    return jsonify({"message": f"Custom word '{custom_word}' added successfully!"})
+
+
+
+
+@app.route("/remove-custom-word", methods=["POST"])
+def remove_custom_word():
+    data = request.json
+    email = data.get("email")
+    custom_word = data.get("custom_word")
+
+    if not email or not custom_word:
+        return jsonify({"error": "Email and custom_word are required"}), 400
+
+    # Find the user and update their custom words
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    if "custom_words" not in user or custom_word not in user["custom_words"]:
+        return jsonify({"error": "Custom word not found"}), 404
+
+    # Remove custom word from the user's profile
+    collection.update_one({"email": email}, {"$pull": {"custom_words": custom_word}})
+
+    return jsonify({"message": f"Custom word '{custom_word}' removed successfully!"})
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Initializing database
 

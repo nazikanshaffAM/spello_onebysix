@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
 import 'package:spello_frontend/util/custom_elevated_button.dart';
 import 'package:spello_frontend/util/parental_control_tile.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -64,14 +65,21 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
-            child: Text(
-              "Click the tile to allocate the sound for practice.",
-              style: TextStyle(
-                fontFamily: "Fredoka",
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: screenWidth * 0.04,
+            align: ContentAlign.bottom, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "Click the tile to allocate the sound for practice.",
+                style: TextStyle(
+                  fontFamily: "Fredoka",
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: screenWidth * 0.045,
+                ),
               ),
             ),
           ),
@@ -84,13 +92,21 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.top,
-            child: Text(
-              "Click 'Apply' to apply the selected sounds.",
-              style: TextStyle(
-                fontFamily: "Fredoka",
-                color: Colors.white,
-                fontSize: screenWidth * 0.04,
+            align: ContentAlign.top, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "Click 'Apply' to apply the selected sounds.",
+                style: TextStyle(
+                  fontFamily: "Fredoka",
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: screenWidth * 0.045,
+                ),
               ),
             ),
           ),
@@ -103,7 +119,6 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
     tutorialCoachMark = TutorialCoachMark(
       targets: targets,
       colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
-      textSkip: "SKIP",
       paddingFocus: 8,
       onFinish: () => debugPrint("Tutorial finished"),
       onClickTarget: (target) =>
@@ -165,15 +180,17 @@ class _ParentalControlOneState extends State<ParentalControlOne> {
           ),
           SizedBox(height: screenHeight * 0.02),
           CustomElevatedButton(
-            key: _applyButtonKey,
-            buttonLength: screenWidth * 0.7,
-            buttonHeight: screenHeight * 0.055,
-            buttonName: "Apply",
-            primaryColor: 0xFFFFC000,
-            shadowColor: 0xFFD29338,
-            textColor: Colors.white,
-            onPressed: _savePreferences,
-          ),
+              key: _applyButtonKey,
+              buttonLength: screenWidth * 0.7,
+              buttonHeight: screenHeight * 0.055,
+              buttonName: "Apply",
+              primaryColor: 0xFFFFC000,
+              shadowColor: 0xFFD29338,
+              textColor: Colors.white,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ParentalControl()));
+              }),
           SizedBox(height: screenHeight * 0.03),
         ],
       ),

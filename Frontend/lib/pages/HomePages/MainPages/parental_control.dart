@@ -48,15 +48,20 @@ class _ParentalControlState extends State<ParentalControl> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            align: ContentAlign.top, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Text(
                 "Tap here to select sounds that match your child's learning goals.",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   fontSize: 16,
+                  fontFamily: "Fredoka",
                 ),
               ),
             ),
@@ -70,16 +75,21 @@ class _ParentalControlState extends State<ParentalControl> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.top,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            align: ContentAlign.top, // Always display below the target
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3A435F),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Text(
                 "Tap here to choose words that support your child's speech development.",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontFamily: "Fredoka"),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: "Fredoka",
+                ),
               ),
             ),
           ),

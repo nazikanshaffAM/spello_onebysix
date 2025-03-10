@@ -209,9 +209,7 @@ class _GamePageState extends State<GamePage> {
                       child: GameCard(
                         gameName: game['name']!,
                         imageName: game['image']!,
-                        onTap: () {
-                          print("Tapped on ${game['name']}");
-                        },
+                        onTap: () {},
                         isRecommended: game['isRecommended']!,
                       ),
                     );
