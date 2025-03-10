@@ -49,3 +49,32 @@ class User {
 }
 
 // API service
+class ApiService {
+  
+  static const String baseUrl = 'http://192.168.8.163:5000';
+
+  static Future<bool> registerUser(User user) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/register'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(user.toJson()),
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        print('Registration Response: ${response.body}');
+        return true;
+      } else {
+        print('Registration failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error registering user: $e');
+      return false;
+    }
+  }
+}
+
