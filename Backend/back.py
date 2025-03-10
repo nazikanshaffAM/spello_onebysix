@@ -5,24 +5,25 @@ import vosk
 from rapidfuzz.distance import Levenshtein
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
-
+from werkzeug.security import check_password_hash, generate_password_hash
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app, supports_credentials=True)  # Enable credentials for session cookies
+app.secret_key = 'spello_secret_key'  # Required for session management
+
 
 # path to the downloaded model
 MODEL_PATH = "vosk-model-small-en-us-0.15"
 
-
 # Load Vosk Model
 if not os.path.exists(MODEL_PATH):
     raise ValueError("Model not found! Please download and extract it.")
-
 
 model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
 
 #creating a dictionary to store targeted words
 session_data = {}
-
 
 # comprehensive word list organized by sounds (first five sounds: p, b, t, d, k)
 sound_word_lists = {
