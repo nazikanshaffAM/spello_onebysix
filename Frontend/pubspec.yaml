@@ -80,6 +80,7 @@ flutter:
     - assets/animations/Confetti.json
     - assets/animations/UFO.json
     - assets/images/bg1.jpg
+    - assets/images/login.png
 
 
   fonts:
