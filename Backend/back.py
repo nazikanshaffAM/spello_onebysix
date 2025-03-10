@@ -340,18 +340,25 @@ def get_users():
 
 
 #get one user based on email
-@app.route("/get_user", methods=["GET"])
+@app.route('/get_user', methods=['GET'])  # get user accordint to email
 def get_user():
-    email = request.args.get("email")  # Get email from query parameters
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        # If not in session, try from query parameters
+        email = request.args.get("email")
 
     if not email:
-        return jsonify({"error": "Email is required"}), 400
+        return jsonify({"error": "Email is required or user not logged in"}), 400
 
-    # Find user by email, exclude MongoDB "_id" field from response
-    user = collection.find_one({"email": email}, {"_id": 0})
+    # Find user by email, exclude password from response
+    user = collection.find_one({"email": email}, {"password": 0})
 
     if not user:
         return jsonify({"error": "User not found"}), 404
+
+    # Convert ObjectId to string
+    user['_id'] = str(user['_id'])
 
     return jsonify(user)
 
