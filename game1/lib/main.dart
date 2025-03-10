@@ -7,16 +7,6 @@ import 'screens/game_start_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-//this is a test backend that used to test the game and commented because no longer  use it
-  //final backend = GameBackend();
-
-  //try {
-   // await backend.startServer(); // Start backend before launching UI
-    //print(" Backend started successfully.");
-  //} catch (e) {
-    //print(" Error starting backend: $e");
-  //}
-
 
 
   runApp(const VoiceGameApp());

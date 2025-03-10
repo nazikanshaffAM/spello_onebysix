@@ -28,7 +28,9 @@ class _StartPageState extends State<StartPage> {
             children: [
               Positioned.fill(
                 child: Image.asset(
-                  'assets/images/startpagebackground.png',
+                  'assets/images/b5.jpg',
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -40,7 +42,7 @@ class _StartPageState extends State<StartPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GamePage(),
+                          builder: (context) => Game1(),
                         ),
                       );
                     }),
@@ -51,7 +53,7 @@ class _StartPageState extends State<StartPage> {
                         MaterialPageRoute(
                           builder: (context) => SettingsPage(
                             onBackgroundSelected: (String newBackground) {
-                              setState(() {}); // Refresh the UI after returning
+                              setState(() {}); //
                             },
                           ),
                         ),
@@ -84,7 +86,7 @@ class _StartPageState extends State<StartPage> {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.pink,//const Color(0xFF6B96AB),
+          backgroundColor: const Color(0xFF0E3955),
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),

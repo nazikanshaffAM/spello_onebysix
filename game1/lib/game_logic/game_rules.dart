@@ -28,30 +28,57 @@ class GameRules extends ChangeNotifier {
 
   // Track selected alien
   String selectedAlienImage = 'assets/images/alien1.png';
+  String sampleEmail = "xyz@gmail.com";
+  List<String> selectedSounds = ['p', 'b', 't'];
+
+
 
   GameRules(this.context) {
-    initializeGame();
+    initializeGame(sampleEmail, selectedSounds);
   }
 
   // Fetch the first word
-  Future<void> initializeGame() async {
+  //Future<void> initializeGame1() async {
+   // word = "Loading..."; // Temporary placeholder until the words are loading from the backend
+   // notifyListeners(); //
+
+    //try {
+      //String? fetchedWord = await ApiService.fetchTargetWord('',);
+      //if (fetchedWord != null && fetchedWord.isNotEmpty) {
+        //word = fetchedWord;
+      //} else {
+        //word = "default"; // Fallback word
+      //}
+    //} catch (e) {
+      //word = "Error fetching word";
+    //}
+
+    //notifyListeners();
+    //();
+  //}
+//second methode to work with new backend update
+  Future<void> initializeGame(String email, List<String> selectedSounds) async {
     word = "Loading..."; // Temporary placeholder until the words are loading from the backend
-    notifyListeners(); //
+    notifyListeners(); // Notify listeners that the word is being loaded
 
     try {
-      String? fetchedWord = await ApiService.fetchTargetWord();
+      // Fetch the target word from the API by passing email and selected sounds
+      String? fetchedWord = await ApiService.fetchTargetWord(email, selectedSounds);
+
       if (fetchedWord != null && fetchedWord.isNotEmpty) {
         word = fetchedWord;
       } else {
-        word = "default"; // Fallback word
+        word = "default"; // Fallback word if the fetched word is empty
       }
     } catch (e) {
-      word = "Error fetching word";
+      word = "Error fetching word"; // Handle the error case
     }
 
-    notifyListeners();
-    startTimer();
+    notifyListeners(); // Notify listeners once the word is set
+    startTimer(); // Start the game timer (you might want to adjust how/where this is called)
   }
+
+
 
   // Function to update the opacity
   void updateAlienOpacity(double opacity) {
@@ -93,7 +120,7 @@ class GameRules extends ChangeNotifier {
           xp += 100;
 
           // Fetch the next word after pronunciation check
-          String? fetchedWord = await ApiService.fetchTargetWord();
+          String? fetchedWord = await ApiService.fetchTargetWord(sampleEmail, selectedSounds);
           if (fetchedWord != null && fetchedWord.isNotEmpty) {
             word = fetchedWord;
           } else {
