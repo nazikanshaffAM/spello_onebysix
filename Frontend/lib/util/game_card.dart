@@ -4,14 +4,14 @@ import 'package:spello_frontend/util/play_button.dart';
 class GameCard extends StatefulWidget {
   final String gameName;
   final String imageName;
-  final Function onTap;
+  final String routeName;
   final bool isRecommended;
 
   const GameCard({
     super.key,
     required this.gameName,
     required this.imageName,
-    required this.onTap,
+    required this.routeName,
     required this.isRecommended,
   });
 
@@ -117,7 +117,7 @@ class _GameCardState extends State<GameCard> {
         Positioned(
           right: screenWidth * 0.04, // Move left
           top: screenHeight * 0.12, // Move down slightly
-          child: PlayButton(onTap: widget.onTap),
+          child: PlayButton(onTap: widget.routeName),
         ),
       ],
     );

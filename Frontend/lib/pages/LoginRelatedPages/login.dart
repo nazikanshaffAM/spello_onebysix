@@ -2,129 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Login App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoginPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-// Placeholder Home Screen
-class HomeScreen extends StatelessWidget {
-  final Map<String, dynamic> userData;
-
-  const HomeScreen({Key? key, required this.userData}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 80),
-            const SizedBox(height: 20),
-            Text(
-              'Welcome, ${userData['name']}!',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (route) => false,
-                );
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
+import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart';
 
 // Placeholder Signup Screen
-class SignupPage extends StatelessWidget {
-  const SignupPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF7B95D3), Color(0xFF6A82C3)],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    fontSize: 28, 
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 5.0,
-                        color: Colors.black26,
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 40),
-                const Text(
-                  'This is a placeholder for the signup page',
-                  style: TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text('Back to Login', style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -165,12 +46,13 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       final responseData = json.decode(response.body);
-      
+
       if (response.statusCode == 200) {
         // Navigate to home page
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => HomeScreen(userData: responseData['user']),//direction to screen if sucess
+            builder: (context) => HomePage(
+                userData: responseData['user']), //direction to screen if sucess
           ),
         );
       } else {
@@ -227,16 +109,16 @@ class _LoginPageState extends State<LoginPage> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 30),
-                        
+
                         // Image placeholder
                         Image.asset(
                           'assets/images/login.png',
                           height: 240,
                           fit: BoxFit.contain,
                         ),
-                        
+
                         const SizedBox(height: 30),
-                        
+
                         // Email Field
                         Container(
                           decoration: BoxDecoration(
@@ -255,14 +137,16 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: const InputDecoration(
                               labelText: 'Email :',
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 15),
                             ),
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
                               }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(value)) {
                                 return 'Please enter a valid email';
                               }
                               return null;
@@ -270,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Password Field
                         Container(
                           decoration: BoxDecoration(
@@ -289,7 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: const InputDecoration(
                               labelText: 'Password:',
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 15),
                             ),
                             obscureText: true,
                             validator: (value) {
@@ -304,17 +189,19 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 30),
-                        
+
                         if (_errorMessage.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 20.0),
                             child: Text(
                               _errorMessage,
-                              style: const TextStyle(color: Colors.red, backgroundColor: Colors.white70),
+                              style: const TextStyle(
+                                  color: Colors.red,
+                                  backgroundColor: Colors.white70),
                               textAlign: TextAlign.center,
                             ),
                           ),
-                        
+
                         // Login Button
                         ElevatedButton(
                           onPressed: _isLoading ? null : _login,
@@ -324,7 +211,8 @@ class _LoginPageState extends State<LoginPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            disabledBackgroundColor: Colors.amber.withOpacity(0.6),
+                            disabledBackgroundColor:
+                                Colors.amber.withOpacity(0.6),
                           ),
                           child: _isLoading
                               ? const SizedBox(
@@ -345,13 +233,13 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Registration link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text(
-                              'Sign up to Start Journey',
+                              'Sign up to Start your Journey',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
@@ -360,11 +248,13 @@ class _LoginPageState extends State<LoginPage> {
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => const SignupPage()),
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RegistrationScreen()),
                                 );
                               },
                               child: const Text(
-                                'Sign urp',
+                                'Sign up',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,

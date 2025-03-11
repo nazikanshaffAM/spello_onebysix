@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: const Color.fromRGBO(10, 87, 151, 1),
-      ),
-      home: const RegistrationScreen(),
-    );
-  }
-}
 ///////////////////////////////////////////////////////////////////
 // User model to structure the data
 class User {
@@ -50,7 +33,6 @@ class User {
 
 // API service
 class ApiService {
-  
   static const String baseUrl = 'http://192.168.8.163:5000';
 
   static Future<bool> registerUser(User user) async {
@@ -91,17 +73,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   // Gender dropdown value
   String _selectedGender = 'Male';
   final List<String> _genderOptions = ['Male', 'Female', 'Other'];
-  
+
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
-  
+
   // Loading state
   bool _isLoading = false;
-  
+
   // Password visibility
   bool _obscurePassword = true;
 
@@ -110,19 +92,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     if (value == null || value.isEmpty) {
       return '$fieldName is required';
     }
-    
+
     if (fieldName == 'Email' && !_isValidEmail(value)) {
       return 'Please enter a valid email address';
     }
-    
+
     if (fieldName == 'Age' && !_isNumeric(value)) {
       return 'Age must be a number';
     }
-    
+
     if (fieldName == 'Password' && value.length < 6) {
       return 'Password must be at least 6 characters';
     }
-    
+
     return null;
   }
 
@@ -166,12 +148,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       try {
         // Send data to API
         final success = await ApiService.registerUser(user);
-        
+
         // Update loading state
         setState(() {
           _isLoading = false;
         });
-        
+
         // Show appropriate dialog based on result
         if (success) {
           _showSuccessDialog();
@@ -186,7 +168,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         } else {
           _showErrorDialog();
         }
-        
       } catch (e) {
         // Handle errors
         setState(() {
@@ -206,7 +187,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         content: const Text('Registration completed successfully!'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              // Navigate to OnboardingPage after pressing OK
+              Navigator.pop(context); // Close the dialog
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OnboardingPage(
+                    name:
+                        _nameController.text, // Pass the name to OnboardingPage
+                  ),
+                ),
+              );
+            },
             child: const Text('OK'),
           ),
         ],
@@ -277,18 +270,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       children: [
                         _buildTextField(_nameController, 'Name:'),
                         const SizedBox(height: 20),
-                        _buildTextField(_ageController, 'Age:', keyboardType: TextInputType.number),
+                        _buildTextField(_ageController, 'Age:',
+                            keyboardType: TextInputType.number),
                         const SizedBox(height: 20),
-                        
+
                         // Gender dropdown
                         _buildDropdownField(),
-                        
+
                         const SizedBox(height: 20),
-                        _buildTextField(_emailController, 'Email:', keyboardType: TextInputType.emailAddress),
-                        
+                        _buildTextField(_emailController, 'Email:',
+                            keyboardType: TextInputType.emailAddress),
+
                         const SizedBox(height: 20),
                         _buildPasswordField(),
-                        
+
                         // Add some extra space at the bottom for better scrolling
                         const SizedBox(height: 40),
                       ],
@@ -309,7 +304,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             ),
                           ),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
                               : const Text(
                                   'NEXT',
                                   style: TextStyle(
@@ -322,9 +318,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       const SizedBox(width: 20),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : () {
-                            Navigator.pop(context);
-                          },
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  Navigator.pop(context);
+                                },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 15),
@@ -381,12 +379,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
       ),
     );
   }
-  
+
   // Helper method to build password field
   Widget _buildPasswordField() {
     return Container(
@@ -411,7 +410,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_off : Icons.visibility,
@@ -427,7 +427,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
   }
-  
+
   // Helper method to build gender dropdown
   Widget _buildDropdownField() {
     return Container(
@@ -465,4 +465,4 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
     );
   }
-} 
+}

@@ -7,7 +7,9 @@ import 'package:spello_frontend/pages/OnboardingPages/onboarding_screen_two.dart
 import 'package:spello_frontend/util/custom_elevated_button.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({super.key});
+  final String name; // Add this line to accept the name
+
+  const OnboardingPage({super.key, required this.name}); // Update constructor
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -118,7 +120,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HomeScreen(),
+                            builder: (context) => HomePage(
+                              userData: {
+                                'name':
+                                    widget.name, // Pass the name to HomePage
+                              },
+                            ),
                           ),
                         );
                       }),

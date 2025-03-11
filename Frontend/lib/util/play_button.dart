@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PlayButton extends StatefulWidget {
-  Function onTap;
+  String onTap;
   PlayButton({super.key, required this.onTap});
 
   @override
@@ -29,7 +29,10 @@ class _PlayButtonState extends State<PlayButton> {
           customBorder: const CircleBorder(),
           splashColor: Colors.orange.withOpacity(0.5),
           highlightColor: Colors.orange.withOpacity(0.7),
-          onTap: () {},
+          onTap: () {
+            Navigator.pushNamed(
+                context, widget.onTap); // Replace with the correct route name
+          },
           child: const Padding(
             padding: EdgeInsets.all(12),
             child: Icon(
