@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomePage extends StatefulWidget {
+  final Map<String, dynamic> userData; // Add this line to receive userData
+
+  const HomePage({super.key, required this.userData}); // Update constructor
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomePageState extends State<HomePage> {
   int? _tappedIndex;
   final List<GlobalKey> _gridItemKeys =
       List.generate(6, (index) => GlobalKey());
@@ -58,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Rest of your methods remain unchanged
   Future<void> _showTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     bool hasSeenTutorial = prefs.getBool('hasSeenTutorial') ?? false;
@@ -162,19 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Home",
-          style: TextStyle(
-            fontFamily: "Fredoka One",
-            fontWeight: FontWeight.bold,
-            fontSize: screenWidth * 0.07,
-          ),
-        ),
-        backgroundColor: const Color(0xFF3A435F),
-        foregroundColor: Colors.white,
-        centerTitle: true,
-      ),
       body: Stack(
         children: [
           Positioned(
@@ -209,70 +199,123 @@ class _HomeScreenState extends State<HomeScreen> {
               width: screenWidth * 0.5,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-            child: Column(
-              children: [
-                SizedBox(height: screenHeight * 0.03),
-                Expanded(
-                  child: GridView.builder(
-                    padding: EdgeInsets.only(top: screenHeight * 0.02),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: screenWidth * 0.04,
-                      mainAxisSpacing: screenWidth * 0.04,
-                      childAspectRatio: 1.0,
-                    ),
-                    itemCount: gridItems.length,
-                    itemBuilder: (context, index) {
-                      final bool isTapped = (_tappedIndex == index);
-                      return GestureDetector(
-                        onTap: () => _onTileTap(index, context),
-                        child: AnimatedContainer(
-                          key: _gridItemKeys[index],
-                          duration: const Duration(milliseconds: 100),
-                          curve: Curves.easeOut,
-                          decoration: BoxDecoration(
-                            color: isTapped
-                                ? const Color(0xFFFFC000)
-                                : const Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isTapped
-                                    ? const Color(0xFF3A4562)
-                                    : const Color(0xFF4C5679),
-                                offset: const Offset(0, 5),
-                                blurRadius: 0,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                gridItems[index]["icon"],
-                                width: screenWidth * 0.18,
-                              ),
-                              SizedBox(height: screenHeight * 0.01),
-                              Text(
-                                gridItems[index]['label'],
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: const Color(0xFF3A4562),
-                                  fontSize: screenWidth * 0.05,
-                                  fontFamily: "Fredoka One",
-                                  height: 1.2,
-                                ),
-                              ),
-                            ],
-                          ),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+              child: Column(
+                children: [
+                  SizedBox(height: screenHeight * 0.03),
+                  // New container on top of the grid
+                  Container(
+                    width: double.infinity,
+                    height: screenHeight * 0.2,
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFB7C2E5),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0xFF4C5679),
+                          offset: Offset(0, 5),
+                          blurRadius: 0,
                         ),
-                      );
-                    },
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(width: screenWidth * 0.02),
+                        Image.asset(
+                          "assets/images/start.png", // Replace with your preferred image
+                          width: screenWidth * 0.12,
+                        ),
+                        SizedBox(width: screenWidth * 0.06),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: screenHeight * 0.04),
+                            Text(
+                              "Hello, ${widget.userData['name']}!", // Changed hardcoded "Venuja" to userData
+                              style: TextStyle(
+                                color: const Color(0xFF3A4552),
+                                fontSize: screenWidth * 0.06,
+                                fontFamily: "Fredoka One",
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "Keep up the great work!",
+                              style: TextStyle(
+                                  color: const Color(0xFF3A4552),
+                                  fontSize: screenWidth * 0.05,
+                                  fontFamily: "Fredoka",
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(height: screenHeight * 0.007),
+                  Expanded(
+                    child: GridView.builder(
+                      padding: EdgeInsets.only(top: screenHeight * 0.02),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: screenWidth * 0.04,
+                        mainAxisSpacing: screenWidth * 0.04,
+                        childAspectRatio: 1.0,
+                      ),
+                      itemCount: gridItems.length,
+                      itemBuilder: (context, index) {
+                        final bool isTapped = (_tappedIndex == index);
+                        return GestureDetector(
+                          onTap: () => _onTileTap(index, context),
+                          child: AnimatedContainer(
+                            key: _gridItemKeys[index],
+                            duration: const Duration(milliseconds: 100),
+                            curve: Curves.easeOut,
+                            decoration: BoxDecoration(
+                              color: isTapped
+                                  ? const Color(0xFFFFC000)
+                                  : const Color(0xFFFFFFFF),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isTapped
+                                      ? const Color(0xFF3A4562)
+                                      : const Color(0xFF4C5679),
+                                  offset: const Offset(0, 5),
+                                  blurRadius: 0,
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  gridItems[index]["icon"],
+                                  width: screenWidth * 0.18,
+                                ),
+                                SizedBox(height: screenHeight * 0.01),
+                                Text(
+                                  gridItems[index]['label'],
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: const Color(0xFF3A4562),
+                                    fontSize: screenWidth * 0.05,
+                                    fontFamily: "Fredoka One",
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
