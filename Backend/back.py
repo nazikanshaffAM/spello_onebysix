@@ -7,6 +7,8 @@ from flask import Flask, request, jsonify, session
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_cors import CORS
+from datetime import datetime, timedelta
+
 app = Flask(__name__)
 CORS(app, supports_credentials=True)  # Enable credentials for session cookies
 app.secret_key = 'spello_secret_key'  # Required for session management
@@ -145,6 +147,7 @@ def speech_to_text():
         "accuracy": accuracy
     })
 
+
 @app.route("/add-custom-word", methods=["POST"])
 def add_custom_word():
     # Get email from session
@@ -172,7 +175,6 @@ def add_custom_word():
             collection.update_one({"email": email}, {"$push": {"custom_words": custom_word}})
 
     return jsonify({"message": f"Custom word '{custom_word}' added successfully!"})
-
 
 
 @app.route("/remove-custom-word", methods=["POST"])
@@ -208,7 +210,6 @@ def remove_custom_word():
 # mongodb connection string
 MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWrites=true&w=majority&appName=spelloDB"
 
-
 # connect to mongoDB
 client = MongoClient(MONGO_URI)
 db = client["spello_database"]  # added database name
@@ -218,7 +219,6 @@ collection = db["sp1"]  # added collection name
 @app.route("/")
 def home():
     return jsonify({"message": "Connected MongoDB Successfully"})
-
 
 
 # registering user
@@ -258,7 +258,10 @@ def register():
         'level': 1,
         'attempts': 0,
         'lives': 5,
-        'scores': []
+        'scores': [],
+        'current_streak': 0,
+        'max_streak': 0,
+        'last_practice_date': ''
     }
 
     # Insert new user
@@ -490,6 +493,8 @@ def play_game():
     if total_score >= 2000 and level == 1:
         level = 2
 
+
+
     # If 5 successful or failed attempts are reached, save the game state and reset lives
     if attempts >= 5 or lives <= 0:
         collection.update_one({'email': email}, {'$set': {
@@ -532,6 +537,29 @@ def play_game():
         'target_word': target_word
     })
 
+# --- Dashboard Feature Endpoints ---
+
+# 1. Weekly Streak Endpoint
+@app.route('/dashboard/streak', methods=['GET'])
+def get_weekly_streak():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get streak information
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
+
+    return jsonify({
+        "current_streak": current_streak,
+        "max_streak": max_streak
+    })
 
 
 if __name__ == '__main__':
