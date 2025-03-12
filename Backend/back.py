@@ -368,7 +368,7 @@ def get_user():
 
 @app.route('/delete_user', methods=['DELETE'])  # to delete user according to email
 def delete_user():
-    # Get email from session for currently logged in user
+    # Get email from session for currently logged-in user
     email = session.get('user_email')
     if not email:
         # If not in session, try from query parameters
@@ -406,7 +406,6 @@ def delete_user():
         return jsonify({"error": "Failed to delete the user"}), 500
 
 
-
 # Route to delete the last inserted user
 @app.route('/delete_last_user', methods=['DELETE'])  # to delete last user
 def delete_last_user():
@@ -438,6 +437,7 @@ def delete_last_user():
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
 
+
 # game logics--Hangman
 
 def calculate_score(accuracy, level):
@@ -455,6 +455,16 @@ def calculate_score(accuracy, level):
             return int((accuracy - 50) * 2)
         else:
             return 0
+
+
+# Helper function to get dates for the past week
+def get_past_week_dates():
+    today = datetime.now().date()
+    dates = []
+    for i in range(7):
+        dates.append((today - timedelta(days=i)).strftime('%Y-%m-%d'))
+    return dates
+
 
 @app.route('/play-game', methods=['POST'])
 def play_game():
