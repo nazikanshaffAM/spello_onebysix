@@ -554,7 +554,8 @@ def play_game():
             'level': level,
             'spoken_word': spoken_word,
             'target_word': target_word,
-            'accuracy': accuracy
+            'accuracy': accuracy,
+            'current_streak': current_streak
         })
 
     # Save progress after each attempt
