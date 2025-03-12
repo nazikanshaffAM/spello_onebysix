@@ -8,6 +8,8 @@ from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_cors import CORS
 from datetime import datetime, timedelta
+from collections import defaultdict
+
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)  # Enable credentials for session cookies
@@ -706,6 +708,79 @@ def get_user_level():
         "current_level": level,
         "total_score": total_score,
         "progress_to_next_level": round(progress_to_next_level, 2)
+    })
+
+
+# 5. Weekly Accuracy Trend Endpoint
+@app.route('/dashboard/weekly-trend', methods=['GET'])
+def get_weekly_accuracy_trend():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get today's date and calculate date 7 days ago
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=6)  # Include today, so 6 days back
+
+    # Get scores from user
+    scores = user.get('scores', [])
+
+    # Check if scores have timestamps
+    if scores and 'timestamp' not in scores[0]:
+        # Initialize with empty data for testing
+        past_week_dates = get_past_week_dates()
+        daily_data = []
+        for date in past_week_dates:
+            daily_data.append({
+                "date": date,
+                "average_accuracy": 0,
+                "attempts": 0
+            })
+        return jsonify({
+            "daily_trend": daily_data,
+            "message": "Historical data not available. Start practicing to see your weekly trend."
+        })
+
+    # Group scores by day
+    daily_scores = defaultdict(list)
+    for score in scores:
+        if 'timestamp' not in score:
+            continue
+
+        try:
+            score_date = datetime.strptime(score['timestamp'], '%Y-%m-%d').date()
+            if score_date >= week_ago and score_date <= today:
+                date_str = score_date.strftime('%Y-%m-%d')
+                daily_scores[date_str].append(score.get('accuracy', 0))
+        except ValueError:
+            # Skip records with invalid date format
+            continue
+
+    # Calculate daily averages
+    daily_trend = []
+    for i in range(7):
+        date = (week_ago + timedelta(days=i)).strftime('%Y-%m-%d')
+        day_scores = daily_scores.get(date, [])
+
+        if day_scores:
+            avg_accuracy = round(sum(day_scores) / len(day_scores), 2)
+        else:
+            avg_accuracy = 0
+
+        daily_trend.append({
+            "date": date,
+            "average_accuracy": avg_accuracy,
+            "attempts": len(day_scores)
+        })
+
+    return jsonify({
+        "daily_trend": daily_trend
     })
 
 
