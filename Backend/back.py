@@ -659,5 +659,14 @@ def get_words_mastered():
             "mastered_list": []
         })
 
+
+    # Create a dictionary to track the highest accuracy for each word
+    word_accuracy = {}
+    for score in scores:
+        target_word = score.get('target_word', '')
+        accuracy = score.get('accuracy', 0)
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
