@@ -565,7 +565,11 @@ def play_game():
         'total_score': total_score,
         'level': level,
         'scores': user.get('scores', []) + [
-            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]
+            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score,
+             'timestamp': current_time}],
+        'last_practice_date': current_time,
+        'current_streak': current_streak,
+        'max_streak': max_streak
     }})
 
     return jsonify({
@@ -575,8 +579,10 @@ def play_game():
         'total_score': total_score,
         'level': level,
         'spoken_word': spoken_word,
-        'target_word': target_word
+        'target_word': target_word,
+        'current_streak': current_streak
     })
+
 
 # --- Dashboard Feature Endpoints ---
 
