@@ -506,7 +506,30 @@ def play_game():
     if total_score >= 2000 and level == 1:
         level = 2
 
+    # Update streak information
+    last_practice_date = user.get('last_practice_date', '')
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
 
+    if last_practice_date != current_time:
+        # New day of practice
+        if last_practice_date:
+            last_date = datetime.strptime(last_practice_date, '%Y-%m-%d').date()
+            today = datetime.now().date()
+            days_diff = (today - last_date).days
+
+            if days_diff == 1:
+                # Consecutive day
+                current_streak += 1
+                if current_streak > max_streak:
+                    max_streak = current_streak
+            elif days_diff > 1:
+                # Streak broken
+                current_streak = 1
+        else:
+            # First time practicing
+            current_streak = 1
+            max_streak = 1
 
 
     # If 5 successful or failed attempts are reached, save the game state and reset lives
