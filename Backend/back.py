@@ -638,5 +638,26 @@ def get_average_accuracy():
         "total_attempts": len(scores)
     })
 
+# 3. Words Mastered Endpoint
+@app.route('/dashboard/words-mastered', methods=['GET'])
+def get_words_mastered():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Find all words with accuracy >= 75%
+    scores = user.get('scores', [])
+    if not scores:
+        return jsonify({
+            "words_mastered": 0,
+            "mastered_list": []
+        })
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
