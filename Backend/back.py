@@ -784,6 +784,108 @@ def get_weekly_accuracy_trend():
     })
 
 
+# Endpoint to get a comprehensive dashboard with all metrics
+@app.route('/dashboard', methods=['GET'])
+def get_dashboard():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get streak information
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
+
+    # Calculate average accuracy
+    scores = user.get('scores', [])
+    if scores:
+        accuracy_sum = sum(score.get('accuracy', 0) for score in scores)
+        average_accuracy = round(accuracy_sum / len(scores), 2)
+        total_attempts = len(scores)
+    else:
+        average_accuracy = 0
+        total_attempts = 0
+
+    # Count mastered words
+    word_accuracy = {}
+    for score in scores:
+        target_word = score.get('target_word', '')
+        accuracy = score.get('accuracy', 0)
+
+        if target_word not in word_accuracy or accuracy > word_accuracy[target_word]:
+            word_accuracy[target_word] = accuracy
+
+    mastered_words = [word for word, accuracy in word_accuracy.items() if accuracy >= 75]
+
+    # Get level information
+    level = user.get('level', 1)
+    total_score = user.get('total_score', 0)
+
+    # Calculate progress to next level
+    progress_to_next_level = 0
+    if level == 1:
+        # Level 1 to 2 requires 2000 points
+        progress_to_next_level = min(total_score / 2000 * 100, 100)
+
+    # Get weekly trend
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=6)
+
+    daily_scores = defaultdict(list)
+    for score in scores:
+        if 'timestamp' not in score:
+            continue
+
+        try:
+            score_date = datetime.strptime(score['timestamp'], '%Y-%m-%d').date()
+            if score_date >= week_ago and score_date <= today:
+                date_str = score_date.strftime('%Y-%m-%d')
+                daily_scores[date_str].append(score.get('accuracy', 0))
+        except ValueError:
+            continue
+
+    daily_trend = []
+    for i in range(7):
+        date = (week_ago + timedelta(days=i)).strftime('%Y-%m-%d')
+        day_scores = daily_scores.get(date, [])
+
+        if day_scores:
+            avg_accuracy = round(sum(day_scores) / len(day_scores), 2)
+        else:
+            avg_accuracy = 0
+
+        daily_trend.append({
+            "date": date,
+            "average_accuracy": avg_accuracy,
+            "attempts": len(day_scores)
+        })
+
+    # Return comprehensive dashboard
+    return jsonify({
+        "streak": {
+            "current_streak": current_streak,
+            "max_streak": max_streak
+        },
+        "accuracy": {
+            "average_accuracy": average_accuracy,
+            "total_attempts": total_attempts
+        },
+        "words_mastered": {
+            "count": len(mastered_words),
+            "list": mastered_words
+        },
+        "level": {
+            "current_level": level,
+            "total_score": total_score,
+            "progress_to_next_level": round(progress_to_next_level, 2)
+        },
+        "weekly_trend": daily_trend
+    })
 
 
 if __name__ == '__main__':
