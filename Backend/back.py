@@ -609,5 +609,34 @@ def get_weekly_streak():
     })
 
 
+# 2. Average Accuracy Score Endpoint
+@app.route('/dashboard/average-accuracy', methods=['GET'])
+def get_average_accuracy():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Calculate average accuracy from scores array
+    scores = user.get('scores', [])
+    if not scores:
+        return jsonify({
+            "average_accuracy": 0,
+            "total_attempts": 0
+        })
+
+    accuracy_sum = sum(score.get('accuracy', 0) for score in scores)
+    average_accuracy = round(accuracy_sum / len(scores), 2)
+
+    return jsonify({
+        "average_accuracy": average_accuracy,
+        "total_attempts": len(scores)
+    })
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
