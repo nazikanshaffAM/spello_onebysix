@@ -531,7 +531,6 @@ def play_game():
             current_streak = 1
             max_streak = 1
 
-
     # If 5 successful or failed attempts are reached, save the game state and reset lives
     if attempts >= 5 or lives <= 0:
         collection.update_one({'email': email}, {'$set': {
@@ -540,8 +539,12 @@ def play_game():
             'attempts': 0,
             'lives': 5,
             'scores': user.get('scores', []) + [
-                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]}
-        })
+                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score,
+                 'timestamp': current_time}],
+            'last_practice_date': current_time,
+            'current_streak': current_streak,
+            'max_streak': max_streak
+        }})
         # Reset game state: New target word, reset attempts/lives for the next round
         session_data['target_word'] = ''
         session_data['spoken_word'] = ''
