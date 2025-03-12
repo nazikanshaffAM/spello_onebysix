@@ -666,6 +666,18 @@ def get_words_mastered():
         target_word = score.get('target_word', '')
         accuracy = score.get('accuracy', 0)
 
+        # Update dictionary if this is a higher accuracy or first time seeing word
+        if target_word not in word_accuracy or accuracy > word_accuracy[target_word]:
+            word_accuracy[target_word] = accuracy
+
+    # Count words with accuracy >= 75%
+    mastered_words = [word for word, accuracy in word_accuracy.items() if accuracy >= 75]
+
+    return jsonify({
+        "words_mastered": len(mastered_words),
+        "mastered_list": mastered_words
+    })
+
 
 
 if __name__ == '__main__':
