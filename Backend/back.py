@@ -696,6 +696,18 @@ def get_user_level():
     level = user.get('level', 1)
     total_score = user.get('total_score', 0)
 
+    # Calculate progress to next level
+    progress_to_next_level = 0
+    if level == 1:
+        # Level 1 to 2 requires 2000 points
+        progress_to_next_level = min(total_score / 2000 * 100, 100)
+
+    return jsonify({
+        "current_level": level,
+        "total_score": total_score,
+        "progress_to_next_level": round(progress_to_next_level, 2)
+    })
+
 
 
 
