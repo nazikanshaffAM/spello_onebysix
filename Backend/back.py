@@ -679,6 +679,25 @@ def get_words_mastered():
     })
 
 
+# 4. User Level Endpoint
+@app.route('/dashboard/level', methods=['GET'])
+def get_user_level():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get user level and total score
+    level = user.get('level', 1)
+    total_score = user.get('total_score', 0)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
