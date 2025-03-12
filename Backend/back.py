@@ -492,6 +492,9 @@ def play_game():
     # Increment total score
     total_score = user.get('total_score', 0) + score
 
+    # Get current timestamp
+    current_time = datetime.now().strftime('%Y-%m-%d')
+
     # Track attempts and lives
     attempts = user.get('attempts', 0) + 1
     lives = user.get('lives', 5)
@@ -502,6 +505,7 @@ def play_game():
     # Check if score exceeds threshold for level up
     if total_score >= 2000 and level == 1:
         level = 2
+
 
 
 
