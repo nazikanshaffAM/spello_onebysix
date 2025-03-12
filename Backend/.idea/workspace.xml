@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/ApiService.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/ApiService.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/GamePage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GamePage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/GameRules.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../game1/lib/GameRules.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +64,18 @@
       <workItem from="1741168597416" duration="1345000" />
       <workItem from="1741274487401" duration="712000" />
       <workItem from="1741286955535" duration="1248000" />
-      <workItem from="1741328416420" duration="683000" />
+      <workItem from="1741328416420" duration="2651000" />
+      <workItem from="1741337446610" duration="5966000" />
+      <workItem from="1741408476123" duration="646000" />
+      <workItem from="1741415406095" duration="111000" />
+      <workItem from="1741418307165" duration="943000" />
+      <workItem from="1741448119430" duration="1546000" />
+      <workItem from="1741538286244" duration="1229000" />
+      <workItem from="1741581621159" duration="1321000" />
+      <workItem from="1741586993384" duration="2942000" />
+      <workItem from="1741593527883" duration="316000" />
+      <workItem from="1741749388703" duration="301000" />
+      <workItem from="1741756209417" duration="640000" />
     </task>
     <servers />
   </component>
@@ -74,6 +83,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741328418415" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741749455043" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
