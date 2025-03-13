@@ -5,17 +5,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe3d2695-310a-45d7-a198-3794eb01f7fb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/UFO.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien5.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien6.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/alien7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b10.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b11.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b12.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b3.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b4.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b5.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b6.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/b9.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/character.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/emtyheart.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/heart.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/newb1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/newb2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Frontend/assets/images/ufo.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/game_logic/audio_recorder.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/game_logic/game_rules.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/screens/ending_page.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/screens/game_page.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/screens/game_start_page.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/screens/how_to_play_page.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/screens/settings_page.dart" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../game1/lib/service/api_service.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/back.py" beforeDir="false" afterPath="$PROJECT_DIR$/back.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/arm64-v8a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/arm64-v8a/configure_fingerprint.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/armeabi-v7a/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/armeabi-v7a/configure_fingerprint.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/x86/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/x86/configure_fingerprint.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/x86_64/configure_fingerprint.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/.cxx/Debug/7582e6ru/x86_64/configure_fingerprint.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,6 +152,8 @@
       <workItem from="1741857293436" duration="17000" />
       <workItem from="1741857311756" duration="415000" />
       <workItem from="1741857736984" duration="3031000" />
+      <workItem from="1741881978420" duration="402000" />
+      <workItem from="1741884127359" duration="306000" />
     </task>
     <servers />
   </component>
@@ -129,7 +161,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1741861938213" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1741881994462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Backend$back.coverage" NAME="back Coverage Results" MODIFIED="1741777004440" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
