@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
+import 'package:spello_frontend/config/config.dart';
 
 ///////////////////////////////////////////////////////////////////
 // User model to structure the data
@@ -32,11 +33,22 @@ class User {
 }
 
 // API service
+// API service with additional validation
 class ApiService {
-  static const String baseUrl = 'http://192.168.8.163:5000';
+  static const String baseUrl = Config.baseUrl;
 
-  static Future<bool> registerUser(User user) async {
+  static Future<Map<String, dynamic>> registerUser(User user) async {
     try {
+      // Add client-side validation before sending to server
+      int? age = int.tryParse(user.age);
+      if (age == null || age < 0 || age > 100) {
+        print('Invalid age detected: ${user.age}. Age must be between 0 and 100.');
+        return {
+          'success': false,
+          'message': 'Age must be between 0 and 100'
+        };
+      }
+
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
         headers: {
@@ -47,15 +59,37 @@ class ApiService {
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         print('Registration Response: ${response.body}');
-        return true;
+        // Parse the response
+        final responseData = jsonDecode(response.body);
+        
+        // Validate server response data
+        final userData = responseData['user'];
+        if (userData != null) {
+          // Verify age is within valid range in the response
+          int? responseAge = int.tryParse(userData['age'].toString());
+          if (responseAge == null || responseAge < 0 || responseAge > 100) {
+            print('Warning: Server returned invalid age: ${userData['age']}');
+            // Fix the age to be within valid range
+            userData['age'] = responseAge != null ? 
+                (responseAge > 100 ? "100" : (responseAge < 0 ? "0" : userData['age'])) : 
+                "0";
+          }
+          
+          return {
+            'success': true,
+            'userData': userData
+          };
+        } else {
+          return {'success': false, 'message': 'Invalid response data'};
+        }
       } else {
         print('Registration failed with status: ${response.statusCode}');
         print('Response body: ${response.body}');
-        return false;
+        return {'success': false, 'message': 'Server error'};
       }
     } catch (e) {
       print('Error registering user: $e');
-      return false;
+      return {'success': false, 'message': 'Network error'};
     }
   }
 }
@@ -97,8 +131,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       return 'Please enter a valid email address';
     }
 
-    if (fieldName == 'Age' && !_isNumeric(value)) {
-      return 'Age must be a number';
+    if (fieldName == 'Age') {
+      // Check if the input is a valid number
+      int? age = int.tryParse(value);
+      
+      // Return error if not a valid number
+      if (age == null) {
+        return 'Age must be a valid number';
+      }
+      
+      // Check if the age is within the allowed range
+      if (age < 0 || age > 100) {
+        return 'Age must be between 0 and 100';
+      }
     }
 
     if (fieldName == 'Password' && value.length < 6) {
@@ -114,8 +159,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   bool _isNumeric(String str) {
-    // Check if the string is a valid number
-    return int.tryParse(str) != null;
+    // Parse the input to an integer
+    int? parsedValue = int.tryParse(str);
+    
+    // Return false if not a valid number
+    if (parsedValue == null) {
+      return false;
+    }
+    
+    // Check if the value is within the allowed range
+    return parsedValue >= 0 && parsedValue <= 100;
   }
 
   @override
@@ -128,10 +181,82 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
-  // Function to handle form submission
+  void _showSuccessDialog(Map<String, dynamic> userData) {
+    // Debug print to verify the user data received from API
+    print('=' * 50 + ' REGISTRATION SUCCESS ' + '=' * 50);
+    print('Registration received user data from API:');
+    print('COMPLETE USER DATA: $userData');
+    print('NAME: ${userData['name']}');
+    print('EMAIL: ${userData['email']}');
+    print('AGE: ${userData['age']}');
+    print('GENDER: ${userData['gender']}');
+    print('=' * 100);
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Success'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Registration completed successfully!'),
+            const SizedBox(height: 10),
+            Text('Name: ${userData['name']}'),
+            Text('Email: ${userData['email']}'),
+            Text('Age: ${userData['age']}'),
+            Text('Gender: ${userData['gender']}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Create a clean copy of the userData to ensure data integrity
+              final Map<String, dynamic> userDataForOnboarding = {
+                'name': userData['name'],
+                'email': userData['email'],
+                'age': userData['age'],
+                'gender': userData['gender'],
+              };
+              
+              // Debug print before navigation
+              print('=' * 50 + ' NAVIGATING TO ONBOARDING ' + '=' * 50);
+              print('Passing user data to OnboardingPage:');
+              print('COMPLETE USER DATA: $userDataForOnboarding');
+              print('=' * 100);
+              
+              Navigator.pop(context); // Close the dialog
+              
+              // Use pushReplacement to ensure clean navigation
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OnboardingPage(
+                    userData: userDataForOnboarding,
+                  ),
+                ),
+              );
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleSubmit() async {
     // Validate form
     if (_formKey.currentState!.validate()) {
+      // Additional explicit check for age (optional, as the form validation should catch this)
+      int? age = int.tryParse(_ageController.text);
+      if (age == null || age < 0 || age > 100) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Age must be between 0 and 100')),
+        );
+        return; // Stop form submission
+      }
+      
       setState(() {
         _isLoading = true;
       });
@@ -146,8 +271,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       try {
-        // Send data to API
-        final success = await ApiService.registerUser(user);
+        // Send data to API and get response
+        final result = await ApiService.registerUser(user);
 
         // Update loading state
         setState(() {
@@ -155,9 +280,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         });
 
         // Show appropriate dialog based on result
-        if (success) {
-          _showSuccessDialog();
-          // Clear form fields after successful registration
+        if (result['success'] == true) {
+          // Get user data from server response
+          final userData = {
+            'name': result['userData']['name'],
+            'email': result['userData']['email'],
+            'age': result['userData']['age'],
+            'gender': result['userData']['gender'],
+          };
+          
+          // Pass the userData from server response to the success dialog
+          _showSuccessDialog(userData);
+          
+          // Clear form fields after showing dialog
           _nameController.clear();
           _ageController.clear();
           _emailController.clear();
@@ -177,34 +312,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         _showErrorDialog();
       }
     }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Success'),
-        content: const Text('Registration completed successfully!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Navigate to OnboardingPage after pressing OK
-              Navigator.pop(context); // Close the dialog
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OnboardingPage(
-                    name:
-                        _nameController.text, // Pass the name to OnboardingPage
-                  ),
-                ),
-              );
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 
   void _showErrorDialog() {
