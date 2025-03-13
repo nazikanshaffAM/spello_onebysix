@@ -1,0 +1,2 @@
+C:/IIT/2nd year/2nd - SEM/SDGP - second-sem/spello/spello/Frontend/android/app/.cxx/Debug/7582e6ru/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/IIT/2nd year/2nd - SEM/SDGP - second-sem/spello/spello/Frontend/android/app/.cxx/Debug/7582e6ru/arm64-v8a/CMakeFiles/rebuild_cache.dir

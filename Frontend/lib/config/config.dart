@@ -2,7 +2,7 @@
 
 class Config {
   // Base URL for API
-  static const String baseUrl = 'http://192.168.8.163:5000';
+  static const String baseUrl = 'http://192.168.73.48:5000';
   
   // Other configuration values
   static const int apiTimeout = 30; // seconds
