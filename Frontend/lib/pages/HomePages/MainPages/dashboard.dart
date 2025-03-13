@@ -1,42 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  final String baseUrl;
+  final Map<String, dynamic> userData; // Added parameter to receive user data
+  
+  const Dashboard({
+    super.key, 
+    required this.baseUrl,
+    required this.userData, // Required parameter for user data
+  });
 
   @override
   State<Dashboard> createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
-  List<FlSpot> get lineSpots => [
-        FlSpot(0, 70),
-        FlSpot(1, 75),
-        FlSpot(2, 80),
-        FlSpot(3, 65),
-        FlSpot(4, 90),
-        FlSpot(5, 85),
-        FlSpot(6, 95),
-      ];
+  // Dashboard data
+  List<FlSpot> _lineSpots = [];
+  int _wordsMastered = 0;
+  int _userLevel = 1;
+  double _accuracyScore = 0.0;
+  int _streakDays = 0;
+  bool _isLoading = true;
+  String _error = "";
 
-  String getWeekdayLabel(double value) {
-    switch (value.toInt()) {
-      case 0:
-        return 'Mon';
-      case 1:
-        return 'Tue';
-      case 2:
-        return 'Wed';
-      case 3:
-        return 'Thu';
-      case 4:
-        return 'Fri';
-      case 5:
-        return 'Sat';
-      case 6:
-        return 'Sun';
-      default:
-        return '';
+  @override
+  void initState() {
+    super.initState();
+    fetchDashboardData();
+  }
+
+  Future<void> fetchDashboardData() async {
+    setState(() {
+      _isLoading = true;
+      _error = "";
+    });
+
+    try {
+      // Get the email from userData to identify the user
+      final String userEmail = widget.userData['email'];
+      
+      
+     
+      final response = await http.get(
+      Uri.parse('${widget.baseUrl}/dashboard?email=$userEmail'),
+      headers: {
+      'Content-Type': 'application/json',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // Convert weekly trend data to FlSpot
+        final List trendsData = data['weekly_trend'];
+        List<FlSpot> spots = [];
+        for (int i = 0; i < trendsData.length; i++) {
+          double accuracy = trendsData[i]['average_accuracy'].toDouble();
+          spots.add(FlSpot(i.toDouble(), accuracy));
+        }
+        
+        setState(() {
+          _accuracyScore = data['accuracy']['average_accuracy'].toDouble();
+          _wordsMastered = data['words_mastered']['count'];
+          _userLevel = data['level']['current_level'];
+          _streakDays = data['streak']['current_streak'];
+          _lineSpots = spots;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = "Error: Server returned status code ${response.statusCode}";
+          _isLoading = false;
+        });
+        print("Server error: ${response.body}");
+      }
+    } catch (e) {
+      setState(() {
+        _error = "Error: ${e.toString()}";
+        _isLoading = false;
+      });
     }
   }
 
@@ -46,421 +92,513 @@ class _DashboardState extends State<Dashboard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final borderRadius = BorderRadius.circular(screenWidth * 0.02);
     const shadowColor = Color(0xFF8C8C8C);
-    const accuracyContainerColor = Color(0xFFFFB000); // Dark yellow
+    const accuracyContainerColor = Color(0xFFFFB000); // Yellow
     const textColor = Color(0xFF3A435F); // Dark blue-gray
     const chartLineColor = Color(0xFF3A435F); // Dark blue-gray
     const graphFillColor = Color(0xFF3A435F); // Color under the graph
 
-    final defaultPadding = screenWidth * 0.02;
-
-    // Sample values (Replace with real data)
-    int wordsMastered = 250;
-    int userLevel = 5;
-    double accuracyScore = 87.5;
-    int streakDays = 5;
+    final defaultPadding = screenWidth * 0.04;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Dashboard",
-          style: TextStyle(
-              fontFamily: "Fredoka One", fontSize: screenWidth * 0.07),
+          "Dashboard - ${widget.userData['name']}", // Show user name in the title
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
         ),
         backgroundColor: const Color(0xFF3A435F),
         foregroundColor: Colors.white,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: fetchDashboardData,
+          ),
+        ],
       ),
-      body: Stack(
-        children: [
-          // Cloud Images
-          Positioned(
-            top: screenHeight * 0.05,
-            left: screenWidth * 0.6,
-            child: Image.asset(
-              "assets/images/cloud.png",
-              width: screenWidth * 0.4,
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.2,
-            right: screenWidth * 0.7,
-            child: Image.asset(
-              "assets/images/cloud.png",
-              width: screenWidth * 0.4,
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.38,
-            left: screenWidth * 0.33,
-            child: Image.asset(
-              "assets/images/cloud.png",
-              width: screenWidth * 0.4,
-            ),
-          ),
-
-          // Main Content
-          SingleChildScrollView(
-            child: Column(
+      backgroundColor: const Color(0xFF8A9AD6), // Light blue-purple background
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          : Stack(
               children: [
-                SizedBox(height: screenHeight * 0.02),
-
-                // Weekly Streak Container
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: borderRadius,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: shadowColor,
-                        offset: const Offset(4, 4),
-                      ),
-                    ],
+                SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.02,
                   ),
-                  height: screenHeight * 0.1,
-                  width: screenWidth * 0.9,
-                  padding: EdgeInsets.all(defaultPadding),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Weekly Streak",
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          fontFamily: "Fredoka",
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.018),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: streakDays / 7, // Normalize to weekly progress
-                          backgroundColor: Colors.grey.shade300,
-                          color: const Color(0xFFFFB000),
-                          minHeight: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: screenWidth * 0.05),
-
-                // Containers
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // Accuracy Score Container
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: borderRadius,
-                        color: accuracyContainerColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: shadowColor,
-                            offset: const Offset(4, 4),
-                          ),
-                        ],
-                      ),
-                      height: screenHeight * 0.213,
-                      width: screenWidth * 0.4,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  height: screenHeight * 0.1,
-                                  width: screenHeight * 0.1,
-                                  child: CircularProgressIndicator(
-                                    value: accuracyScore / 100,
-                                    strokeWidth: 10,
-                                    backgroundColor: Colors.white,
-                                    color: chartLineColor,
-                                  ),
-                                ),
-                                Text(
-                                  "${accuracyScore.toStringAsFixed(1)}%",
-                                  style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Fredoka "),
-                                ),
-                              ],
+                      // Weekly Streak Container
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: borderRadius,
+                          color: Colors.white,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: shadowColor,
+                              offset: Offset(2, 2),
+                              blurRadius: 3,
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              "Accuracy Score",
+                          ],
+                        ),
+                        width: double.infinity,
+                        padding: EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Weekly Streak",
                               style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                  fontFamily: "Fredoka",
-                                  fontWeight: FontWeight.bold),
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: LinearProgressIndicator(
+                                value: _error.isEmpty ? _streakDays / 7 : 0, // Use 0 when there's an error
+                                backgroundColor: Colors.grey.shade300,
+                                color: const Color(0xFFFFB000),
+                                minHeight: 15,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ),
 
-                    Column(
-                      children: [
-                        // Words Mastered Container
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: borderRadius,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: shadowColor,
-                                offset: const Offset(4, 4),
-                              ),
-                            ],
-                          ),
-                          height: screenHeight * 0.1,
-                          width: screenWidth * 0.45,
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "$wordsMastered",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: textColor,
-                                    fontFamily: "Fredoka One"),
-                              ),
-                              Text(
-                                "Words Mastered",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: textColor,
-                                    fontFamily: "Fredoka",
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(height: screenWidth * 0.03),
-
-                        // Level Container
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: borderRadius,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: shadowColor,
-                                offset: const Offset(4, 4),
-                              ),
-                            ],
-                          ),
-                          height: screenHeight * 0.1,
-                          width: screenWidth * 0.45,
-                          alignment: Alignment.center,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Level $userLevel",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: textColor,
-                                    fontFamily: "Fredoka One"),
-                              ),
-                              Text(
-                                "Your Level",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: textColor,
-                                    fontFamily: "Fredoka",
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-
-                SizedBox(height: screenWidth * 0.05),
-
-                // Weekly Accuracy Trend Graph
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: borderRadius,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: shadowColor,
-                        offset: const Offset(2, 2),
-                      ),
-                    ],
-                  ),
-                  // Reverted to previous sizes
-                  height: screenHeight * 0.45,
-                  width: screenWidth * 0.9,
-                  padding: EdgeInsets.only(
-                    left: defaultPadding * 0.5,
-                    right: defaultPadding * 1.5,
-                    top: defaultPadding,
-                    bottom: defaultPadding,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Weekly Accuracy Trend",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          fontFamily: "Fredoka",
-                        ),
-                      ),
                       SizedBox(height: screenHeight * 0.02),
-                      Expanded(
-                        child: LineChart(
-                          LineChartData(
-                            gridData: FlGridData(
-                              show: true,
-                              drawVerticalLine: true,
-                              getDrawingHorizontalLine: (value) {
-                                return FlLine(
-                                  color: Colors.grey.shade300,
-                                  strokeWidth: 1.2,
-                                  dashArray: [5, 5],
-                                );
-                              },
-                              getDrawingVerticalLine: (value) {
-                                return FlLine(
-                                  color: Colors.grey.shade300,
-                                  strokeWidth: 1.2,
-                                  dashArray: [5, 5],
-                                );
-                              },
-                            ),
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                axisNameWidget: Padding(
-                                  // Add some padding to create a gap between axis name and labels
-                                  padding: const EdgeInsets.only(bottom: 10.0),
-                                  child: Text(
-                                    "Daily Accuracy (%)",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: "Fredoka"),
+
+                      // Accuracy Score and Stats Containers
+                      Row(
+                        children: [
+                          // Accuracy Score Container
+                          Expanded(
+                            flex: 45,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: borderRadius,
+                                color: accuracyContainerColor,
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: shadowColor,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 3,
                                   ),
-                                ),
-                                // Increase axisNameSize for extra space
-                                axisNameSize: 40,
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize:
-                                      30, // Keep labels close, but not too close
-                                  interval: 10,
-                                  getTitlesWidget: (value, meta) {
-                                    if (value % 10 == 0) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 4.0),
-                                        child: Text(
-                                          '${value.toInt()}%',
-                                          style: const TextStyle(fontSize: 10),
+                                ],
+                              ),
+                              height: screenHeight * 0.2,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: screenHeight * 0.1,
+                                          width: screenHeight * 0.1,
+                                          child: CircularProgressIndicator(
+                                            value: _error.isEmpty ? _accuracyScore / 100 : 0,
+                                            strokeWidth: 10,
+                                            backgroundColor: Colors.white,
+                                            color: chartLineColor,
+                                          ),
                                         ),
-                                      );
-                                    }
-                                    return Container();
-                                  },
-                                ),
-                              ),
-                              rightTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              topTitles: AxisTitles(
-                                sideTitles: SideTitles(showTitles: false),
-                              ),
-                              bottomTitles: AxisTitles(
-                                axisNameWidget: Text(
-                                  "Day",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Fredoka"),
-                                ),
-                                axisNameSize: 20,
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  interval: 1,
-                                  getTitlesWidget: (value, meta) {
-                                    List<String> days = [
-                                      "Mon",
-                                      "Tue",
-                                      "Wed",
-                                      "Thu",
-                                      "Fri",
-                                      "Sat",
-                                      "Sun"
-                                    ];
-                                    if (value >= 0 && value < days.length) {
-                                      return Text(
-                                        days[value.toInt()],
-                                        style: const TextStyle(fontSize: 12),
-                                      );
-                                    }
-                                    return Container();
-                                  },
+                                        Text(
+                                          _error.isEmpty ? "${_accuracyScore.toStringAsFixed(1)}%" : "N/A",
+                                          style: const TextStyle(
+                                            color: textColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Text(
+                                      "Accuracy Score",
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                  color: Colors.grey.shade400, width: 1),
-                            ),
-                            minX: 0,
-                            maxX: 6,
-                            minY: 0,
-                            maxY: 100,
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: lineSpots,
-                                isCurved: true,
-                                color: chartLineColor,
-                                barWidth: 4,
-                                isStrokeCapRound: true,
-                                belowBarData: BarAreaData(
-                                  show: true,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      graphFillColor
-                                          .withOpacity(0.9), // Top part
-                                      graphFillColor
-                                          .withOpacity(0.5), // Bottom part
+                          ),
+
+                          SizedBox(width: screenWidth * 0.03),
+
+                          // Right column containers
+                          Expanded(
+                            flex: 55,
+                            child: Column(
+                              children: [
+                                // Words Mastered Container
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: borderRadius,
+                                    color: Colors.white,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: shadowColor,
+                                        offset: Offset(2, 2),
+                                        blurRadius: 3,
+                                      ),
+                                    ],
+                                  ),
+                                  height: screenHeight * 0.095,
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _error.isEmpty ? "$_wordsMastered" : "N/A",
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "Words Mastered",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
+
+                                SizedBox(height: screenHeight * 0.01),
+
+                                // Level Container
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: borderRadius,
+                                    color: Colors.white,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: shadowColor,
+                                        offset: Offset(2, 2),
+                                        blurRadius: 3,
+                                      ),
+                                    ],
+                                  ),
+                                  height: screenHeight * 0.095,
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _error.isEmpty ? "Level $_userLevel" : "Level N/A",
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "Your Level",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+
+                      SizedBox(height: screenHeight * 0.02),
+
+                      // Weekly Accuracy Trend Graph
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: borderRadius,
+                          color: Colors.white,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: shadowColor,
+                              offset: Offset(2, 2),
+                              blurRadius: 3,
+                            ),
+                          ],
+                        ),
+                        height: screenHeight * 0.45,
+                        width: double.infinity,
+                        padding: EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Weekly Accuracy Trend",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: screenHeight * 0.02),
+                            Expanded(
+                              child: _error.isEmpty && _lineSpots.isNotEmpty
+                                  ? LineChart(
+                                      LineChartData(
+                                        gridData: FlGridData(
+                                          show: true,
+                                          drawVerticalLine: true,
+                                          getDrawingHorizontalLine: (value) {
+                                            return FlLine(
+                                              color: Colors.grey.shade300,
+                                              strokeWidth: 1,
+                                              dashArray: [5, 5],
+                                            );
+                                          },
+                                          getDrawingVerticalLine: (value) {
+                                            return FlLine(
+                                              color: Colors.grey.shade300,
+                                              strokeWidth: 1,
+                                              dashArray: [5, 5],
+                                            );
+                                          },
+                                        ),
+                                        titlesData: FlTitlesData(
+                                          leftTitles: AxisTitles(
+                                            axisNameWidget: const Padding(
+                                              padding: EdgeInsets.only(right: 8.0),
+                                              child: Text(
+                                                "Daily Accuracy (%)",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            axisNameSize: 40,
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 30,
+                                              interval: 10,
+                                              getTitlesWidget: (value, meta) {
+                                                if (value % 10 == 0) {
+                                                  return Padding(
+                                                    padding: const EdgeInsets.only(right: 4.0),
+                                                    child: Text(
+                                                      '${value.toInt()}%',
+                                                      style: const TextStyle(fontSize: 10),
+                                                    ),
+                                                  );
+                                                }
+                                                return Container();
+                                              },
+                                            ),
+                                          ),
+                                          rightTitles: const AxisTitles(
+                                            sideTitles: SideTitles(showTitles: false),
+                                          ),
+                                          topTitles: const AxisTitles(
+                                            sideTitles: SideTitles(showTitles: false),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            axisNameWidget: const Text(
+                                              "Day",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            axisNameSize: 20,
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              interval: 1,
+                                              getTitlesWidget: (value, meta) {
+                                                List<String> days = [
+                                                  "Mon",
+                                                  "Tue",
+                                                  "Wed",
+                                                  "Thu",
+                                                  "Fri",
+                                                  "Sat",
+                                                  "Sun"
+                                                ];
+                                                if (value >= 0 && value < days.length) {
+                                                  return Text(
+                                                    days[value.toInt()],
+                                                    style: const TextStyle(fontSize: 12),
+                                                  );
+                                                }
+                                                return Container();
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        borderData: FlBorderData(
+                                          show: true,
+                                          border: Border.all(
+                                            color: Colors.grey.shade400, 
+                                            width: 1
+                                          ),
+                                        ),
+                                        minX: 0,
+                                        maxX: 6,
+                                        minY: 0,
+                                        maxY: 100,
+                                        lineBarsData: [
+                                          LineChartBarData(
+                                            spots: _lineSpots,
+                                            isCurved: true,
+                                            color: chartLineColor,
+                                            barWidth: 3,
+                                            isStrokeCapRound: true,
+                                            belowBarData: BarAreaData(
+                                              show: true,
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                  graphFillColor.withOpacity(0.9),
+                                                  graphFillColor.withOpacity(0.5),
+                                                ],
+                                              ),
+                                            ),
+                                            dotData: FlDotData(
+                                              show: true,
+                                              getDotPainter: (spot, percent, barData, index) {
+                                                return FlDotCirclePainter(
+                                                  radius: 4,
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                  strokeColor: chartLineColor,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            "No data available",
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          if (_error.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 8.0),
+                                              child: Text(
+                                                "Check your connection",
+                                                style: TextStyle(
+                                                  color: textColor.withOpacity(0.7),
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // User Email Info
+                      SizedBox(height: screenHeight * 0.02),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: borderRadius,
+                          color: Colors.white,
+                          boxShadow: const [
+                            BoxShadow(
+                              color: shadowColor,
+                              offset: Offset(2, 2),
+                              blurRadius: 3,
+                            ),
+                          ],
+                        ),
+                        width: double.infinity,
+                        padding: EdgeInsets.all(defaultPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Account Information",
+                              style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Email: ${widget.userData['email']}",
+                              style: const TextStyle(
+                                color: textColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+                
+                // Error Banner - only show when there's an error
+                if (_error.isNotEmpty)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.red.shade100,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.wifi_off, color: Colors.red),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Connection error: Unable to load data",
+                              style: TextStyle(color: Colors.red.shade900),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: fetchDashboardData,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade900,
+                              foregroundColor: Colors.white,
+                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            ),
+                            child: const Text("Retry"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
