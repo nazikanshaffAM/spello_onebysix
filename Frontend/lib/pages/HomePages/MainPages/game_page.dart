@@ -3,7 +3,12 @@ import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/util/game_card.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({super.key});
+  final Map<String, dynamic> userData;
+  
+  const GamePage({
+    super.key, 
+    required this.userData
+  });
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -48,6 +53,20 @@ class _GamePageState extends State<GamePage> {
       'route': '/dashboard'
     },
   ];
+
+  // Method to safely access user data with fallback values
+  String get userName => widget.userData['name'] ?? 'User';
+  String get userEmail => widget.userData['email'] ?? '';
+  int get userScore => widget.userData['score'] ?? 250;
+  int get userLevel => widget.userData['level'] ?? 5;
+
+  @override
+  void initState() {
+    super.initState();
+    // Debug print to verify userData is being received correctly
+    print("GamePage received userData: ${widget.userData}");
+    print("User Email: $userEmail"); // Log email specifically to verify it's being received
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +145,7 @@ class _GamePageState extends State<GamePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Tom Ford",
+                                  userName, // Use userName from userData
                                   style: TextStyle(
                                     fontFamily: "Fredoka",
                                     fontSize: screenHeight * 0.022,
@@ -140,7 +159,7 @@ class _GamePageState extends State<GamePage> {
                                         size: screenHeight * 0.018),
                                     SizedBox(width: screenWidth * 0.01),
                                     Text(
-                                      "250",
+                                      userScore.toString(), // Use user score from userData
                                       style: TextStyle(
                                         fontFamily: "Fredoka",
                                         fontSize: screenHeight * 0.018,
@@ -151,11 +170,22 @@ class _GamePageState extends State<GamePage> {
                                 ),
                               ],
                             ),
+                            const Spacer(),
+                            // Display email or a tooltip with email
+                            Tooltip(
+                              message: userEmail,
+                              child: Icon(
+                                Icons.email,
+                                color: Colors.white70,
+                                size: screenHeight * 0.025,
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.08),
                           ],
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         Text(
-                          "Level 5",
+                          "Level ${userLevel}", // Use user level from userData
                           style: TextStyle(
                             fontFamily: "Fredoka One",
                             fontSize: screenHeight * 0.035,
@@ -213,11 +243,25 @@ class _GamePageState extends State<GamePage> {
                     final game = games[index];
                     return Padding(
                       padding: EdgeInsets.only(bottom: screenHeight * 0.025),
-                      child: GameCard(
-                        gameName: game['name']!,
-                        imageName: game['image']!,
-                        routeName: game['route']!,
-                        isRecommended: game['isRecommended']!,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navigate to dashboard directly without using routes
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Dashboard()
+                            ),
+                          );
+                          
+                          // Debug print to verify the navigation
+                          print("Navigating to ${game['name']} dashboard");
+                        },
+                        child: GameCard(
+                          gameName: game['name']!,
+                          imageName: game['image']!,
+                          routeName: game['route']!,
+                          isRecommended: game['isRecommended']!,
+                        ),
                       ),
                     );
                   },
