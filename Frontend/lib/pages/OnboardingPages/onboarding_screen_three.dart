@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class OnboardingScreenThree extends StatelessWidget {
-  const OnboardingScreenThree({super.key});
+  final Map<String, dynamic> userData;
+  
+  const OnboardingScreenThree({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +77,7 @@ class OnboardingScreenThree extends StatelessWidget {
             left: screenWidth * 0.1,
             right: screenWidth * 0.1,
             child: Text(
-              "Monitor your improvement with\naccuracy scores and feedback.\n Keep practicing and level up your\nSpeech skills!",
+              "Monitor your improvement with\naccuracy scores and feedback.\nKeep practicing and level up your\nSpeech skills!",
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white,
@@ -84,6 +86,9 @@ class OnboardingScreenThree extends StatelessWidget {
                   fontFamily: "Fredoka"),
             ),
           ),
+          
+          
+         
         ],
       ),
     );
