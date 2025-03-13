@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart';
+import 'package:spello_frontend/config/config.dart';
 
 // Placeholder Signup Screen
 
@@ -33,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.8.163:5000/login'),
+         Uri.parse('${Config.baseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': _emailController.text,
