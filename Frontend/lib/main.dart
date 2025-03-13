@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import the services package
 import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/game_data_screen.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/settings.dart';
 import 'package:spello_frontend/pages/HomePages/SubPages/page_under_construction.dart';
 import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart';
-import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
+import 'package:spello_frontend/pages/LoginRelatedPages/login.dart'; 
+import 'package:spello_frontend/config/config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
@@ -21,24 +24,40 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF8092CC)),
-      home: RegistrationScreen(),
-
+      home: LoginPage(),
       // home: HomeScreen(
-      //     userData: {'name': 'John Doe', 'email': 'johndoe@example.com'}),
+      //   userData: {'name': 'John Doe', 'email': 'johndoe@example.com'}),
       routes: {
-        '/startPractice': (context) => const GamePage(), // Placeholder for now
-        '/parentalControl': (context) => ParentalControl(),
-        '/dashboard': (context) => Dashboard(),
+        '/login': (context) => LoginPage(),
+        '/startPractice': (context) => GamePage(
+          userData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ?? {},
+        ),
+        '/parentalControl': (context) => ParentalControl(
+          userData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ?? {},
+        ),
+        '/dashboard': (context) => Dashboard(
+          baseUrl: Config.baseUrl,
+          userData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ?? {},
+        ),
         '/notifications': (context) => PageUnderConstruction(),
-        '/settings': (context) => PageUnderConstruction(),
+        '/settings': (context) => Settings(
+          userData: ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ?? {},
+        ),
         '/helpCenter': (context) => PageUnderConstruction(),
+        '/game-data': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+            return GameDataScreen(
+              userData: args?['userData'] ?? {},
+              gameName: args?['gameName'] ?? 'Game',
+    );
+  },
       },
     );
   }
