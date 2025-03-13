@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class OnboardingScreenTwo extends StatelessWidget {
-  const OnboardingScreenTwo({super.key});
+  final Map<String, dynamic> userData;
+  
+  const OnboardingScreenTwo({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,7 @@ class OnboardingScreenTwo extends StatelessWidget {
             left: screenWidth * 0.1,
             right: screenWidth * 0.1,
             child: Text(
-              "Pronounce words correctly to level\nup! The better your speech, the\nhigher your score!",
+              "Pronounce words correctly to level\n up!\nThe better your speech, the\nhigher your score!",
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white,
