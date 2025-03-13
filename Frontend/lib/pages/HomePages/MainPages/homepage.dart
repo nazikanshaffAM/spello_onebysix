@@ -3,9 +3,9 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userData; // Add this line to receive userData
+  final Map<String, dynamic> userData; // Receives userData from login or registration flow
 
-  const HomePage({super.key, required this.userData}); // Update constructor
+  const HomePage({super.key, required this.userData});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,6 +17,12 @@ class _HomePageState extends State<HomePage> {
       List.generate(6, (index) => GlobalKey());
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
+
+  // Method to safely access user data with fallback values
+  String get userName => widget.userData['name'] ?? 'User';
+  String get userEmail => widget.userData['email'] ?? '';
+  String get userAge => widget.userData['age']?.toString() ?? '';
+  String get userGender => widget.userData['gender'] ?? '';
 
   final List<Map<String, dynamic>> gridItems = [
     {
@@ -54,13 +60,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    
+    // Log userData to verify it's being passed correctly
+    print("HomePage received userData: ${widget.userData}");
+    
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _initTargets();
       await _showTutorial();
     });
   }
 
-  // Rest of your methods remain unchanged
   Future<void> _showTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     bool hasSeenTutorial = prefs.getBool('hasSeenTutorial') ?? false;
@@ -146,6 +155,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Pass userData to all routes
   void _onTileTap(int index, BuildContext context) {
     setState(() {
       _tappedIndex = index;
@@ -155,7 +165,18 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _tappedIndex = null;
       });
-      Navigator.pushNamed(context, gridItems[index]['navigateTo']);
+      
+      // Get the route name
+      String routeName = gridItems[index]['navigateTo'];
+      
+      // Pass userData to all routes
+      print("Navigating to $routeName with user data: ${widget.userData}");
+      
+      Navigator.pushNamed(
+        context, 
+        routeName,
+        arguments: widget.userData, // Pass complete userData as arguments
+      );
     });
   }
 
@@ -205,11 +226,11 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 children: [
                   SizedBox(height: screenHeight * 0.03),
-                  // New container on top of the grid
+                  // User greeting container
                   Container(
                     width: double.infinity,
                     height: screenHeight * 0.2,
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: const Color(0xFFB7C2E5),
                       borderRadius: BorderRadius.circular(12),
@@ -225,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         SizedBox(width: screenWidth * 0.02),
                         Image.asset(
-                          "assets/images/start.png", // Replace with your preferred image
+                          "assets/images/start.png",
                           width: screenWidth * 0.12,
                         ),
                         SizedBox(width: screenWidth * 0.06),
@@ -234,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             SizedBox(height: screenHeight * 0.04),
                             Text(
-                              "Hello, ${widget.userData['name']}!", // Changed hardcoded "Venuja" to userData
+                              "Hello, ${userName}!", // Uses userName getter with fallback
                               style: TextStyle(
                                 color: const Color(0xFF3A4552),
                                 fontSize: screenWidth * 0.06,
