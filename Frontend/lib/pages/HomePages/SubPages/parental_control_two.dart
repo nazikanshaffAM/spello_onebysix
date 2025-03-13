@@ -3,9 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spello_frontend/util/added_word_tile.dart';
 import 'package:spello_frontend/util/add_word_dialogbox.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:spello_frontend/config/config.dart';
 
 class ParentalControlTwo extends StatefulWidget {
-  const ParentalControlTwo({super.key});
+  // Add userData parameter
+  final Map<String, dynamic> userData;
+
+  // Update constructor to require userData
+  const ParentalControlTwo({super.key, required this.userData});
 
   @override
   State<ParentalControlTwo> createState() => _ParentalControlTwoState();
@@ -18,14 +25,83 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   final GlobalKey _firstTileKey = GlobalKey();
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
-  final ScrollController _scrollController =
-      ScrollController(); // Add ScrollController
+  final ScrollController _scrollController = ScrollController();
+  
+  bool isLoading = false;
+  String errorMessage = '';
 
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose(); // Dispose the ScrollController
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCustomWords();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowAddButtonTutorial();
+    });
+  }
+
+  // Fetch custom words from the backend
+  Future<void> _fetchCustomWords() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+      wordList.clear();
+    });
+
+    try {
+      // Use email as a query parameter like in the working solutions
+      // Change this line in all API calls
+      final url = Uri.parse('${Config.baseUrl}/get_user?email=${widget.userData['email']}');
+      print("Fetching custom words from: $url");
+      
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      print("Fetch response status: ${response.statusCode}");
+      print("Fetch response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        // Check if user has custom words
+        if (data.containsKey('custom_words')) {
+          List<dynamic> customWords = data['custom_words'];
+          print("Loaded custom words: $customWords");
+          setState(() {
+            for (var word in customWords) {
+              // Ensure word is treated as a string
+              String wordStr = word.toString();
+              wordList.add([wordStr]);
+            }
+          });
+          print("Updated wordList: $wordList");
+        } else {
+          print("No custom words found in response");
+        }
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load words: Server error (${response.statusCode})';
+        });
+      }
+    } catch (e) {
+      print("Error fetching custom words: $e");
+      setState(() {
+        errorMessage = 'Network error: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _checkAndShowAddButtonTutorial() async {
@@ -48,19 +124,72 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     }
   }
 
-  void saveNewWord() {
+  // Modified to save to backend
+  Future<void> saveNewWord() async {
     String newWord = _controller.text.trim();
-    if (newWord.isNotEmpty && RegExp(r'^\S+$').hasMatch(newWord)) {
-      setState(() {
-        wordList.add([newWord]);
-      });
-      _controller.clear();
+    if (newWord.isEmpty || !RegExp(r'^\S+$').hasMatch(newWord)) {
       Navigator.of(context).pop();
-      if (wordList.length == 1) {
-        _checkAndShowTileTutorial();
+      return;
+    }
+
+    // Close the dialog first
+    Navigator.of(context).pop();
+
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      // Send request to backend to add custom word
+      // Using query parameter for email instead of relying on session
+      final url = Uri.parse('${Config.baseUrl}/add-custom-word?email=${widget.userData['email']}');
+      print("Making request to: $url");
+      
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'custom_word': newWord,
+        }),
+      );
+
+      print("Add word response status: ${response.statusCode}");
+      print("Add word response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Add word to local list if successful
+        setState(() {
+          wordList.add([newWord]);
+        });
+        _controller.clear();
+        if (wordList.length == 1) {
+          _checkAndShowTileTutorial();
+        }
+      } else {
+        String errorMsg = 'Failed to add word: Server error';
+        try {
+          final responseData = jsonDecode(response.body);
+          errorMsg = responseData['error'] ?? errorMsg;
+        } catch (e) {
+          print("Error parsing response JSON: $e");
+        }
+        
+        setState(() {
+          errorMessage = errorMsg;
+        });
       }
-    } else {
-      Navigator.of(context).pop();
+    } catch (e) {
+      print("Error adding custom word: $e");
+      setState(() {
+        errorMessage = 'Network error: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -89,10 +218,62 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     );
   }
 
-  void deleteWord(int index) {
+  // Modified to delete from backend
+   Future<void> deleteWord(int index) async {
+    final wordToDelete = wordList[index][0];
+    
     setState(() {
-      wordList.removeAt(index);
+      isLoading = true;
+      errorMessage = '';
     });
+
+    try {
+      // Send request to backend to remove custom word
+      // Using query parameter for email instead of relying on session
+      final url = Uri.parse('http://192.168.8.163:5000/remove-custom-word?email=${widget.userData['email']}');
+      print("Making delete request to: $url");
+      
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'custom_word': wordToDelete,
+        }),
+      );
+
+      print("Delete word response status: ${response.statusCode}");
+      print("Delete word response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        // Remove from local list if successful
+        setState(() {
+          wordList.removeAt(index);
+        });
+      } else {
+        String errorMsg = 'Failed to remove word: Server error';
+        try {
+          final responseData = jsonDecode(response.body);
+          errorMsg = responseData['error'] ?? errorMsg;
+        } catch (e) {
+          print("Error parsing response JSON: $e");
+        }
+        
+        setState(() {
+          errorMessage = errorMsg;
+        });
+      }
+    } catch (e) {
+      print("Error removing custom word: $e");
+      setState(() {
+        errorMessage = 'Network error: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _initAddButtonTarget() {
@@ -111,9 +292,9 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                 color: const Color(0xFF3A435F),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
+              child: const Text(
                 "Press the button to add a word for practice.",
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: "Fredoka",
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -143,9 +324,9 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                 color: const Color(0xFF3A435F),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
+              child: const Text(
                 "Swipe left to delete.",
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: "Fredoka",
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -194,14 +375,6 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAndShowAddButtonTutorial();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -229,15 +402,24 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         ),
         child: FloatingActionButton(
           key: _addButtonKey,
-          backgroundColor: isLimitReached
+          backgroundColor: isLimitReached || isLoading
               ? const Color(0xFFB0B0B0)
               : const Color(0xFFFFC000),
           foregroundColor: Colors.white,
-          onPressed: addNewWord,
-          child: Icon(
-            Icons.add,
-            size: screenWidth * 0.08,
-          ),
+          onPressed: isLoading || isLimitReached ? null : addNewWord,
+          child: isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : Icon(
+                  Icons.add,
+                  size: screenWidth * 0.08,
+                ),
         ),
       ),
       body: Stack(
@@ -276,6 +458,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
               ),
             ),
           ),
+          
           // Main Content
           Padding(
             padding: EdgeInsets.symmetric(
@@ -297,7 +480,40 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (wordList.isEmpty)
+                
+                // Error message display
+                if (errorMessage.isNotEmpty)
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.05,
+                      vertical: 8,
+                    ),
+                    margin: EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            errorMessage,
+                            style: TextStyle(color: Colors.red.shade900),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                
+                if (isLoading && wordList.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (wordList.isEmpty)
                   Padding(
                     padding: EdgeInsets.only(top: screenHeight * 0.05),
                     child: Center(
@@ -309,10 +525,11 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                       ),
                     ),
                   ),
+                
                 if (wordList.isNotEmpty)
                   Expanded(
                     child: ListView.builder(
-                      controller: _scrollController, // Add ScrollController
+                      controller: _scrollController,
                       itemCount: wordList.length,
                       itemBuilder: (context, index) {
                         final tileKey = index == 0 ? _firstTileKey : null;
