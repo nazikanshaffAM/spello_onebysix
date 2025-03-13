@@ -240,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Text(
-                              'Sign up to Start your Journey',
+                              'Sign up to Start your Journey !',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
@@ -257,8 +257,8 @@ class _LoginPageState extends State<LoginPage> {
                               child: const Text(
                                 'Sign up',
                                 style: TextStyle(
-                                  color: Color.fromARGB(255, 247, 214, 1),
-                                  
+                                  color: Color.fromARGB(255, 238, 207, 8),
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   
                                 ),
