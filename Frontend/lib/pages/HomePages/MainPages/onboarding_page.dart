@@ -7,9 +7,9 @@ import 'package:spello_frontend/pages/OnboardingPages/onboarding_screen_two.dart
 import 'package:spello_frontend/util/custom_elevated_button.dart';
 
 class OnboardingPage extends StatefulWidget {
-  final String name; // Add this line to accept the name
+  final Map<String, dynamic> userData; // Accept a map of user data
 
-  const OnboardingPage({super.key, required this.name}); // Update constructor
+  const OnboardingPage({super.key, required this.userData});
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -18,9 +18,57 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   // creating a controller to keep track of the page we are on
   PageController controller = PageController();
+  
+  // value to keep track of whether its last page or not
+  bool onLastPage = false;
+  
+  // Store a local copy of userData to ensure data consistency
+  late Map<String, dynamic> _userData;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Create a deep copy of the userData to prevent reference issues
+    _userData = Map<String, dynamic>.from(widget.userData);
+    
+    // Debug prints to verify data is received correctly
+    print('=' * 50 + ' ONBOARDING PAGE INITIALIZATION ' + '=' * 50);
+    print('OnboardingPage received userData:');
+    print('COMPLETE USER DATA: $_userData');
+    
+    // Verify all required fields exist
+    final requiredKeys = ['name', 'email', 'age', 'gender'];
+    for (final key in requiredKeys) {
+      if (_userData.containsKey(key)) {
+        print('✓ $key: ${_userData[key]}');
+      } else {
+        print('✗ MISSING KEY: $key');
+        // Add default values for missing keys to prevent null errors
+        switch (key) {
+          case 'name':
+            _userData[key] = 'User';
+            break;
+          case 'email':
+            _userData[key] = '';
+            break;
+          case 'age':
+            _userData[key] = '';
+            break;
+          case 'gender':
+            _userData[key] = '';
+            break;
+        }
+      }
+    }
+    print('=' * 100);
+  }
 
-  //value to keep track of whether its last page or not
-  late bool onLastPage = false;
+  @override
+  void dispose() {
+    // Clean up controller when widget is disposed
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +79,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return Scaffold(
       body: Stack(
         children: [
+          // PageView with the three onboarding screens
           PageView(
             controller: controller,
             onPageChanged: (index) {
@@ -38,12 +87,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 onLastPage = (index == 2);
               });
             },
-            children: const [
-              OnboardingScreenOne(),
-              OnboardingScreenTwo(),
-              OnboardingScreenThree(),
+            children: [
+              OnboardingScreenOne(userData: _userData),
+              OnboardingScreenTwo(userData: _userData),
+              OnboardingScreenThree(userData: _userData),
             ],
           ),
+          
+          // Page indicator
           Positioned(
             bottom: screenHeight * 0.2,
             left: screenWidth * 0.4,
@@ -59,15 +110,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
           ),
-          // Position the row at the bottom spanning the full width (or with horizontal padding)
+          
+          // Navigation buttons (Skip/Next or Get Started)
           !onLastPage
               ? Positioned(
                   bottom: screenHeight * 0.1,
                   left: 0,
                   right: 0,
                   child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -84,22 +135,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             ),
                           ),
                         ),
-                        // Smooth page indicator
-                        // Next button (using your custom elevated button)
+                        // Next button
                         CustomElevatedButton(
-                          buttonLength: screenWidth *
-                              0.23, // dynamically adjust button width
-                          buttonHeight: screenHeight *
-                              0.05, // dynamically adjust button height
+                          buttonLength: screenWidth * 0.23,
+                          buttonHeight: screenHeight * 0.05,
                           buttonName: "Next",
                           primaryColor: 0xFFFFC000,
                           shadowColor: 0xFFD29338,
                           textColor: Colors.white,
                           onPressed: () {
                             controller.nextPage(
-                                duration: Duration(milliseconds: 500),
+                                duration: const Duration(milliseconds: 500),
                                 curve: Curves.easeIn);
-                            // Your button action goes here
                           },
                         ),
                       ],
@@ -110,25 +157,32 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   bottom: screenHeight * 0.1,
                   left: screenWidth * 0.15,
                   child: CustomElevatedButton(
-                      buttonLength: screenWidth * 0.7,
-                      buttonHeight: screenHeight * 0.05,
-                      buttonName: "Get Started",
-                      primaryColor: 0xFFFFC000,
-                      shadowColor: 0xFFD29338,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(
-                              userData: {
-                                'name':
-                                    widget.name, // Pass the name to HomePage
-                              },
-                            ),
+                    buttonLength: screenWidth * 0.7,
+                    buttonHeight: screenHeight * 0.05,
+                    buttonName: "Get Started",
+                    primaryColor: 0xFFFFC000,
+                    shadowColor: 0xFFD29338,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      // Debug print to check data before passing to HomePage
+                      print('=' * 50 + ' NAVIGATING TO HOMEPAGE ' + '=' * 50);
+                      print('User data being passed: $_userData');
+                      
+                      // Create a new copy of userData for HomePage to ensure data integrity
+                      final homePageData = Map<String, dynamic>.from(_userData);
+                      
+                      // Use pushReplacement to avoid stacking screens
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(
+                            userData: homePageData,
                           ),
-                        );
-                      }),
+                        ),
+                      );
+                      print('=' * 100);
+                    },
+                  ),
                 )
         ],
       ),
