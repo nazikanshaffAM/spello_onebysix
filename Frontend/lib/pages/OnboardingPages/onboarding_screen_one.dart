@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
 class OnboardingScreenOne extends StatelessWidget {
-  const OnboardingScreenOne({super.key});
+  final Map<String, dynamic> userData;
+  
+  const OnboardingScreenOne({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
+    // Debug print to verify data is received
+    print('OnboardingScreenOne received userData: $userData');
+    
+    // Get user's name with a fallback value
+    final String userName = userData['name'] ?? 'Friend';
+    
     // Retrieve screen dimensions
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -12,6 +20,7 @@ class OnboardingScreenOne extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
+          // Cloud images
           Positioned(
             top: screenHeight * 0.05,
             left: screenWidth * 0,
@@ -23,7 +32,6 @@ class OnboardingScreenOne extends StatelessWidget {
               ),
             ),
           ),
-
           Positioned(
             top: screenHeight * 0.2,
             left: screenWidth * 0.8,
@@ -46,30 +54,33 @@ class OnboardingScreenOne extends StatelessWidget {
               ),
             ),
           ),
-          // "Speak & Play" text positioned using percentages
+          
+          // Welcome text with user's name
           Positioned(
-            top: screenHeight * 0.12, // 10% from the top
-            left: screenWidth * 0.09, // 25% from the left
+            top: screenHeight * 0.12,
+            left: screenWidth * 0.09,
             child: Text(
-              "Welcome to Spello",
+              'Welcome, $userName!', 
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: screenWidth * 0.09, // Scales with screen width
+                  fontSize: screenWidth * 0.09,
                   fontWeight: FontWeight.w700,
                   fontFamily: "Fredoka One"),
             ),
           ),
-          // Star image positioned responsively
+          
+          // Main image
           Positioned(
             top: screenHeight * 0.14,
             left: screenWidth * 0.15,
             child: Image.asset(
               "assets/images/onboarding_screen_one.png",
-              height: screenHeight * 0.5, // 40% of screen height
-              width: screenWidth * 0.7, // 60% of screen width
+              height: screenHeight * 0.5,
+              width: screenWidth * 0.7,
             ),
           ),
-          // Descriptive text positioned responsively
+          
+          // Description text
           Positioned(
             top: screenHeight * 0.57,
             left: screenWidth * 0.1,
@@ -79,7 +90,7 @@ class OnboardingScreenOne extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: screenWidth * 0.05, // Responsive font size
+                  fontSize: screenWidth * 0.05,
                   fontWeight: FontWeight.bold,
                   fontFamily: "Fredoka"),
             ),
