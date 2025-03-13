@@ -7,6 +7,10 @@ from flask import Flask, request, jsonify, session
 from pymongo import MongoClient
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_cors import CORS
+from datetime import datetime, timedelta
+from collections import defaultdict
+
+
 app = Flask(__name__)
 CORS(app, supports_credentials=True)  # Enable credentials for session cookies
 app.secret_key = 'spello_secret_key'  # Required for session management
@@ -145,6 +149,7 @@ def speech_to_text():
         "accuracy": accuracy
     })
 
+
 @app.route("/add-custom-word", methods=["POST"])
 def add_custom_word():
     # Get email from session
@@ -172,7 +177,6 @@ def add_custom_word():
             collection.update_one({"email": email}, {"$push": {"custom_words": custom_word}})
 
     return jsonify({"message": f"Custom word '{custom_word}' added successfully!"})
-
 
 
 @app.route("/remove-custom-word", methods=["POST"])
@@ -208,7 +212,6 @@ def remove_custom_word():
 # mongodb connection string
 MONGO_URI = "mongodb+srv://spello:spello100@spellodb.8zvmy.mongodb.net/?retryWrites=true&w=majority&appName=spelloDB"
 
-
 # connect to mongoDB
 client = MongoClient(MONGO_URI)
 db = client["spello_database"]  # added database name
@@ -218,7 +221,6 @@ collection = db["sp1"]  # added collection name
 @app.route("/")
 def home():
     return jsonify({"message": "Connected MongoDB Successfully"})
-
 
 
 # registering user
@@ -258,7 +260,10 @@ def register():
         'level': 1,
         'attempts': 0,
         'lives': 5,
-        'scores': []
+        'scores': [],
+        'current_streak': 0,
+        'max_streak': 0,
+        'last_practice_date': ''
     }
 
     # Insert new user
@@ -365,7 +370,7 @@ def get_user():
 
 @app.route('/delete_user', methods=['DELETE'])  # to delete user according to email
 def delete_user():
-    # Get email from session for currently logged in user
+    # Get email from session for currently logged-in user
     email = session.get('user_email')
     if not email:
         # If not in session, try from query parameters
@@ -403,7 +408,6 @@ def delete_user():
         return jsonify({"error": "Failed to delete the user"}), 500
 
 
-
 # Route to delete the last inserted user
 @app.route('/delete_last_user', methods=['DELETE'])  # to delete last user
 def delete_last_user():
@@ -435,6 +439,7 @@ def delete_last_user():
     else:
         return jsonify({"error": "Failed to delete the last user"}), 500
 
+
 # game logics--Hangman
 
 def calculate_score(accuracy, level):
@@ -452,6 +457,16 @@ def calculate_score(accuracy, level):
             return int((accuracy - 50) * 2)
         else:
             return 0
+
+
+# Helper function to get dates for the past week
+def get_past_week_dates():
+    today = datetime.now().date()
+    dates = []
+    for i in range(7):
+        dates.append((today - timedelta(days=i)).strftime('%Y-%m-%d'))
+    return dates
+
 
 @app.route('/play-game', methods=['POST'])
 def play_game():
@@ -479,6 +494,9 @@ def play_game():
     # Increment total score
     total_score = user.get('total_score', 0) + score
 
+    # Get current timestamp
+    current_time = datetime.now().strftime('%Y-%m-%d')
+
     # Track attempts and lives
     attempts = user.get('attempts', 0) + 1
     lives = user.get('lives', 5)
@@ -490,6 +508,31 @@ def play_game():
     if total_score >= 2000 and level == 1:
         level = 2
 
+    # Update streak information
+    last_practice_date = user.get('last_practice_date', '')
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
+
+    if last_practice_date != current_time:
+        # New day of practice
+        if last_practice_date:
+            last_date = datetime.strptime(last_practice_date, '%Y-%m-%d').date()
+            today = datetime.now().date()
+            days_diff = (today - last_date).days
+
+            if days_diff == 1:
+                # Consecutive day
+                current_streak += 1
+                if current_streak > max_streak:
+                    max_streak = current_streak
+            elif days_diff > 1:
+                # Streak broken
+                current_streak = 1
+        else:
+            # First time practicing
+            current_streak = 1
+            max_streak = 1
+
     # If 5 successful or failed attempts are reached, save the game state and reset lives
     if attempts >= 5 or lives <= 0:
         collection.update_one({'email': email}, {'$set': {
@@ -498,8 +541,12 @@ def play_game():
             'attempts': 0,
             'lives': 5,
             'scores': user.get('scores', []) + [
-                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]}
-        })
+                {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score,
+                 'timestamp': current_time}],
+            'last_practice_date': current_time,
+            'current_streak': current_streak,
+            'max_streak': max_streak
+        }})
         # Reset game state: New target word, reset attempts/lives for the next round
         session_data['target_word'] = ''
         session_data['spoken_word'] = ''
@@ -509,7 +556,8 @@ def play_game():
             'level': level,
             'spoken_word': spoken_word,
             'target_word': target_word,
-            'accuracy': accuracy
+            'accuracy': accuracy,
+            'current_streak': current_streak
         })
 
     # Save progress after each attempt
@@ -519,7 +567,11 @@ def play_game():
         'total_score': total_score,
         'level': level,
         'scores': user.get('scores', []) + [
-            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score}]
+            {'target_word': target_word, 'spoken_word': spoken_word, 'accuracy': accuracy, 'score': score,
+             'timestamp': current_time}],
+        'last_practice_date': current_time,
+        'current_streak': current_streak,
+        'max_streak': max_streak
     }})
 
     return jsonify({
@@ -529,9 +581,311 @@ def play_game():
         'total_score': total_score,
         'level': level,
         'spoken_word': spoken_word,
-        'target_word': target_word
+        'target_word': target_word,
+        'current_streak': current_streak
     })
 
+
+# --- Dashboard Feature Endpoints ---
+
+# 1. Weekly Streak Endpoint
+@app.route('/dashboard/streak', methods=['GET'])
+def get_weekly_streak():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get streak information
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
+
+    return jsonify({
+        "current_streak": current_streak,
+        "max_streak": max_streak
+    })
+
+
+# 2. Average Accuracy Score Endpoint
+@app.route('/dashboard/average-accuracy', methods=['GET'])
+def get_average_accuracy():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Calculate average accuracy from scores array
+    scores = user.get('scores', [])
+    if not scores:
+        return jsonify({
+            "average_accuracy": 0,
+            "total_attempts": 0
+        })
+
+    accuracy_sum = sum(score.get('accuracy', 0) for score in scores)
+    average_accuracy = round(accuracy_sum / len(scores), 2)
+
+    return jsonify({
+        "average_accuracy": average_accuracy,
+        "total_attempts": len(scores)
+    })
+
+# 3. Words Mastered Endpoint
+@app.route('/dashboard/words-mastered', methods=['GET'])
+def get_words_mastered():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Find all words with accuracy >= 75%
+    scores = user.get('scores', [])
+    if not scores:
+        return jsonify({
+            "words_mastered": 0,
+            "mastered_list": []
+        })
+
+
+    # Create a dictionary to track the highest accuracy for each word
+    word_accuracy = {}
+    for score in scores:
+        target_word = score.get('target_word', '')
+        accuracy = score.get('accuracy', 0)
+
+        # Update dictionary if this is a higher accuracy or first time seeing word
+        if target_word not in word_accuracy or accuracy > word_accuracy[target_word]:
+            word_accuracy[target_word] = accuracy
+
+    # Count words with accuracy >= 75%
+    mastered_words = [word for word, accuracy in word_accuracy.items() if accuracy >= 75]
+
+    return jsonify({
+        "words_mastered": len(mastered_words),
+        "mastered_list": mastered_words
+    })
+
+
+# 4. User Level Endpoint
+@app.route('/dashboard/level', methods=['GET'])
+def get_user_level():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get user level and total score
+    level = user.get('level', 1)
+    total_score = user.get('total_score', 0)
+
+    # Calculate progress to next level
+    progress_to_next_level = 0
+    if level == 1:
+        # Level 1 to 2 requires 2000 points
+        progress_to_next_level = min(total_score / 2000 * 100, 100)
+
+    return jsonify({
+        "current_level": level,
+        "total_score": total_score,
+        "progress_to_next_level": round(progress_to_next_level, 2)
+    })
+
+
+# 5. Weekly Accuracy Trend Endpoint
+@app.route('/dashboard/weekly-trend', methods=['GET'])
+def get_weekly_accuracy_trend():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get today's date and calculate date 7 days ago
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=6)  # Include today, so 6 days back
+
+    # Get scores from user
+    scores = user.get('scores', [])
+
+    # Check if scores have timestamps
+    if scores and 'timestamp' not in scores[0]:
+        # Initialize with empty data for testing
+        past_week_dates = get_past_week_dates()
+        daily_data = []
+        for date in past_week_dates:
+            daily_data.append({
+                "date": date,
+                "average_accuracy": 0,
+                "attempts": 0
+            })
+        return jsonify({
+            "daily_trend": daily_data,
+            "message": "Historical data not available. Start practicing to see your weekly trend."
+        })
+
+    # Group scores by day
+    daily_scores = defaultdict(list)
+    for score in scores:
+        if 'timestamp' not in score:
+            continue
+
+        try:
+            score_date = datetime.strptime(score['timestamp'], '%Y-%m-%d').date()
+            if score_date >= week_ago and score_date <= today:
+                date_str = score_date.strftime('%Y-%m-%d')
+                daily_scores[date_str].append(score.get('accuracy', 0))
+        except ValueError:
+            # Skip records with invalid date format
+            continue
+
+    # Calculate daily averages
+    daily_trend = []
+    for i in range(7):
+        date = (week_ago + timedelta(days=i)).strftime('%Y-%m-%d')
+        day_scores = daily_scores.get(date, [])
+
+        if day_scores:
+            avg_accuracy = round(sum(day_scores) / len(day_scores), 2)
+        else:
+            avg_accuracy = 0
+
+        daily_trend.append({
+            "date": date,
+            "average_accuracy": avg_accuracy,
+            "attempts": len(day_scores)
+        })
+
+    return jsonify({
+        "daily_trend": daily_trend
+    })
+
+
+# Endpoint to get a comprehensive dashboard with all metrics
+@app.route('/dashboard', methods=['GET'])
+def get_dashboard():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Get streak information
+    current_streak = user.get('current_streak', 0)
+    max_streak = user.get('max_streak', 0)
+
+    # Calculate average accuracy
+    scores = user.get('scores', [])
+    if scores:
+        accuracy_sum = sum(score.get('accuracy', 0) for score in scores)
+        average_accuracy = round(accuracy_sum / len(scores), 2)
+        total_attempts = len(scores)
+    else:
+        average_accuracy = 0
+        total_attempts = 0
+
+    # Count mastered words
+    word_accuracy = {}
+    for score in scores:
+        target_word = score.get('target_word', '')
+        accuracy = score.get('accuracy', 0)
+
+        if target_word not in word_accuracy or accuracy > word_accuracy[target_word]:
+            word_accuracy[target_word] = accuracy
+
+    mastered_words = [word for word, accuracy in word_accuracy.items() if accuracy >= 75]
+
+    # Get level information
+    level = user.get('level', 1)
+    total_score = user.get('total_score', 0)
+
+    # Calculate progress to next level
+    progress_to_next_level = 0
+    if level == 1:
+        # Level 1 to 2 requires 2000 points
+        progress_to_next_level = min(total_score / 2000 * 100, 100)
+
+    # Get weekly trend
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=6)
+
+    daily_scores = defaultdict(list)
+    for score in scores:
+        if 'timestamp' not in score:
+            continue
+
+        try:
+            score_date = datetime.strptime(score['timestamp'], '%Y-%m-%d').date()
+            if score_date >= week_ago and score_date <= today:
+                date_str = score_date.strftime('%Y-%m-%d')
+                daily_scores[date_str].append(score.get('accuracy', 0))
+        except ValueError:
+            continue
+
+    daily_trend = []
+    for i in range(7):
+        date = (week_ago + timedelta(days=i)).strftime('%Y-%m-%d')
+        day_scores = daily_scores.get(date, [])
+
+        if day_scores:
+            avg_accuracy = round(sum(day_scores) / len(day_scores), 2)
+        else:
+            avg_accuracy = 0
+
+        daily_trend.append({
+            "date": date,
+            "average_accuracy": avg_accuracy,
+            "attempts": len(day_scores)
+        })
+
+    # Return comprehensive dashboard
+    return jsonify({
+        "streak": {
+            "current_streak": current_streak,
+            "max_streak": max_streak
+        },
+        "accuracy": {
+            "average_accuracy": average_accuracy,
+            "total_attempts": total_attempts
+        },
+        "words_mastered": {
+            "count": len(mastered_words),
+            "list": mastered_words
+        },
+        "level": {
+            "current_level": level,
+            "total_score": total_score,
+            "progress_to_next_level": round(progress_to_next_level, 2)
+        },
+        "weekly_trend": daily_trend
+    })
 
 
 if __name__ == '__main__':
