@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/util/game_card.dart';
 
 class GamePage extends StatefulWidget {
@@ -20,37 +19,37 @@ class _GamePageState extends State<GamePage> {
       'name': 'Spelling Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': true,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'Word Rush',
       'image': 'assets/images/game_two.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'ZIP & ZAP',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': ' Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'Word ',
       'image': 'assets/images/game_two.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'ZIP ',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
   ];
 
@@ -58,7 +57,7 @@ class _GamePageState extends State<GamePage> {
   String get userName => widget.userData['name'] ?? 'User';
   String get userEmail => widget.userData['email'] ?? '';
   int get userScore => widget.userData['score'] ?? 250;
-  int get userLevel => widget.userData['level'] ?? 5;
+  int get userLevel => widget.userData['level'] ?? 1;
 
   @override
   void initState() {
@@ -175,7 +174,7 @@ class _GamePageState extends State<GamePage> {
                             Tooltip(
                               message: userEmail,
                               child: Icon(
-                                Icons.email,
+                                Icons.rocket_launch,
                                 color: Colors.white70,
                                 size: screenHeight * 0.025,
                               ),
@@ -245,17 +244,31 @@ class _GamePageState extends State<GamePage> {
                       padding: EdgeInsets.only(bottom: screenHeight * 0.025),
                       child: GestureDetector(
                         onTap: () {
-                          // Navigate to dashboard directly without using routes
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Dashboard()
-                            ),
-                          );
-                          
-                          // Debug print to verify the navigation
-                          print("Navigating to ${game['name']} dashboard");
-                        },
+                                // Debug print to verify what's in the userData before navigation
+                                print("Before navigation - userData contains: ${widget.userData}");
+                                
+                                // Make sure we're passing a complete userData object
+                                final completeUserData = {
+                                  'name': userName,
+                                  'email': userEmail,
+                                  'score': userScore,
+                                  'level': userLevel,
+                                  // Add any other fields that might be needed
+                                };
+                                
+                                // Navigate with the complete data
+                                Navigator.pushNamed(
+                                  context,
+                                  '/game-data',
+                                  arguments: {
+                                    'userData': completeUserData,
+                                    'gameName': game['name']
+                                  },
+                                );
+                                
+                                // Debug print after setting up arguments
+                                print("Navigating to ${game['name']} with userData: $completeUserData");
+                              },
                         child: GameCard(
                           gameName: game['name']!,
                           imageName: game['image']!,
