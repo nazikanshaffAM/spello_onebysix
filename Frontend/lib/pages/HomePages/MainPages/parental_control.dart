@@ -6,7 +6,11 @@ import 'package:spello_frontend/util/custom_elevated_button.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class ParentalControl extends StatefulWidget {
-  const ParentalControl({Key? key}) : super(key: key);
+  // Add userData parameter
+  final Map<String, dynamic> userData;
+
+  // Update constructor to require userData
+  const ParentalControl({Key? key, required this.userData}) : super(key: key);
 
   @override
   State<ParentalControl> createState() => _ParentalControlState();
@@ -212,7 +216,9 @@ class _ParentalControlState extends State<ParentalControl> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ParentalControlOne(),
+                        builder: (context) => ParentalControlOne(
+                          userData: widget.userData, // Pass userData to the next screen
+                        ),
                       ),
                     );
                   },
@@ -230,7 +236,9 @@ class _ParentalControlState extends State<ParentalControl> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ParentalControlTwo(),
+                        builder: (context) => ParentalControlTwo(
+                          userData: widget.userData, // Pass userData to the next screen
+                        ),
                       ),
                     );
                   },
