@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/util/game_card.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({super.key});
+  final Map<String, dynamic> userData;
+  
+  const GamePage({
+    super.key, 
+    required this.userData
+  });
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -15,39 +19,53 @@ class _GamePageState extends State<GamePage> {
       'name': 'Spelling Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': true,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'Word Rush',
       'image': 'assets/images/game_two.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'ZIP & ZAP',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': ' Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'Word ',
       'image': 'assets/images/game_two.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
     {
       'name': 'ZIP ',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/dashboard'
+      'route': '/game-data'  // Updated route
     },
   ];
+
+  // Method to safely access user data with fallback values
+  String get userName => widget.userData['name'] ?? 'User';
+  String get userEmail => widget.userData['email'] ?? '';
+  int get userScore => widget.userData['score'] ?? 250;
+  int get userLevel => widget.userData['level'] ?? 1;
+
+  @override
+  void initState() {
+    super.initState();
+    // Debug print to verify userData is being received correctly
+    print("GamePage received userData: ${widget.userData}");
+    print("User Email: $userEmail"); // Log email specifically to verify it's being received
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +144,7 @@ class _GamePageState extends State<GamePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Tom Ford",
+                                  userName, // Use userName from userData
                                   style: TextStyle(
                                     fontFamily: "Fredoka",
                                     fontSize: screenHeight * 0.022,
@@ -140,7 +158,7 @@ class _GamePageState extends State<GamePage> {
                                         size: screenHeight * 0.018),
                                     SizedBox(width: screenWidth * 0.01),
                                     Text(
-                                      "250",
+                                      userScore.toString(), // Use user score from userData
                                       style: TextStyle(
                                         fontFamily: "Fredoka",
                                         fontSize: screenHeight * 0.018,
@@ -151,11 +169,22 @@ class _GamePageState extends State<GamePage> {
                                 ),
                               ],
                             ),
+                            const Spacer(),
+                            // Display email or a tooltip with email
+                            Tooltip(
+                              message: userEmail,
+                              child: Icon(
+                                Icons.rocket_launch,
+                                color: Colors.white70,
+                                size: screenHeight * 0.025,
+                              ),
+                            ),
+                            SizedBox(width: screenWidth * 0.08),
                           ],
                         ),
                         SizedBox(height: screenHeight * 0.01),
                         Text(
-                          "Level 5",
+                          "Level ${userLevel}", // Use user level from userData
                           style: TextStyle(
                             fontFamily: "Fredoka One",
                             fontSize: screenHeight * 0.035,
@@ -213,11 +242,39 @@ class _GamePageState extends State<GamePage> {
                     final game = games[index];
                     return Padding(
                       padding: EdgeInsets.only(bottom: screenHeight * 0.025),
-                      child: GameCard(
-                        gameName: game['name']!,
-                        imageName: game['image']!,
-                        routeName: game['route']!,
-                        isRecommended: game['isRecommended']!,
+                      child: GestureDetector(
+                        onTap: () {
+                                // Debug print to verify what's in the userData before navigation
+                                print("Before navigation - userData contains: ${widget.userData}");
+                                
+                                // Make sure we're passing a complete userData object
+                                final completeUserData = {
+                                  'name': userName,
+                                  'email': userEmail,
+                                  'score': userScore,
+                                  'level': userLevel,
+                                  // Add any other fields that might be needed
+                                };
+                                
+                                // Navigate with the complete data
+                                Navigator.pushNamed(
+                                  context,
+                                  '/game-data',
+                                  arguments: {
+                                    'userData': completeUserData,
+                                    'gameName': game['name']
+                                  },
+                                );
+                                
+                                // Debug print after setting up arguments
+                                print("Navigating to ${game['name']} with userData: $completeUserData");
+                              },
+                        child: GameCard(
+                          gameName: game['name']!,
+                          imageName: game['image']!,
+                          routeName: game['route']!,
+                          isRecommended: game['isRecommended']!,
+                        ),
                       ),
                     );
                   },

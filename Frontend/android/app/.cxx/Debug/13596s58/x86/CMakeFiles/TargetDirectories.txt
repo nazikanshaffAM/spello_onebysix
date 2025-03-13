@@ -1,0 +1,2 @@
+D:/IIT/SpelloSdgp/spellomine/Frontend/android/app/.cxx/Debug/13596s58/x86/CMakeFiles/edit_cache.dir
+D:/IIT/SpelloSdgp/spellomine/Frontend/android/app/.cxx/Debug/13596s58/x86/CMakeFiles/rebuild_cache.dir
