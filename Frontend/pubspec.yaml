@@ -28,6 +28,7 @@ dependencies:
   tutorial_coach_mark: ^1.2.13
   shared_preferences: ^2.3.3
   lottie: ^3.3.1
+  http: ^1.1.0
 
 
 
@@ -37,12 +38,21 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  http: ^1.1.0  
+  flutter_launcher_icons: "^0.14.3"
+  flutter_lints: ^5.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/spellologo.png"
+  remove_alpha_ios: true
+
+    
   #should in line 20, not sure
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices.
-  flutter_lints: ^5.0.0
+  
 
 flutter:
   # The following line ensures that the Material Icons font is
@@ -81,6 +91,7 @@ flutter:
     - assets/animations/UFO.json
     - assets/images/bg1.jpg
     - assets/images/login.png
+    - assets/images/spellologo.png
 
 
   fonts:
