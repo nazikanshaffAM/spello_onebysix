@@ -1,0 +1,11 @@
+flask==2.0.1
+vosk==0.3.32
+rapidfuzz==3.12.2
+pymongo[srv]==4.1.1
+flask-pymongo==2.3.0
+flask-cors==3.0.10
+pytest==7.0.0
+pytest-flask==1.2.0
+mongomock==4.0.0
+werkzeug==2.0.1
+setuptools==76.0.0

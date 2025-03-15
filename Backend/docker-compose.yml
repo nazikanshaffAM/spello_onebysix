@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    networks:
+      - app-network
+    # No local MongoDB dependency - using Atlas instead
+
+networks:
+  app-network:
+    driver: bridge
+
+# No volumes needed since we're using MongoDB Atlas
