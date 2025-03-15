@@ -780,7 +780,7 @@ def get_weekly_accuracy_trend():
         })
 
     return jsonify({
-
+        "daily_trend": daily_trend
     })
 
 
