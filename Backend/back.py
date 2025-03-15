@@ -884,7 +884,6 @@ def get_dashboard():
             "total_score": total_score,
             "progress_to_next_level": round(progress_to_next_level, 2)
         },
-        "weekly_trend": daily_trend
     })
 
 
