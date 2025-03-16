@@ -15,7 +15,14 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   bool isLoading = false;
+  bool isDeleting = false;
+  bool isUpdating = false;
   String? errorMessage;
+  
+  // Controllers for updating user details
+  late TextEditingController nameController;
+  late TextEditingController ageController;
+  late String selectedGender;
 
   Future<void> _handleLogout() async {
     setState(() {
@@ -114,6 +121,372 @@ class _SettingsState extends State<Settings> {
     }
   }
 
+  Future<void> _handleDeleteAccount() async {
+    // First show a confirmation dialog
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Account?'),
+        content: const Text(
+          'This action cannot be undone. All your data will be permanently deleted.',
+          style: TextStyle(fontFamily: "Fredoka"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    ) ?? false;
+
+    if (!shouldDelete) return;
+
+    setState(() {
+      isDeleting = true;
+      errorMessage = null;
+    });
+    
+    try {
+      // Get the email from userData
+      final String email = widget.userData['email'];
+      print("Deleting account for user: $email");
+      
+      // Make the DELETE request to the server
+      final response = await http.delete(
+        Uri.parse('${Config.baseUrl}/delete_user?email=$email'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      print("Delete account response status: ${response.statusCode}");
+      
+      // Handle the response
+      if (response.statusCode >= 200 && response.statusCode < 300 && mounted) {
+        print("Account deleted successfully");
+        
+        // Clear any stored preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        
+        // Show success message before redirecting
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Your account has been deleted.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Navigate to login screen and clear navigation stack
+        Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+      } else {
+        print("Account deletion failed");
+        
+        // Try to parse the error message from response
+        String message = 'Failed to delete account';
+        if (response.body.isNotEmpty) {
+          try {
+            final data = jsonDecode(response.body);
+            message = data['error'] ?? message;
+          } catch (e) {
+            // Ignore JSON parsing errors
+          }
+        }
+        
+        setState(() {
+          errorMessage = message;
+        });
+        
+        // Show error dialog
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Delete Account Error'),
+              content: Text(errorMessage ?? 'An unknown error occurred'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Delete account exception: $e");
+      setState(() {
+        errorMessage = 'Could not connect to server. Please try again later.';
+      });
+      
+      // Show error dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Delete Account Error'),
+            content: Text(errorMessage ?? 'An unknown error occurred'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isDeleting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with current values
+    nameController = TextEditingController(text: widget.userData['name'] ?? '');
+    ageController = TextEditingController(text: widget.userData['age']?.toString() ?? '');
+    selectedGender = widget.userData['gender'] ?? 'Not specified';
+  }
+  
+  @override
+  void dispose() {
+    nameController.dispose();
+    ageController.dispose();
+    super.dispose();
+  }
+  
+  Future<void> _showUpdateDialog() async {
+    // Make a copy of the current values
+    final TextEditingController tempNameController = TextEditingController(text: nameController.text);
+    final TextEditingController tempAgeController = TextEditingController(text: ageController.text);
+    String tempGender = selectedGender;
+    
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text(
+            "Update Profile",
+            style: TextStyle(
+              fontFamily: "Fredoka One",
+              color: Color(0xFF3A435F),
+            ),
+          ),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                TextField(
+                  controller: tempNameController,
+                  decoration: const InputDecoration(
+                    labelText: "Name",
+                    labelStyle: TextStyle(fontFamily: "Fredoka"),
+                    border: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(fontFamily: "Fredoka"),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: tempAgeController,
+                  decoration: const InputDecoration(
+                    labelText: "Age",
+                    labelStyle: TextStyle(fontFamily: "Fredoka"),
+                    border: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(fontFamily: "Fredoka"),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: tempGender,
+                  decoration: const InputDecoration(
+                    labelText: "Gender",
+                    labelStyle: TextStyle(fontFamily: "Fredoka"),
+                    border: OutlineInputBorder(),
+                  ),
+                  style: const TextStyle(fontFamily: "Fredoka", color: Colors.black),
+                  items: const [
+                    DropdownMenuItem(value: "Male", child: Text("Male")),
+                    DropdownMenuItem(value: "Female", child: Text("Female")),
+                    DropdownMenuItem(value: "Not specified", child: Text("Not specified")),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      tempGender = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                "Cancel",
+                style: TextStyle(fontFamily: "Fredoka"),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF3A435F),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                nameController.text = tempNameController.text;
+                ageController.text = tempAgeController.text;
+                selectedGender = tempGender;
+                Navigator.pop(context, true);
+              },
+              child: const Text(
+                "Update",
+                style: TextStyle(fontFamily: "Fredoka"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).then((result) {
+      if (result == true) {
+        _handleUpdateProfile();
+      }
+    });
+  }
+  
+  Future<void> _handleUpdateProfile() async {
+    setState(() {
+      isUpdating = true;
+      errorMessage = null;
+    });
+    
+    try {
+      // Get the email from userData
+      final String email = widget.userData['email'];
+      
+      // Prepare data to update
+      final Map<String, dynamic> updateData = {
+        "name": nameController.text,
+      };
+      
+      // Only add age if it's not empty
+      if (ageController.text.isNotEmpty) {
+        updateData["age"] = int.tryParse(ageController.text) ?? 0;
+      }
+      
+      // Add gender if it's not empty
+      if (selectedGender != "Not specified") {
+        updateData["gender"] = selectedGender;
+      }
+      
+      // Make the API call
+      final response = await http.put(
+        Uri.parse('${Config.baseUrl}/update_user?email=$email'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(updateData),
+      );
+      
+      if (response.statusCode >= 200 && response.statusCode < 300 && mounted) {
+        // Parse the response
+        final data = jsonDecode(response.body);
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Profile updated successfully',
+              style: TextStyle(fontFamily: "Fredoka"),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Update the userData in the widget
+        setState(() {
+          widget.userData['name'] = data['user']['name'];
+          widget.userData['age'] = data['user']['age'];
+          widget.userData['gender'] = data['user']['gender'];
+        });
+      } else {
+        // Parse error message
+        String message = 'Failed to update profile';
+        if (response.body.isNotEmpty) {
+          try {
+            final data = jsonDecode(response.body);
+            message = data['error'] ?? message;
+          } catch (e) {
+            // Ignore JSON parsing errors
+          }
+        }
+        
+        setState(() {
+          errorMessage = message;
+        });
+        
+        // Show error dialog
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Update Error'),
+              content: Text(errorMessage ?? 'An unknown error occurred'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Update profile exception: $e");
+      setState(() {
+        errorMessage = 'Could not connect to server. Please try again later.';
+      });
+      
+      // Show error dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Update Error'),
+            content: Text(errorMessage ?? 'An unknown error occurred'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isUpdating = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -136,50 +509,7 @@ class _SettingsState extends State<Settings> {
         color: const Color(0xFF8092CC),
         child: Column(
           children: [
-            // User Info Section
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "User Profile",
-                        style: TextStyle(
-                          fontFamily: "Fredoka One",
-                          fontSize: 20,
-                          color: Color(0xFF3A435F),
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        "Name: ${widget.userData['name'] ?? 'Not available'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Email: ${widget.userData['email'] ?? 'Not available'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            // App Info Section
+
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Card(
@@ -222,6 +552,80 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
             ),
+            // User Info Section
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "User Profile",
+                            style: TextStyle(
+                              fontFamily: "Fredoka One",
+                              fontSize: 20,
+                              color: Color(0xFF3A435F),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Color(0xFF3A435F),
+                            ),
+                            onPressed: _showUpdateDialog,
+                            tooltip: "Edit Profile",
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        "Name: ${widget.userData['name'] ?? 'Not available'}",
+                        style: TextStyle(
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Email: ${widget.userData['email'] ?? 'Not available'}",
+                        style: TextStyle(
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Age: ${widget.userData['age'] ?? 'Not available'}",
+                        style: TextStyle(
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Gender: ${widget.userData['gender'] ?? 'Not specified'}",
+                        style: TextStyle(
+                          fontFamily: "Fredoka",
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            
+            // App Info Section
+            
             
             if (errorMessage != null)
               Padding(
@@ -237,6 +641,51 @@ class _SettingsState extends State<Settings> {
               ),
             
             const Spacer(),
+            
+            // Delete Account Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isDeleting ? null : _handleDeleteAccount,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: isDeleting
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.delete_forever),
+                            SizedBox(width: 10),
+                            Text(
+                              "Delete Account",
+                              style: TextStyle(
+                                fontFamily: "Fredoka",
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
             
             // Logout Button
             Padding(
