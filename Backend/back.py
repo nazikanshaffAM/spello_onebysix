@@ -55,7 +55,7 @@ for sound, words in sound_word_lists.items():
 @app.route('/get-target-word', methods=['GET'])
 def get_target_word():
     # Get selected sounds from query parameters
-    selected_sounds = request.args.get('sounds', '').lower().split(',')
+    query_sounds = request.args.get('sounds', '').lower().split(',')
 
     # Get email from session instead of from query parameters
     email = session.get('user_email')
@@ -67,6 +67,9 @@ def get_target_word():
     user = collection.find_one({"email": email})
     if not user:
         return jsonify({"error": "User not found"}), 404
+
+    # Determine which sounds to use
+    selected_sounds = query_sounds if query_sounds and query_sounds[0] != '' else user.get('selected_sounds', [])
 
     custom_words = user.get("custom_words", [])
 
@@ -109,6 +112,50 @@ def calculate_accuracy(target, spoken):
     max_length = max(len(target), len(spoken))
     accuracy = ((max_length - distance) / max_length) * 100
     return round(accuracy, 2)
+
+#change password
+@app.route('/change_password', methods=['POST'])
+def change_password():
+    # Get email from session
+    email = session.get('user_email')
+    if not email:
+        # If not in session, try from query parameters
+        email = request.args.get("email")
+
+    if not email:
+        return jsonify({"error": "User not logged in. Please log in first."}), 401
+
+    data = request.json
+
+    # Validate required fields
+    if not data or not data.get('current_password') or not data.get('new_password'):
+        return jsonify({"error": "Current password and new password are required"}), 400
+
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    # Find user in database
+    user = collection.find_one({"email": email})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Verify current password
+    if not check_password_hash(user['password'], current_password):
+        return jsonify({"error": "Current password is incorrect"}), 401
+
+    # Hash the new password
+    hashed_password = generate_password_hash(new_password)
+
+    # Update the password
+    result = collection.update_one(
+        {"email": email},
+        {"$set": {"password": hashed_password}}
+    )
+
+    if result.modified_count == 1:
+        return jsonify({"message": "Password changed successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to change password"}), 500
 
 
 # API Endpoint to receive audio
