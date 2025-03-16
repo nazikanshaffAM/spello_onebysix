@@ -17,11 +17,11 @@ app.secret_key = 'spello_secret_key'  # Required for session management
 
 
 # path to the downloaded model
-MODEL_PATH = "vosk-model-small-en-us-0.15"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'vosk-model-small-en-us-0.15')
 
 # Load Vosk Model
 if not os.path.exists(MODEL_PATH):
-    raise ValueError("Model not found! Please download and extract it.")
+    raise ValueError(f"Vosk model directory not found at: {MODEL_PATH}")
 
 model = vosk.Model(MODEL_PATH)
 recognizer = vosk.KaldiRecognizer(model, 16000)  # rate is 16kHz
