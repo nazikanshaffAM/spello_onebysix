@@ -263,254 +263,219 @@ class _SettingsState extends State<Settings> {
     selectedGender = widget.userData['gender'] ?? 'Not specified';
   }
   
-  Future<void> _showChangePasswordDialog() async {
-    final TextEditingController currentPasswordController = TextEditingController();
-    final TextEditingController newPasswordController = TextEditingController();
-    final TextEditingController confirmPasswordController = TextEditingController();
-    bool obscureCurrentPassword = true;
-    bool obscureNewPassword = true;
-    bool obscureConfirmPassword = true;
+Future<void> _showChangePasswordDialog() async {
+  final TextEditingController currentPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+  bool obscureCurrentPassword = true;
+  bool obscureNewPassword = true;
+  bool obscureConfirmPassword = true;
+  bool isLoading = false; // Add loading state for the dialog
+  
+  await showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => StatefulBuilder(
+      builder: (context, setModalState) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Change Password",
+                style: TextStyle(
+                  fontFamily: "Fredoka One",
+                  fontSize: 20,
+                  color: Color(0xFF3A435F),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: currentPasswordController,
+                obscureText: obscureCurrentPassword,
+                decoration: InputDecoration(
+                  labelText: "Current Password",
+                  labelStyle: const TextStyle(fontFamily: "Fredoka"),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureCurrentPassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setModalState(() {
+                        obscureCurrentPassword = !obscureCurrentPassword;
+                      });
+                    },
+                  ),
+                ),
+                style: const TextStyle(fontFamily: "Fredoka"),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordController,
+                obscureText: obscureNewPassword,
+                decoration: InputDecoration(
+                  labelText: "New Password",
+                  labelStyle: const TextStyle(fontFamily: "Fredoka"),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureNewPassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setModalState(() {
+                        obscureNewPassword = !obscureNewPassword;
+                      });
+                    },
+                  ),
+                ),
+                style: const TextStyle(fontFamily: "Fredoka"),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: obscureConfirmPassword,
+                decoration: InputDecoration(
+                  labelText: "Confirm New Password",
+                  labelStyle: const TextStyle(fontFamily: "Fredoka"),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setModalState(() {
+                        obscureConfirmPassword = !obscureConfirmPassword;
+                      });
+                    },
+                  ),
+                ),
+                style: const TextStyle(fontFamily: "Fredoka"),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: isLoading ? null : () => Navigator.pop(context),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(fontFamily: "Fredoka"),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF3A435F),
+    foregroundColor: Colors.white,
+  ),
+  onPressed: () {
+    // Skip all validation for immediate closure
+    Navigator.of(context).pop();
     
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 20,
-            right: 20,
-            top: 20,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Change Password",
-                  style: TextStyle(
-                    fontFamily: "Fredoka One",
-                    fontSize: 20,
-                    color: Color(0xFF3A435F),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: currentPasswordController,
-                  obscureText: obscureCurrentPassword,
-                  decoration: InputDecoration(
-                    labelText: "Current Password",
-                    labelStyle: const TextStyle(fontFamily: "Fredoka"),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscureCurrentPassword ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setModalState(() {
-                          obscureCurrentPassword = !obscureCurrentPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  style: const TextStyle(fontFamily: "Fredoka"),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: newPasswordController,
-                  obscureText: obscureNewPassword,
-                  decoration: InputDecoration(
-                    labelText: "New Password",
-                    labelStyle: const TextStyle(fontFamily: "Fredoka"),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscureNewPassword ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setModalState(() {
-                          obscureNewPassword = !obscureNewPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  style: const TextStyle(fontFamily: "Fredoka"),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: confirmPasswordController,
-                  obscureText: obscureConfirmPassword,
-                  decoration: InputDecoration(
-                    labelText: "Confirm New Password",
-                    labelStyle: const TextStyle(fontFamily: "Fredoka"),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () {
-                        setModalState(() {
-                          obscureConfirmPassword = !obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                  ),
-                  style: const TextStyle(fontFamily: "Fredoka"),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(fontFamily: "Fredoka"),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3A435F),
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () {
-                        // Validate passwords
-                        if (currentPasswordController.text.isEmpty ||
-                            newPasswordController.text.isEmpty ||
-                            confirmPasswordController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Please fill all fields"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        
-                        if (newPasswordController.text != confirmPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("New passwords don't match"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        
-                        if (newPasswordController.text.length < 6) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Password must be at least 6 characters"),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        
-                        Navigator.pop(context, {
-                          'current_password': currentPasswordController.text,
-                          'new_password': newPasswordController.text,
-                        });
-                      },
-                      child: const Text(
-                        "Change Password",
-                        style: TextStyle(fontFamily: "Fredoka"),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+    // Process passwords after popup is closed
+    if (currentPasswordController.text.isNotEmpty &&
+        newPasswordController.text.isNotEmpty &&
+        confirmPasswordController.text.isNotEmpty &&
+        newPasswordController.text == confirmPasswordController.text &&
+        newPasswordController.text.length >= 6) {
+      
+      // Handle password change
+      _handleChangePassword(
+        currentPasswordController.text,
+        newPasswordController.text
+      );
+    } else {
+      // Show any error messages needed
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid password inputs"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  },
+  child: const Text(
+    "Change Password",
+    style: TextStyle(fontFamily: "Fredoka"),
+  ),
+),
+                  
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
           ),
         ),
       ),
-    ).then((result) {
-      if (result != null && result is Map<String, String>) {
-        _handleChangePassword(result['current_password']!, result['new_password']!);
-      }
-    });
-  }
+    ),
+  );
+}
+
+// Modified to return success status
+Future<bool> _handleChangePassword(String currentPassword, String newPassword) async {
+  setState(() {
+    isChangingPassword = true;
+    errorMessage = null;
+  });
   
-  Future<void> _handleChangePassword(String currentPassword, String newPassword) async {
-    setState(() {
-      isChangingPassword = true;
-      errorMessage = null;
-    });
+  try {
+    // Get the email from userData
+    final String email = widget.userData['email'];
     
-    try {
-      // Get the email from userData
-      final String email = widget.userData['email'];
-      
-      // Prepare request data
-      final Map<String, String> passwordData = {
-        "current_password": currentPassword,
-        "new_password": newPassword,
-      };
-      
-      // Make the API call
-      final response = await http.post(
-        Uri.parse('${Config.baseUrl}/change_password?email=$email'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(passwordData),
+    // Prepare request data
+    final Map<String, String> passwordData = {
+      "current_password": currentPassword,
+      "new_password": newPassword,
+    };
+    
+    // Make the API call
+    final response = await http.post(
+      Uri.parse('${Config.baseUrl}/change_password?email=$email'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(passwordData),
+    );
+    
+    if (response.statusCode >= 200 && response.statusCode < 300 && mounted) {
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Password changed successfully',
+            style: TextStyle(fontFamily: "Fredoka"),
+          ),
+          backgroundColor: Colors.green,
+        ),
       );
       
-      if (response.statusCode >= 200 && response.statusCode < 300 && mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Password changed successfully',
-              style: TextStyle(fontFamily: "Fredoka"),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        // Parse error message
-        String message = 'Failed to change password';
-        if (response.body.isNotEmpty) {
-          try {
-            final data = jsonDecode(response.body);
-            message = data['error'] ?? message;
-          } catch (e) {
-            // Ignore JSON parsing errors
-          }
-        }
-        
-        setState(() {
-          errorMessage = message;
-        });
-        
-        // Show error dialog
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Change Password Error'),
-              content: Text(errorMessage ?? 'An unknown error occurred'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
+      return true; // Return success
+    } else {
+      // Parse error message
+      String message = 'Failed to change password';
+      if (response.body.isNotEmpty) {
+        try {
+          final data = jsonDecode(response.body);
+          message = data['error'] ?? message;
+        } catch (e) {
+          // Ignore JSON parsing errors
         }
       }
-    } catch (e) {
-      print("Change password exception: $e");
+      
       setState(() {
-        errorMessage = 'Could not connect to server. Please try again later.';
+        errorMessage = message;
       });
       
       // Show error dialog
@@ -529,14 +494,41 @@ class _SettingsState extends State<Settings> {
           ),
         );
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isChangingPassword = false;
-        });
-      }
+      
+      return false; // Return failure
+    }
+  } catch (e) {
+    print("Change password exception: $e");
+    setState(() {
+      errorMessage = 'Could not connect to server. Please try again later.';
+    });
+    
+    // Show error dialog
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Change Password Error'),
+          content: Text(errorMessage ?? 'An unknown error occurred'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return false; // Return failure
+  } finally {
+    if (mounted) {
+      setState(() {
+        isChangingPassword = false;
+      });
     }
   }
+}
 
   @override
   void dispose() {
