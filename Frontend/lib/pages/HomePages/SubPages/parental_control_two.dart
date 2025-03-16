@@ -230,7 +230,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     try {
       // Send request to backend to remove custom word
       // Using query parameter for email instead of relying on session
-      final url = Uri.parse('http://192.168.8.163:5000/remove-custom-word?email=${widget.userData['email']}');
+      final url = Uri.parse('${Config.baseUrl}/remove-custom-word?email=${widget.userData['email']}');
       print("Making delete request to: $url");
       
       final response = await http.post(
