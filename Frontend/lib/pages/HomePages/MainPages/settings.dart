@@ -275,22 +275,37 @@ class _SettingsState extends State<Settings> {
     final TextEditingController tempAgeController = TextEditingController(text: ageController.text);
     String tempGender = selectedGender;
     
-    await showDialog(
+    // Using BottomSheet approach to handle keyboard better
+    await showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // Important for keyboard handling
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text(
-            "Update Profile",
-            style: TextStyle(
-              fontFamily: "Fredoka One",
-              color: Color(0xFF3A435F),
-            ),
+        builder: (context, setState) => Padding(
+          // This padding ensures the form shifts up when keyboard appears
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 20,
           ),
-          content: Container(
-            width: double.maxFinite,
-            child: ListView(
-              shrinkWrap: true,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  "Update Profile",
+                  style: TextStyle(
+                    fontFamily: "Fredoka One",
+                    fontSize: 20,
+                    color: Color(0xFF3A435F),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 TextField(
                   controller: tempNameController,
                   decoration: const InputDecoration(
@@ -331,34 +346,41 @@ class _SettingsState extends State<Settings> {
                     });
                   },
                 ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(fontFamily: "Fredoka"),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3A435F),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                        nameController.text = tempNameController.text;
+                        ageController.text = tempAgeController.text;
+                        selectedGender = tempGender;
+                        Navigator.pop(context, true);
+                      },
+                      child: const Text(
+                        "Update",
+                        style: TextStyle(fontFamily: "Fredoka"),
+                      ),
+                    ),
+                  ],
+                ),
+                // Add extra space at bottom to ensure buttons are fully visible
+                const SizedBox(height: 20),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "Cancel",
-                style: TextStyle(fontFamily: "Fredoka"),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3A435F),
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                nameController.text = tempNameController.text;
-                ageController.text = tempAgeController.text;
-                selectedGender = tempGender;
-                Navigator.pop(context, true);
-              },
-              child: const Text(
-                "Update",
-                style: TextStyle(fontFamily: "Fredoka"),
-              ),
-            ),
-          ],
         ),
       ),
     ).then((result) {
@@ -374,6 +396,41 @@ class _SettingsState extends State<Settings> {
       errorMessage = null;
     });
     
+    // Check if there are any changes before making the API call
+    bool hasChanges = false;
+    
+    if (nameController.text != widget.userData['name']) {
+      hasChanges = true;
+    }
+    
+    int? newAge = ageController.text.isNotEmpty ? int.tryParse(ageController.text) : null;
+    if (newAge != widget.userData['age']) {
+      hasChanges = true;
+    }
+    
+    if (selectedGender != widget.userData['gender']) {
+      hasChanges = true;
+    }
+    
+    // If no changes, show message and return
+    if (!hasChanges) {
+      setState(() {
+        isUpdating = false;
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No changes to update',
+            style: TextStyle(fontFamily: "Fredoka"),
+          ),
+          backgroundColor: Colors.blue,
+        ),
+      );
+      
+      return;
+    }
+    
     try {
       // Get the email from userData
       final String email = widget.userData['email'];
@@ -385,7 +442,7 @@ class _SettingsState extends State<Settings> {
       
       // Only add age if it's not empty
       if (ageController.text.isNotEmpty) {
-        updateData["age"] = int.tryParse(ageController.text) ?? 0;
+        updateData["age"] = newAge ?? 0;
       }
       
       // Add gender if it's not empty
@@ -507,231 +564,231 @@ class _SettingsState extends State<Settings> {
       ),
       body: Container(
         color: const Color(0xFF8092CC),
-        child: Column(
-          children: [
-
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Spello",
-                        style: TextStyle(
-                          fontFamily: "Fredoka One",
-                          fontSize: 24,
-                          color: Color(0xFF3A435F),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Version 1.0.0",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        "A pronunciation learning app for children.",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // User Info Section
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: SafeArea(  // Added SafeArea to prevent overflow
+          child: SingleChildScrollView(  // Make the entire screen scrollable
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "User Profile",
+                          const Text(
+                            "Spello",
                             style: TextStyle(
                               fontFamily: "Fredoka One",
-                              fontSize: 20,
+                              fontSize: 24,
                               color: Color(0xFF3A435F),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.edit,
-                              color: Color(0xFF3A435F),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Version 1.0.0",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                              color: Colors.grey,
                             ),
-                            onPressed: _showUpdateDialog,
-                            tooltip: "Edit Profile",
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "A pronunciation learning app for children.",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 12),
-                      Text(
-                        "Name: ${widget.userData['name'] ?? 'Not available'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Email: ${widget.userData['email'] ?? 'Not available'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Age: ${widget.userData['age'] ?? 'Not available'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Gender: ${widget.userData['gender'] ?? 'Not specified'}",
-                        style: TextStyle(
-                          fontFamily: "Fredoka",
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
-            // App Info Section
-            
-            
-            if (errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  errorMessage!,
-                  style: const TextStyle(
-                    color: Colors.red, 
-                    fontFamily: "Fredoka",
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            
-            const Spacer(),
-            
-            // Delete Account Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isDeleting ? null : _handleDeleteAccount,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                    elevation: 4,
                   ),
-                  child: isDeleting
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.delete_forever),
-                            SizedBox(width: 10),
-                            Text(
-                              "Delete Account",
-                              style: TextStyle(
-                                fontFamily: "Fredoka",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Logout Button
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _handleLogout,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFC000),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                // User Info Section
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Card(
+                    elevation: 4,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    elevation: 4,
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.logout),
-                            SizedBox(width: 10),
-                            Text(
-                              "Logout",
-                              style: TextStyle(
-                                fontFamily: "Fredoka",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "User Profile",
+                                style: TextStyle(
+                                  fontFamily: "Fredoka One",
+                                  fontSize: 20,
+                                  color: Color(0xFF3A435F),
+                                ),
                               ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Color(0xFF3A435F),
+                                ),
+                                onPressed: _showUpdateDialog,
+                                tooltip: "Edit Profile",
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "Name: ${widget.userData['name'] ?? 'Not available'}",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Email: ${widget.userData['email'] ?? 'Not available'}",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Age: ${widget.userData['age'] ?? 'Not available'}",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Gender: ${widget.userData['gender'] ?? 'Not specified'}",
+                            style: TextStyle(
+                              fontFamily: "Fredoka",
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+                
+                if (errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(
+                        color: Colors.red, 
+                        fontFamily: "Fredoka",
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                
+                SizedBox(height: 20),  // Added fixed spacing instead of Spacer
+                
+                // Delete Account Button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isDeleting ? null : _handleDeleteAccount,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: isDeleting
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.delete_forever),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Delete Account",
+                                  style: TextStyle(
+                                    fontFamily: "Fredoka",
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Logout Button
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _handleLogout,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC000),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.logout),
+                                SizedBox(width: 10),
+                                Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                    fontFamily: "Fredoka",
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 30),  // Bottom padding
+              ],
             ),
-            SizedBox(height: screenHeight * 0.05),
-          ],
+          ),
         ),
       ),
     );
