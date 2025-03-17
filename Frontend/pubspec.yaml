@@ -32,7 +32,7 @@ dependencies:
   permission_handler: ^11.0.1
   record: ^5.2.1
   path_provider: ^2.1.5
-  path: 1.9.1
+  path: 1.9.0
   audioplayers: ^6.2.0
   provider: ^6.0.5
   shelf_router: ^1.1.4
@@ -128,6 +128,7 @@ flutter:
     - assets/images/alien7.png
     - assets/images/newb1.png
     - assets/images/newb2.png
+    - assets/images/profile_picture.png
 
 
   fonts:

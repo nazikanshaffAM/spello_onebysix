@@ -3,7 +3,8 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  final Map<String, dynamic> userData; // Receives userData from login or registration flow
+  final Map<String, dynamic>
+      userData; // Receives userData from login or registration flow
 
   const HomePage({super.key, required this.userData});
 
@@ -27,32 +28,32 @@ class _HomePageState extends State<HomePage> {
   final List<Map<String, dynamic>> gridItems = [
     {
       'icon': "assets/images/start.png",
-      'label': 'Start Practice',
+      'label': 'START PRACTICE',
       'navigateTo': "/startPractice",
     },
     {
       'icon': "assets/images/parental_control.png",
-      'label': 'Parental\nControl',
+      'label': 'PARENTAL CONTROL',
       'navigateTo': "/parentalControl",
     },
     {
       'icon': "assets/images/dashboard.png",
-      'label': 'Dashboard',
+      'label': 'DASHBOARD',
       'navigateTo': "/dashboard",
     },
     {
       'icon': "assets/images/notification.png",
-      'label': 'Notifications',
+      'label': 'NOTIFICATIONS',
       'navigateTo': "/notifications",
     },
     {
       'icon': "assets/images/settings.png",
-      'label': 'Settings',
+      'label': 'SETTINGS',
       'navigateTo': "/settings",
     },
     {
       'icon': "assets/images/help_center.png",
-      'label': 'Help Center',
+      'label': 'HELP CENTER',
       'navigateTo': "/helpCenter",
     },
   ];
@@ -60,10 +61,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    
+
     // Log userData to verify it's being passed correctly
     print("HomePage received userData: ${widget.userData}");
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _initTargets();
       await _showTutorial();
@@ -165,15 +166,15 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _tappedIndex = null;
       });
-      
+
       // Get the route name
       String routeName = gridItems[index]['navigateTo'];
-      
+
       // Pass userData to all routes
       print("Navigating to $routeName with user data: ${widget.userData}");
-      
+
       Navigator.pushNamed(
-        context, 
+        context,
         routeName,
         arguments: widget.userData, // Pass complete userData as arguments
       );
@@ -229,11 +230,11 @@ class _HomePageState extends State<HomePage> {
                   // User greeting container
                   Container(
                     width: double.infinity,
-                    height: screenHeight * 0.2,
+                    height: screenHeight * 0.18,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFB7C2E5),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFA7B6E7),
+                      borderRadius: BorderRadius.circular(15),
                       boxShadow: const [
                         BoxShadow(
                           color: Color(0xFF4C5679),
@@ -245,9 +246,15 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       children: [
                         SizedBox(width: screenWidth * 0.02),
-                        Image.asset(
-                          "assets/images/start.png",
-                          width: screenWidth * 0.12,
+                        CircleAvatar(
+                          backgroundColor: Colors.white60,
+                          radius: 30,
+                          child: const CircleAvatar(
+                            backgroundImage:
+                                AssetImage('assets/images/profile_picture.png'),
+                            backgroundColor: Colors.red,
+                            radius: 25,
+                          ),
                         ),
                         SizedBox(width: screenWidth * 0.06),
                         Column(
@@ -257,7 +264,7 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               "Hello, ${userName}!", // Uses userName getter with fallback
                               style: TextStyle(
-                                color: const Color(0xFF3A4552),
+                                color: const Color(0xFF3C3939),
                                 fontSize: screenWidth * 0.06,
                                 fontFamily: "Fredoka One",
                                 fontWeight: FontWeight.bold,
@@ -267,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                               "Keep up the great work!",
                               style: TextStyle(
                                   color: const Color(0xFF3A4552),
-                                  fontSize: screenWidth * 0.05,
+                                  fontSize: screenWidth * 0.035,
                                   fontFamily: "Fredoka",
                                   fontWeight: FontWeight.bold),
                             ),
@@ -322,10 +329,9 @@ class _HomePageState extends State<HomePage> {
                                   gridItems[index]['label'],
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    color: const Color(0xFF3A4562),
-                                    fontSize: screenWidth * 0.05,
+                                    color: const Color(0xFF3C3939),
+                                    fontSize: screenWidth * 0.0335,
                                     fontFamily: "Fredoka One",
-                                    height: 1.2,
                                   ),
                                 ),
                               ],
