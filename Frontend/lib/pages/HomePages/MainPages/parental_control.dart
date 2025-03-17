@@ -190,7 +190,7 @@ class _ParentalControlState extends State<ParentalControl> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: screenWidth * 0.05,
+                      fontSize: screenWidth * 0.045,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Fredoka",
                     ),
@@ -217,7 +217,8 @@ class _ParentalControlState extends State<ParentalControl> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ParentalControlOne(
-                          userData: widget.userData, // Pass userData to the next screen
+                          userData: widget
+                              .userData, // Pass userData to the next screen
                         ),
                       ),
                     );
@@ -237,7 +238,8 @@ class _ParentalControlState extends State<ParentalControl> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ParentalControlTwo(
-                          userData: widget.userData, // Pass userData to the next screen
+                          userData: widget
+                              .userData, // Pass userData to the next screen
                         ),
                       ),
                     );
