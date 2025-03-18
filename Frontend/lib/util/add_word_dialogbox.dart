@@ -70,10 +70,11 @@ class _AddWordDialogboxState extends State<AddWordDialogbox> {
                       BorderRadius.circular(12), // Small border radius
                 ),
                 hintText: "Add a new Word",
-                hintStyle: const TextStyle(
-                  color: Color(0xFF3A435F), // Hint text color
+                hintStyle: TextStyle(
+                  color: const Color(0xFF3A435F), // Hint text color
                   fontFamily: "Fredoka",
                   fontWeight: FontWeight.bold,
+                  fontSize: screenWidth * 0.045,
                 ),
               ),
             ),
