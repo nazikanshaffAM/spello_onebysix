@@ -43,24 +43,13 @@ class GameRules extends ChangeNotifier {
     notifyListeners(); // Notify UI that loading has started
 
     try {
-      //
-      bool loggedIn = await ApiService.loginUser("john@example.com", "123456"
-      );
+      // Fetch target word using session cookies (no need for login)
+      String? fetchedWord = await ApiService.fetchTargetWord();
 
-      if (loggedIn) {
-        print("Login successful. Fetching target word...");
-
-        //
-        String? fetchedWord = await ApiService.fetchTargetWord();
-
-        if (fetchedWord != null && fetchedWord.isNotEmpty) {
-          word = fetchedWord;
-        } else {
-          word = "default"; // Fallback if API response is empty
-        }
+      if (fetchedWord != null && fetchedWord.isNotEmpty) {
+        word = fetchedWord;
       } else {
-        print("Login failed. Running in offline mode...");
-        word = "Offline Mode"; // Handle offline case
+        word = "default"; // Fallback if API response is empty
       }
     } catch (e) {
       word = "Error fetching word"; // Handle the error case
@@ -70,6 +59,7 @@ class GameRules extends ChangeNotifier {
     notifyListeners(); // Notify UI about the word update
     startTimer(); // Start the game timer
   }
+
 
 
 

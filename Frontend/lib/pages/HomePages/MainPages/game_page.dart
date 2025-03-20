@@ -19,7 +19,7 @@ class _GamePageState extends State<GamePage> {
       'name': 'HangMan 🎮',
       'image': 'assets/images/hangman.png',
       'isRecommended': true,
-      'route': '/game-data'  // Updated route
+      'route': '/game1'  // Updated route
     },
     {
       'name': 'Word Rush',
