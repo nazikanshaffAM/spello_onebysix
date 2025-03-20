@@ -113,12 +113,12 @@ class _GamePageState extends State<GamePage> {
                             SizedBox(width: screenWidth * 0.08),
                             CircleAvatar(
                               backgroundColor: Colors.white60,
-                              radius: 22,
+                              radius: 30,
                               child: const CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/images/start.png'),
+                                backgroundImage: AssetImage(
+                                    'assets/images/profile_picture.png'),
                                 backgroundColor: Colors.red,
-                                radius: 18,
+                                radius: 25,
                               ),
                             ),
                             SizedBox(width: screenWidth * 0.02),

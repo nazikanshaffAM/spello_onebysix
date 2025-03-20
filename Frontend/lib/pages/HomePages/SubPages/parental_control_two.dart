@@ -26,7 +26,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   late TutorialCoachMark tutorialCoachMark;
   List<TargetFocus> targets = [];
   final ScrollController _scrollController = ScrollController();
-  
+
   bool isLoading = false;
   String errorMessage = '';
 
@@ -57,9 +57,10 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     try {
       // Use email as a query parameter like in the working solutions
       // Change this line in all API calls
-      final url = Uri.parse('${Config.baseUrl}/get_user?email=${widget.userData['email']}');
+      final url = Uri.parse(
+          '${Config.baseUrl}/get_user?email=${widget.userData['email']}');
       print("Fetching custom words from: $url");
-      
+
       final response = await http.get(
         url,
         headers: {
@@ -89,7 +90,8 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         }
       } else {
         setState(() {
-          errorMessage = 'Failed to load words: Server error (${response.statusCode})';
+          errorMessage =
+              'Failed to load words: Server error (${response.statusCode})';
         });
       }
     } catch (e) {
@@ -143,9 +145,10 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     try {
       // Send request to backend to add custom word
       // Using query parameter for email instead of relying on session
-      final url = Uri.parse('${Config.baseUrl}/add-custom-word?email=${widget.userData['email']}');
+      final url = Uri.parse(
+          '${Config.baseUrl}/add-custom-word?email=${widget.userData['email']}');
       print("Making request to: $url");
-      
+
       final response = await http.post(
         url,
         headers: {
@@ -176,7 +179,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         } catch (e) {
           print("Error parsing response JSON: $e");
         }
-        
+
         setState(() {
           errorMessage = errorMsg;
         });
@@ -219,9 +222,9 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
   }
 
   // Modified to delete from backend
-   Future<void> deleteWord(int index) async {
+  Future<void> deleteWord(int index) async {
     final wordToDelete = wordList[index][0];
-    
+
     setState(() {
       isLoading = true;
       errorMessage = '';
@@ -230,9 +233,10 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
     try {
       // Send request to backend to remove custom word
       // Using query parameter for email instead of relying on session
-      final url = Uri.parse('${Config.baseUrl}/remove-custom-word?email=${widget.userData['email']}');
+      final url = Uri.parse(
+          '${Config.baseUrl}/remove-custom-word?email=${widget.userData['email']}');
       print("Making delete request to: $url");
-      
+
       final response = await http.post(
         url,
         headers: {
@@ -259,7 +263,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
         } catch (e) {
           print("Error parsing response JSON: $e");
         }
-        
+
         setState(() {
           errorMessage = errorMsg;
         });
@@ -458,7 +462,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
               ),
             ),
           ),
-          
+
           // Main Content
           Padding(
             padding: EdgeInsets.symmetric(
@@ -473,14 +477,14 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                       ? "No words, please add a new word."
                       : "Added Words:",
                   style: TextStyle(
-                    fontSize: screenWidth * 0.05,
+                    fontSize: screenWidth * 0.045,
                     color: Colors.white,
                     fontFamily: "Fredoka",
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 // Error message display
                 if (errorMessage.isNotEmpty)
                   Container(
@@ -506,7 +510,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                       ],
                     ),
                   ),
-                
+
                 if (isLoading && wordList.isEmpty)
                   Expanded(
                     child: Center(
@@ -525,7 +529,7 @@ class _ParentalControlTwoState extends State<ParentalControlTwo> {
                       ),
                     ),
                   ),
-                
+
                 if (wordList.isNotEmpty)
                   Expanded(
                     child: ListView.builder(

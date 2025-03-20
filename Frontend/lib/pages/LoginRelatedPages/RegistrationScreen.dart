@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/config/config.dart';
 
-///////////////////////////////////////////////////////////////////
-// User model to structure the data
 class User {
   final String name;
   final String age;
@@ -32,63 +30,42 @@ class User {
   }
 }
 
-// API service
-// API service with additional validation
 class ApiService {
   static const String baseUrl = Config.baseUrl;
 
   static Future<Map<String, dynamic>> registerUser(User user) async {
     try {
-      // Add client-side validation before sending to server
       int? age = int.tryParse(user.age);
       if (age == null || age < 0 || age > 100) {
-        print('Invalid age detected: ${user.age}. Age must be between 0 and 100.');
-        return {
-          'success': false,
-          'message': 'Age must be between 0 and 100'
-        };
+        return {'success': false, 'message': 'Age must be between 0 and 100'};
       }
 
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(user.toJson()),
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        print('Registration Response: ${response.body}');
-        // Parse the response
         final responseData = jsonDecode(response.body);
-        
-        // Validate server response data
         final userData = responseData['user'];
         if (userData != null) {
-          // Verify age is within valid range in the response
           int? responseAge = int.tryParse(userData['age'].toString());
           if (responseAge == null || responseAge < 0 || responseAge > 100) {
-            print('Warning: Server returned invalid age: ${userData['age']}');
-            // Fix the age to be within valid range
-            userData['age'] = responseAge != null ? 
-                (responseAge > 100 ? "100" : (responseAge < 0 ? "0" : userData['age'])) : 
-                "0";
+            userData['age'] = responseAge != null
+                ? (responseAge > 100
+                    ? "100"
+                    : (responseAge < 0 ? "0" : userData['age']))
+                : "0";
           }
-          
-          return {
-            'success': true,
-            'userData': userData
-          };
+          return {'success': true, 'userData': userData};
         } else {
           return {'success': false, 'message': 'Invalid response data'};
         }
       } else {
-        print('Registration failed with status: ${response.statusCode}');
-        print('Response body: ${response.body}');
         return {'success': false, 'message': 'Server error'};
       }
     } catch (e) {
-      print('Error registering user: $e');
       return {'success': false, 'message': 'Network error'};
     }
   }
@@ -102,96 +79,69 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  // Create controllers to handle text input
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  // Gender dropdown value
-  String _selectedGender = 'Male';
+  String? _selectedGender;
   final List<String> _genderOptions = ['Male', 'Female', 'Other'];
-
-  // Form key for validation
   final _formKey = GlobalKey<FormState>();
-
-  // Loading state
   bool _isLoading = false;
-
-  // Password visibility
   bool _obscurePassword = true;
 
-  // Function to validate form fields
   String? _validateField(String? value, String fieldName) {
-    if (value == null || value.isEmpty) {
-      return '$fieldName is required';
+    if (value == null || value.isEmpty)
+      return 'Please enter your ${fieldName.toLowerCase()}';
+    if (fieldName == 'email' &&
+        !RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return 'Please enter a valid email';
     }
-
-    if (fieldName == 'Email' && !_isValidEmail(value)) {
-      return 'Please enter a valid email address';
-    }
-
-    if (fieldName == 'Age') {
-      // Check if the input is a valid number
+    if (fieldName == 'age') {
       int? age = int.tryParse(value);
-      
-      // Return error if not a valid number
-      if (age == null) {
-        return 'Age must be a valid number';
-      }
-      
-      // Check if the age is within the allowed range
-      if (age < 0 || age > 100) {
-        return 'Age must be between 0 and 100';
-      }
+      if (age == null) return 'Age must be a number';
+      if (age < 0 || age > 100) return 'Age must be 0-100';
     }
-
-    if (fieldName == 'Password' && value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
+    if (fieldName == 'password' && value.length < 6)
+      return 'Password must be 6+ characters';
     return null;
   }
 
-  bool _isValidEmail(String email) {
-    // Simple email validation
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
+  void _handleSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      final user = User(
+        name: _nameController.text,
+        age: _ageController.text,
+        gender: _selectedGender ?? '',
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
 
-  bool _isNumeric(String str) {
-    // Parse the input to an integer
-    int? parsedValue = int.tryParse(str);
-    
-    // Return false if not a valid number
-    if (parsedValue == null) {
-      return false;
+      try {
+        final result = await ApiService.registerUser(user);
+        setState(() => _isLoading = false);
+        if (result['success'] == true) {
+          _showSuccessDialog(result['userData']);
+          _clearForm();
+        } else {
+          _showErrorDialog();
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        _showErrorDialog();
+      }
     }
-    
-    // Check if the value is within the allowed range
-    return parsedValue >= 0 && parsedValue <= 100;
   }
 
-  @override
-  void dispose() {
-    // Dispose controllers when the widget is removed
-    _nameController.dispose();
-    _ageController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void _clearForm() {
+    _nameController.clear();
+    _ageController.clear();
+    _emailController.clear();
+    _passwordController.clear();
+    setState(() => _selectedGender = null);
   }
 
   void _showSuccessDialog(Map<String, dynamic> userData) {
-    // Debug print to verify the user data received from API
-    print('=' * 50 + ' REGISTRATION SUCCESS ' + '=' * 50);
-    print('Registration received user data from API:');
-    print('COMPLETE USER DATA: $userData');
-    print('NAME: ${userData['name']}');
-    print('EMAIL: ${userData['email']}');
-    print('AGE: ${userData['age']}');
-    print('GENDER: ${userData['gender']}');
-    print('=' * 100);
-    
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -201,7 +151,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Registration completed successfully!'),
+            const Text('Registration successful!'),
             const SizedBox(height: 10),
             Text('Name: ${userData['name']}'),
             Text('Email: ${userData['email']}'),
@@ -212,29 +162,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // Create a clean copy of the userData to ensure data integrity
-              final Map<String, dynamic> userDataForOnboarding = {
-                'name': userData['name'],
-                'email': userData['email'],
-                'age': userData['age'],
-                'gender': userData['gender'],
-              };
-              
-              // Debug print before navigation
-              print('=' * 50 + ' NAVIGATING TO ONBOARDING ' + '=' * 50);
-              print('Passing user data to OnboardingPage:');
-              print('COMPLETE USER DATA: $userDataForOnboarding');
-              print('=' * 100);
-              
-              Navigator.pop(context); // Close the dialog
-              
-              // Use pushReplacement to ensure clean navigation
+              Navigator.pop(context);
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => OnboardingPage(
-                    userData: userDataForOnboarding,
-                  ),
+                  builder: (context) => OnboardingPage(userData: {
+                    'name': userData['name'],
+                    'email': userData['email'],
+                    'age': userData['age'],
+                    'gender': userData['gender'],
+                  }),
                 ),
               );
             },
@@ -245,81 +182,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  void _handleSubmit() async {
-    // Validate form
-    if (_formKey.currentState!.validate()) {
-      // Additional explicit check for age (optional, as the form validation should catch this)
-      int? age = int.tryParse(_ageController.text);
-      if (age == null || age < 0 || age > 100) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Age must be between 0 and 100')),
-        );
-        return; // Stop form submission
-      }
-      
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Create user object
-      final user = User(
-        name: _nameController.text,
-        age: _ageController.text,
-        gender: _selectedGender,
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      try {
-        // Send data to API and get response
-        final result = await ApiService.registerUser(user);
-
-        // Update loading state
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show appropriate dialog based on result
-        if (result['success'] == true) {
-          // Get user data from server response
-          final userData = {
-            'name': result['userData']['name'],
-            'email': result['userData']['email'],
-            'age': result['userData']['age'],
-            'gender': result['userData']['gender'],
-          };
-          
-          // Pass the userData from server response to the success dialog
-          _showSuccessDialog(userData);
-          
-          // Clear form fields after showing dialog
-          _nameController.clear();
-          _ageController.clear();
-          _emailController.clear();
-          _passwordController.clear();
-          setState(() {
-            _selectedGender = 'Male';
-          });
-        } else {
-          _showErrorDialog();
-        }
-      } catch (e) {
-        // Handle errors
-        setState(() {
-          _isLoading = false;
-        });
-        print('Error: $e');
-        _showErrorDialog();
-      }
-    }
-  }
-
   void _showErrorDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Error'),
-        content: const Text('Failed to register. Please try again later.'),
+        content: const Text('Registration failed. Please try again.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -332,244 +200,372 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF8092CC),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Back arrow
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        // Navigate back
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Title
-                  const Text(
-                    'Register now to get started!',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Form fields in a ListView to handle keyboard overflow
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        _buildTextField(_nameController, 'Name:'),
-                        const SizedBox(height: 20),
-                        _buildTextField(_ageController, 'Age:',
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 20),
-
-                        // Gender dropdown
-                        _buildDropdownField(),
-
-                        const SizedBox(height: 20),
-                        _buildTextField(_emailController, 'Email:',
-                            keyboardType: TextInputType.emailAddress),
-
-                        const SizedBox(height: 20),
-                        _buildPasswordField(),
-
-                        // Add some extra space at the bottom for better scrolling
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-
-                  // Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleSubmit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white)
-                              : const Text(
-                                  'NEXT',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () {
-                                  Navigator.pop(context);
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'BACK',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+        decoration: const BoxDecoration(color: Color(0xFF8092CC)),
+        child: Stack(children: [
+          Positioned(
+            top: screenHeight * 0,
+            left: screenWidth * 0,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
               ),
             ),
           ),
+          // Cloud 2
+          Positioned(
+            top: screenHeight * 0.15,
+            left: screenWidth * 0.8,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.4,
+              ),
+            ),
+          ),
+          // Cloud 3
+          Positioned(
+            top: screenHeight * 0.4,
+            left: screenWidth * 0.22,
+            child: Opacity(
+              opacity: 0.7,
+              child: Image.asset(
+                "assets/images/cloud.png",
+                width: screenWidth * 0.6,
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(screenWidth * 0.05),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          icon:
+                              Icon(Icons.arrow_back, size: screenWidth * 0.07),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 14),
+                        child: Text(
+                          'Register now to get started!',
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.084,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontFamily: "Fredoka One",
+                            shadows: const [
+                              Shadow(
+                                blurRadius: 5.0,
+                                color: Colors.black26,
+                                offset: Offset(2.0, 2.0),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.05),
+                      _buildTextField(_nameController, 'Name'),
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildTextField(_ageController, 'Age',
+                          keyboardType: TextInputType.number),
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildDropdownField(),
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildTextField(_emailController, 'Email',
+                          keyboardType: TextInputType.emailAddress),
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildPasswordField(),
+                      SizedBox(height: screenHeight * 0.04),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: screenWidth * 0.375,
+                            child: _buildButton(
+                              text: 'Back',
+                              color: Colors.white,
+                              textColor: Color(0xFF4C5679).withOpacity(0.8),
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => Navigator.pop(context),
+                              isPrimary: false,
+                            ),
+                          ),
+                          SizedBox(width: screenWidth * 0.05),
+                          Container(
+                            width: screenWidth * 0.375,
+                            child: _buildButton(
+                              text: 'Next',
+                              color: const Color(0xFFFFC107),
+                              textColor: Colors.white,
+                              onPressed: _isLoading ? null : _handleSubmit,
+                              isLoading: _isLoading,
+                              isPrimary: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required String text,
+    required Color color,
+    required Color textColor,
+    required VoidCallback? onPressed,
+    bool isLoading = false,
+    bool isPrimary = true,
+  }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          color: isLoading ? color.withOpacity(0.6) : color,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: isPrimary ? const Color(0xFFD29338) : Colors.grey,
+              offset: const Offset(0, 5),
+              blurRadius: 0,
+            )
+          ],
+        ),
+        child: Center(
+          child: isLoading
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  ),
+                )
+              : Text(
+                  text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: screenWidth * 0.04,
+                    fontFamily: "Fredoka",
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ),
     );
   }
 
-  // Helper method to build text fields
   Widget _buildTextField(
     TextEditingController controller,
     String label, {
     TextInputType keyboardType = TextInputType.text,
   }) {
     return Container(
+      height: 60,
+      width: MediaQuery.of(context).size.width * 0.8,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.25),
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        validator: (value) => _validateField(value, label.replaceAll(':', '')),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (value) => _validateField(value, label),
+        style: const TextStyle(
+          fontSize: 14,
+          fontFamily: "Fredoka",
+          fontWeight: FontWeight.bold,
+        ),
         decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
+          labelText: '$label:',
+          labelStyle: const TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          errorStyle: const TextStyle(
+            fontSize: 10,
+            height: 0.8,
+          ),
         ),
       ),
     );
   }
 
-  // Helper method to build password field
   Widget _buildPasswordField() {
     return Container(
+      height: 60,
+      width: MediaQuery.of(context).size.width * 0.8,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.25),
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: TextFormField(
         controller: _passwordController,
         obscureText: _obscurePassword,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) => _validateField(value, 'Password'),
+        style: const TextStyle(
+          fontSize: 14,
+          fontFamily: "Fredoka",
+          fontWeight: FontWeight.bold,
+        ),
         decoration: InputDecoration(
           labelText: 'Password:',
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
+          labelStyle: const TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
           ),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          errorStyle: const TextStyle(
+            fontSize: 10,
+            height: 0.8,
+          ),
           suffixIcon: IconButton(
             icon: Icon(
               _obscurePassword ? Icons.visibility_off : Icons.visibility,
               color: Colors.grey,
+              size: 20,
             ),
-            onPressed: () {
-              setState(() {
-                _obscurePassword = !_obscurePassword;
-              });
-            },
+            onPressed: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
           ),
         ),
       ),
     );
   }
 
-  // Helper method to build gender dropdown
   Widget _buildDropdownField() {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Container(
+      height: 60,
+      width: screenWidth * 0.8,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.25),
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: DropdownButtonFormField<String>(
         value: _selectedGender,
-        decoration: const InputDecoration(
-          labelText: 'Gender:',
-          border: InputBorder.none,
+        hint: const Text(
+          'Gender:',
+          style: TextStyle(
+            fontFamily: 'Fredoka',
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: Colors.black54,
+          ),
         ),
-        items: _genderOptions.map((String gender) {
-          return DropdownMenuItem<String>(
-            value: gender,
-            child: Text(gender),
-          );
-        }).toList(),
-        onChanged: (String? newValue) {
-          if (newValue != null) {
-            setState(() {
-              _selectedGender = newValue;
-            });
-          }
-        },
+        style: const TextStyle(
+          fontSize: 14,
+          fontFamily: "Fredoka",
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+        ),
+        icon: const Icon(
+          Icons.arrow_drop_down,
+          color: Colors.grey,
+          size: 24,
+        ),
+        dropdownColor: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        elevation: 4,
+        menuMaxHeight: 200,
+        items: _genderOptions
+            .map((gender) => DropdownMenuItem(
+                  value: gender,
+                  child: Text(
+                    gender,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Fredoka",
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ))
+            .toList(),
+        onChanged: (value) => setState(() => _selectedGender = value),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
