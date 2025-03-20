@@ -19,7 +19,7 @@ class _GamePageState extends State<GamePage> {
       'name': 'Spelling Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': true,
-      'route': '/game-data'  // Updated route
+      'route': '/game1'  // Updated route
     },
     {
       'name': 'Word Rush',

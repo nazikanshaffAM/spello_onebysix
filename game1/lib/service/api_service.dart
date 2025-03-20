@@ -5,17 +5,22 @@ import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.73.48:5000";
+  static const String baseUrl = "http://192.168.143.48:5000";
 
-  // Upload WAV file and get pronunciation accuracy
+  // **Utility Function to Retrieve Stored Cookies**
+  static Future<String?> getStoredCookies() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString("cookies");
+  }
+
+  // **Upload WAV file and get pronunciation accuracy**
   static Future<int?> uploadAudio(String filePath) async {
     try {
       var uri = Uri.parse("$baseUrl/speech-to-text");
       var request = http.MultipartRequest('POST', uri);
 
       // Retrieve stored session cookies
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? cookies = prefs.getString("cookies");
+      String? cookies = await getStoredCookies();
 
       // Attach the audio file
       request.files.add(await http.MultipartFile.fromPath(
@@ -48,51 +53,13 @@ class ApiService {
     }
   }
 
-  // Login function
-  static Future<bool> loginUser(String email, String password) async {
-    try {
-      final uri = Uri.parse("$baseUrl/login");
-
-      final response = await http.post(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: jsonEncode({"email": email, "password": password}),
-      );
-
-      if (response.statusCode == 200) {
-        await saveCookies(response);
-        return true;
-      } else {
-        debugPrint("Login failed: ${response.reasonPhrase}");
-        return false;
-      }
-    } catch (e) {
-      debugPrint("Exception: $e");
-      return false;
-    }
-  }
-
-  // Save session cookies after login
-  static Future<void> saveCookies(http.Response response) async {
-    String? rawCookies = response.headers['set-cookie'];
-    if (rawCookies != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("cookies", rawCookies);
-      debugPrint("Session cookies saved: $rawCookies");
-    }
-  }
-
-  // Fetch the target word with session authentication
+  // **Fetch the target word with session authentication**
   static Future<String?> fetchTargetWord() async {
     try {
       final uri = Uri.parse("$baseUrl/get-target-word");
 
       // Retrieve stored session cookies
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? cookies = prefs.getString("cookies");
+      String? cookies = await getStoredCookies();
 
       final response = await http.get(
         uri,

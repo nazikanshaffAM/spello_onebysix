@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
 import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart';
 import 'package:spello_frontend/config/config.dart';
-
-// Placeholder Signup Screen
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -33,8 +32,9 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final response = await http.post(
-         Uri.parse('${Config.baseUrl}/login'),
+      var client = http.Client();
+      var response = await client.post(
+        Uri.parse('${Config.baseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': _emailController.text,
@@ -49,15 +49,22 @@ class _LoginPageState extends State<LoginPage> {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        // Navigate to home page
+        // Extract cookies from response headers
+        String? rawCookies = response.headers['set-cookie'];
+        if (rawCookies != null) {
+          List<String> cookies = rawCookies.split(';');
+
+          // Save cookies to shared preferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('session_cookie', cookies[0]);
+        }
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => HomePage(
-                userData: responseData['user']), //direction to screen if sucess
+            builder: (context) => HomePage(userData: responseData['user']),
           ),
         );
       } else {
-        // Login failed
         setState(() {
           _errorMessage = responseData['message'] ?? 'Authentication failed';
         });
@@ -72,74 +79,120 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          color: Color(0xFF7B95D3), // Matches the blue in your Figma
-        ),
+        decoration: const BoxDecoration(color: Color(0xFF8092CC)),
         child: Stack(
           children: [
-            // Login form
+            Positioned(
+              top: screenHeight * 0.05,
+              left: screenWidth * 0,
+              child: Opacity(
+                opacity: 0.5,
+                child: Image.asset(
+                  "assets/images/cloud.png",
+                  width: screenWidth * 0.4,
+                ),
+              ),
+            ),
+            Positioned(
+              top: screenHeight * 0.2,
+              left: screenWidth * 0.8,
+              child: Opacity(
+                opacity: 0.5,
+                child: Image.asset(
+                  "assets/images/cloud.png",
+                  width: screenWidth * 0.4,
+                ),
+              ),
+            ),
             SafeArea(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(30.0),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: screenWidth * 0.05,
+                    vertical: screenHeight * 0.05,
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SizedBox(height: 60),
-                        const Text(
+                        SizedBox(height: screenHeight * 0.01),
+                        Text(
                           'Hello From Spello!',
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: screenWidth * 0.084,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
+                            fontFamily: "Fredoka One",
                             shadows: [
                               Shadow(
-                                blurRadius: 5.0,
+                                blurRadius: screenWidth * 0.01,
                                 color: Colors.black26,
-                                offset: Offset(2.0, 2.0),
+                                offset: Offset(
+                                    screenWidth * 0.005, screenWidth * 0.005),
                               ),
                             ],
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: screenHeight * 0.08),
 
-                        // Image placeholder
                         Image.asset(
                           'assets/images/login.png',
-                          height: 240,
+                          height: screenHeight * 0.25,
                           fit: BoxFit.contain,
                         ),
 
-                        const SizedBox(height: 30),
+                        SizedBox(height: screenHeight * 0.05),
 
                         // Email Field
                         Container(
+                          width: screenWidth * 0.8,
+                          height: screenHeight * 0.07,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius:
+                            BorderRadius.circular(screenWidth * 0.03),
+                            border: Border.all(color: Colors.white),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: screenWidth * 0.01,
+                                offset: Offset(0, screenHeight * 0.005),
                               ),
                             ],
                           ),
                           child: TextFormField(
                             controller: _emailController,
-                            decoration: const InputDecoration(
+                            autovalidateMode:
+                            AutovalidateMode.onUserInteraction,
+                            decoration: InputDecoration(
                               labelText: 'Email :',
+                              labelStyle: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: screenWidth * 0.035,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
+                                horizontal: screenWidth * 0.05,
+                                vertical: screenHeight * 0.015,
+                              ),
+                              errorStyle: TextStyle(
+                                fontSize: screenWidth * 0.03,
+                                height: 0.8,
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.04,
+                              fontFamily: "Fredoka",
+                              fontWeight: FontWeight.bold,
                             ),
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
@@ -152,30 +205,58 @@ class _LoginPageState extends State<LoginPage> {
                               }
                               return null;
                             },
+                            onChanged: (_) {
+                              if (_errorMessage.isNotEmpty) {
+                                setState(() => _errorMessage = '');
+                              }
+                            },
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: screenHeight * 0.02),
 
                         // Password Field
                         Container(
+                          width: screenWidth * 0.8,
+                          height: screenHeight * 0.07,
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius:
+                            BorderRadius.circular(screenWidth * 0.03),
+                            border: Border.all(color: Colors.white),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: screenWidth * 0.01,
+                                offset: Offset(0, screenHeight * 0.005),
+                              )
                             ],
                           ),
                           child: TextFormField(
                             controller: _passwordController,
-                            decoration: const InputDecoration(
+                            autovalidateMode:
+                            AutovalidateMode.onUserInteraction,
+                            decoration: InputDecoration(
                               labelText: 'Password:',
+                              labelStyle: TextStyle(
+                                fontFamily: 'Fredoka',
+                                fontSize: screenWidth * 0.035,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
+                                horizontal: screenWidth * 0.05,
+                                vertical: screenHeight * 0.015,
+                              ),
+                              errorStyle: TextStyle(
+                                fontSize: screenWidth * 0.03,
+                                height: 0.8,
+                              ),
+                            ),
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.04,
+                              fontFamily: "Fredoka",
+                              fontWeight: FontWeight.bold,
                             ),
                             obscureText: true,
                             validator: (value) {
@@ -187,80 +268,105 @@ class _LoginPageState extends State<LoginPage> {
                               }
                               return null;
                             },
+                            onChanged: (_) {
+                              if (_errorMessage.isNotEmpty) {
+                                setState(() => _errorMessage = '');
+                              }
+                            },
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: screenHeight * 0.03),
 
-                        if (_errorMessage.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: Text(
-                              _errorMessage,
-                              style: const TextStyle(
-                                  color: Colors.red,
-                                  backgroundColor: Colors.white70),
-                              textAlign: TextAlign.center,
+                        // Error message container
+                        SizedBox(
+                          height: screenHeight * 0.04,
+                          child: _errorMessage.isNotEmpty
+                              ? Text(
+                            _errorMessage,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: screenWidth * 0.035,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ),
+                            textAlign: TextAlign.center,
+                          )
+                              : null,
+                        ),
 
                         // Login Button
-                        ElevatedButton(
-                          onPressed: _isLoading ? null : _login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.amber,
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            disabledBackgroundColor:
-                                Colors.amber.withOpacity(0.6),
-                          ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 3,
-                                  ),
-                                )
-                              : const Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                        InkWell(
+                          onTap: _isLoading ? null : _login,
+                          borderRadius:
+                          BorderRadius.circular(screenWidth * 0.03),
+                          child: Container(
+                            width: screenWidth * 0.8,
+                            height: screenHeight * 0.07,
+                            decoration: BoxDecoration(
+                              color: _isLoading
+                                  ? Colors.amber.withOpacity(0.6)
+                                  : const Color(0xFFFFC107),
+                              borderRadius:
+                              BorderRadius.circular(screenWidth * 0.03),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFD29338),
+                                  offset: Offset(0, screenHeight * 0.005),
+                                  blurRadius: 0,
                                 ),
+                              ],
+                            ),
+                            child: Center(
+                              child: _isLoading
+                                  ? SizedBox(
+                                height: screenHeight * 0.03,
+                                width: screenHeight * 0.03,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: screenWidth * 0.008,
+                                ),
+                              )
+                                  : Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: screenWidth * 0.04,
+                                  fontFamily: "Fredoka",
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: screenHeight * 0.02),
 
                         // Registration link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
-                              'Sign up to Start your Journey !',
+                            Text(
+                              'Sign up to Start your Journey!',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Fredoka",
+                                fontSize: screenWidth * 0.035,
                               ),
                             ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationScreen()),
+                                    builder: (context) =>
+                                    const RegistrationScreen(),
+                                  ),
                                 );
                               },
-                              child: const Text(
+                              child: Text(
                                 'Sign up',
                                 style: TextStyle(
-                                  color: Color.fromARGB(255, 238, 207, 8),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  
+                                  color: const Color.fromARGB(255, 238, 207, 8),
+                                  fontSize: screenWidth * 0.035,
+                                  fontFamily: "Fredoka One",
                                 ),
                               ),
                             ),
