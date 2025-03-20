@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF8092CC)),
-      home: NotificationsPage(),
+      home: LoginPage(),
       // home: HomeScreen(
       //   userData: {'name': 'John Doe', 'email': 'johndoe@example.com'}),
       routes: {
