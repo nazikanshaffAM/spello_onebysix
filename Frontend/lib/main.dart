@@ -3,9 +3,7 @@ import 'package:flutter/services.dart'; // Import the services package
 import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_data_screen.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/help_center.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
-import 'package:spello_frontend/pages/HomePages/MainPages/notifications_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/settings.dart';
@@ -13,6 +11,8 @@ import 'package:spello_frontend/pages/HomePages/SubPages/page_under_construction
 import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart';
 import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
 import 'package:spello_frontend/config/config.dart';
+
+import 'game1/screens/game_start_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
@@ -54,13 +54,14 @@ class MyApp extends StatelessWidget {
                       as Map<String, dynamic>? ??
                   {},
             ),
-        '/notifications': (context) => NotificationsPage(),
+        '/notifications': (context) => PageUnderConstruction(),
+        '/game1': (context) => StartPage(),
         '/settings': (context) => Settings(
               userData: ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>? ??
                   {},
             ),
-        '/helpCenter': (context) => HelpCenterPage(),
+        '/helpCenter': (context) => PageUnderConstruction(),
         '/game-data': (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>?;

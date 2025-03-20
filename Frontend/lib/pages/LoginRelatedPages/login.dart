@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
@@ -31,7 +32,8 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final response = await http.post(
+      var client = http.Client();
+      var response = await client.post(
         Uri.parse('${Config.baseUrl}/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
@@ -47,6 +49,16 @@ class _LoginPageState extends State<LoginPage> {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        // Extract cookies from response headers
+        String? rawCookies = response.headers['set-cookie'];
+        if (rawCookies != null) {
+          List<String> cookies = rawCookies.split(';');
+
+          // Save cookies to shared preferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('session_cookie', cookies[0]);
+        }
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => HomePage(userData: responseData['user']),
@@ -145,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
-                                BorderRadius.circular(screenWidth * 0.03),
+                            BorderRadius.circular(screenWidth * 0.03),
                             border: Border.all(color: Colors.white),
                             boxShadow: [
                               BoxShadow(
@@ -158,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: TextFormField(
                             controller: _emailController,
                             autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               labelText: 'Email :',
                               labelStyle: TextStyle(
@@ -209,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
-                                BorderRadius.circular(screenWidth * 0.03),
+                            BorderRadius.circular(screenWidth * 0.03),
                             border: Border.all(color: Colors.white),
                             boxShadow: [
                               BoxShadow(
@@ -222,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: TextFormField(
                             controller: _passwordController,
                             autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
+                            AutovalidateMode.onUserInteraction,
                             decoration: InputDecoration(
                               labelText: 'Password:',
                               labelStyle: TextStyle(
@@ -270,14 +282,14 @@ class _LoginPageState extends State<LoginPage> {
                           height: screenHeight * 0.04,
                           child: _errorMessage.isNotEmpty
                               ? Text(
-                                  _errorMessage,
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: screenWidth * 0.035,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                )
+                            _errorMessage,
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: screenWidth * 0.035,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
                               : null,
                         ),
 
@@ -285,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
                         InkWell(
                           onTap: _isLoading ? null : _login,
                           borderRadius:
-                              BorderRadius.circular(screenWidth * 0.03),
+                          BorderRadius.circular(screenWidth * 0.03),
                           child: Container(
                             width: screenWidth * 0.8,
                             height: screenHeight * 0.07,
@@ -294,7 +306,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ? Colors.amber.withOpacity(0.6)
                                   : const Color(0xFFFFC107),
                               borderRadius:
-                                  BorderRadius.circular(screenWidth * 0.03),
+                              BorderRadius.circular(screenWidth * 0.03),
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFFD29338),
@@ -306,22 +318,22 @@ class _LoginPageState extends State<LoginPage> {
                             child: Center(
                               child: _isLoading
                                   ? SizedBox(
-                                      height: screenHeight * 0.03,
-                                      width: screenHeight * 0.03,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: screenWidth * 0.008,
-                                      ),
-                                    )
+                                height: screenHeight * 0.03,
+                                width: screenHeight * 0.03,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: screenWidth * 0.008,
+                                ),
+                              )
                                   : Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: screenWidth * 0.04,
-                                        fontFamily: "Fredoka",
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: screenWidth * 0.04,
+                                  fontFamily: "Fredoka",
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -345,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const RegistrationScreen(),
+                                    const RegistrationScreen(),
                                   ),
                                 );
                               },

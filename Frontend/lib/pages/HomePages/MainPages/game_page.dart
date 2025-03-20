@@ -16,10 +16,10 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   final List<Map<String, dynamic>> games = [
     {
-      'name': 'Spelling Bee',
-      'image': 'assets/images/game_one.png',
+      'name': 'HangMan 🎮',
+      'image': 'assets/images/hangman.png',
       'isRecommended': true,
-      'route': '/game-data'  // Updated route
+      'route': '/game1'  // Updated route
     },
     {
       'name': 'Word Rush',
@@ -261,7 +261,7 @@ class _GamePageState extends State<GamePage> {
                                   context,
                                   '/game-data',
                                   arguments: {
-                                    'userData': completeUserData,
+                                    'userData': widget.userData, 
                                     'gameName': game['name']
                                   },
                                 );
