@@ -129,6 +129,7 @@ flutter:
     - assets/images/newb1.png
     - assets/images/newb2.png
     - assets/images/profile_picture.png
+    - assets/images/help_center_page.png
 
 
   fonts:
