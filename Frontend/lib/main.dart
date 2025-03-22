@@ -12,6 +12,8 @@ import 'package:spello_frontend/pages/LoginRelatedPages/RegistrationScreen.dart'
 import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
 import 'package:spello_frontend/config/config.dart';
 
+import 'game1/screens/game_start_page.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
   SystemChrome.setPreferredOrientations([
@@ -53,6 +55,7 @@ class MyApp extends StatelessWidget {
                   {},
             ),
         '/notifications': (context) => PageUnderConstruction(),
+        '/game1': (context) => StartPage(),
         '/settings': (context) => Settings(
               userData: ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>? ??
