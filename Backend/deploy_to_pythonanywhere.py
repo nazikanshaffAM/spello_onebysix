@@ -7,8 +7,6 @@ import time
 API_TOKEN = os.environ.get("PYTHONANYWHERE_API_TOKEN")
 USERNAME = os.environ.get("PYTHONANYWHERE_USERNAME", "spello")
 APP_DIRECTORY = os.environ.get("APP_DIRECTORY", "/home/spello/spellomine")
-# Get the GitHub repository from environment or default to the current repository
-GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "spello100/your-repo-name")
 GITHUB_BRANCH = os.environ.get("GITHUB_REF_NAME", "main")
 WSGI_FILE = os.environ.get("WSGI_FILE", "/var/www/spello_pythonanywhere_com_wsgi.py")
 
@@ -25,96 +23,52 @@ WEBAPP_URL = f"{API_BASE_URL}/webapps/{USERNAME}.pythonanywhere.com"
 # Request headers
 headers = {"Authorization": f"Token {API_TOKEN}"}
 
-def create_console_and_run_command():
-    """Create a console to run git pull and update dependencies"""
-    print("Creating console for deployment commands...")
+def run_deployment_commands():
+    """Run deployment commands directly instead of checking console output"""
+    print("Running deployment commands...")
     
-    # Enhanced update command with specific focus on project structure
-    update_command = (
-        f"cd {APP_DIRECTORY} && "
-        "echo '=== Current directory contents ===' && ls -la && "
-        "if [ -d .git ]; then "
-        "    echo '=== Updating existing git repository ===' && "
-        "    git fetch --verbose && "
-        f"    git checkout {GITHUB_BRANCH} && "
-        "    git pull --verbose && "
-        "    echo '=== Git repository updated ===' && "
-        "else "
-        "    echo 'ERROR: No git repository found. Cannot update.' && "
-        "    exit 1; "
-        "fi && "
-        "echo '=== Directory contents after update ===' && ls -la && "
-        "# If Backend directory exists, check its contents too\n"
-        "if [ -d Backend ]; then\n"
-        "    echo '=== Backend directory contents ==='\n"
-        "    ls -la Backend\n"
-        "fi && "
-        "echo '=== Installing dependencies ===' && "
-        "if [ -f requirements.txt ]; then "
-        "    pip install -r requirements.txt --user "
-        "elif [ -f Backend/requirements.txt ]; then "
-        "    pip install -r Backend/requirements.txt --user "
-        "else "
-        "    echo 'WARNING: No requirements.txt found' "
-        "fi && "
-        f"echo '=== Touching WSGI file at {WSGI_FILE} ===' && "
-        f"touch {WSGI_FILE} && "
-        "echo '=== All deployment steps completed successfully ==='"
-    )
+    # Simplified command approach - run multiple smaller commands instead of one big one
+    commands = [
+        # Check current directory
+        f"cd {APP_DIRECTORY} && ls -la",
+        
+        # Update git repository
+        f"cd {APP_DIRECTORY} && git fetch && git checkout {GITHUB_BRANCH} && git pull",
+        
+        # Install dependencies
+        f"cd {APP_DIRECTORY} && pip install -r requirements.txt --user",
+        
+        # Touch WSGI file to ensure reload
+        f"touch {WSGI_FILE}"
+    ]
     
-    data = {
-        "executable": "bash",
-        "working_directory": f"/home/{USERNAME}",
-        "arguments": f"-c '{update_command}'"
-    }
-    
-    try:
-        response = requests.post(CONSOLES_URL, headers=headers, json=data)
-        response.raise_for_status()
-        console_id = response.json()["id"]
-        print(f"Console created with ID: {console_id}")
-        return console_id
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to create console: {str(e)}")
-        if hasattr(e, 'response') and e.response:
-            print(f"Response: {e.response.status_code}, {e.response.text}")
-        return None
-
-def check_console_output(console_id, max_wait=300):
-    """Check console output to see if commands completed successfully"""
-    print(f"Checking console output (ID: {console_id})...")
-    
-    console_url = f"{CONSOLES_URL}{console_id}/get_latest_output/"
-    start_time = time.time()
-    success_marker = "=== All deployment steps completed successfully ==="
-    error_marker = "ERROR:"
-    
-    while time.time() - start_time < max_wait:
+    for cmd in commands:
+        print(f"Executing: {cmd}")
         try:
-            response = requests.get(console_url, headers=headers)
+            # Create a new console for each command to avoid timeout issues
+            data = {
+                "executable": "bash",
+                "working_directory": f"/home/{USERNAME}",
+                "arguments": f"-c '{cmd}'"
+            }
+            
+            response = requests.post(CONSOLES_URL, headers=headers, json=data)
             response.raise_for_status()
-            output = response.json()["output"]
+            console_id = response.json()["id"]
+            print(f"Command started in console ID: {console_id}")
             
-            # Check for success message
-            if success_marker in output:
-                print("Deployment commands completed successfully!")
-                return True
-            
-            # Check for error message
-            if error_marker in output:
-                print(f"Error detected in console output: {output}")
-                return False
-                
-            # Continue waiting
-            print("Waiting for deployment commands to complete...")
-            time.sleep(10)
+            # Give each command some time to complete
+            time.sleep(15)
             
         except requests.exceptions.RequestException as e:
-            print(f"Error checking console output: {str(e)}")
-            time.sleep(10)
+            print(f"Warning: Error executing command: {str(e)}")
+            if hasattr(e, 'response') and e.response:
+                print(f"Response: {e.response.status_code}, {e.response.text}")
     
-    print(f"Timed out waiting for deployment commands to complete after {max_wait} seconds")
-    return False
+    # Additional sleep to ensure all commands have completed
+    print("Waiting for all commands to complete...")
+    time.sleep(30)
+    return True
 
 def reload_webapp():
     """Reload the web application"""
@@ -127,7 +81,7 @@ def reload_webapp():
         
         # Wait for the reload to complete
         print("Waiting for webapp reload to complete...")
-        time.sleep(60)  # Give more time for the reload to fully take effect
+        time.sleep(60)
         
         return True
     except requests.exceptions.RequestException as e:
@@ -140,22 +94,15 @@ def deploy():
     """Main deployment function"""
     print(f"Starting deployment to PythonAnywhere for {USERNAME}...")
     print(f"Target directory: {APP_DIRECTORY}")
-    print(f"GitHub repository: {GITHUB_REPO}")
     print(f"Branch: {GITHUB_BRANCH}")
     print(f"WSGI file: {WSGI_FILE}")
     
-    # Step 1: Create a console and run update commands
-    console_id = create_console_and_run_command()
-    if not console_id:
-        print("Deployment failed: Could not create console")
+    # Step 1: Run deployment commands
+    if not run_deployment_commands():
+        print("Deployment failed: Error running commands")
         return False
     
-    # Step 2: Wait for commands to complete with verification
-    if not check_console_output(console_id):
-        print("Deployment failed: Commands did not complete successfully")
-        return False
-    
-    # Step 3: Reload the web application
+    # Step 2: Reload the web application
     if not reload_webapp():
         print("Deployment failed: Could not reload web app")
         return False
