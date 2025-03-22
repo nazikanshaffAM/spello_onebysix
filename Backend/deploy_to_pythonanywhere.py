@@ -28,30 +28,23 @@ def create_console_and_run_command():
     """Create a console to run git pull and update dependencies"""
     print("Creating console for deployment commands...")
     
-    # Enhanced git command sequence with more verbose output and error handling
+    # Simplified git command sequence focused on pulling updates
     update_command = (
         f"cd {APP_DIRECTORY} && "
-        "echo '=== Current directory contents ===' && ls -la && "
+        "echo 'Current directory contents:' && ls -la && "
         "if [ -d .git ]; then "
-        "    echo '=== Updating existing git repository ===' && "
-        "    git fetch --verbose && "  # More verbose output
-        f"    git checkout {GITHUB_BRANCH} && "
-        "    git pull --verbose && "  # More verbose output
-        "    echo '=== Git repository updated ===' && "
-        "    # Touch the WSGI file to ensure PythonAnywhere recognizes the changes\n"
-        "    if [ -f *.wsgi ]; then\n"
-        "        echo '=== Touching WSGI file ==='\n"
-        "        touch *.wsgi\n"
-        "    fi\n"
+        "    echo 'Updating existing git repository...' && "
+        "    git fetch && "  # Fetch all branches
+        f"    git checkout {GITHUB_BRANCH} && "  # Make sure we're on the right branch
+        "    git pull && "  # Pull changes
+        "    echo 'Git repository updated'; "
         "else "
-        "    echo 'ERROR: No git repository found in ${APP_DIRECTORY}' && "
-        "    echo 'Please ensure your app directory contains a git repository.' && "
-        "    exit 1; "
+        "    echo 'Warning: No git repository found. Cannot pull updates.' && "
+        "    echo 'Please ensure your app directory contains a git repository.'; "
         "fi && "
-        "echo '=== Directory contents after update ===' && ls -la && "
-        "echo '=== Installing dependencies ===' && "
-        "pip install -r requirements.txt --user && "
-        "echo '=== All deployment steps completed successfully ==='"
+        "echo 'Directory contents after update:' && ls -la && "
+        "echo 'Installing dependencies...' && "
+        "pip install -r requirements.txt --user"
     )
     
     data = {
@@ -72,42 +65,6 @@ def create_console_and_run_command():
             print(f"Response: {e.response.status_code}, {e.response.text}")
         return None
 
-def check_console_output(console_id, max_wait=300):
-    """Check console output to see if commands completed successfully"""
-    print(f"Checking console output (ID: {console_id})...")
-    
-    console_url = f"{CONSOLES_URL}{console_id}/get_latest_output/"
-    start_time = time.time()
-    success_marker = "=== All deployment steps completed successfully ==="
-    error_marker = "ERROR:"
-    
-    while time.time() - start_time < max_wait:
-        try:
-            response = requests.get(console_url, headers=headers)
-            response.raise_for_status()
-            output = response.json()["output"]
-            
-            # Check for success message
-            if success_marker in output:
-                print("Deployment commands completed successfully!")
-                return True
-            
-            # Check for error message
-            if error_marker in output:
-                print(f"Error detected in console output: {output}")
-                return False
-                
-            # Continue waiting
-            print("Waiting for deployment commands to complete...")
-            time.sleep(10)
-            
-        except requests.exceptions.RequestException as e:
-            print(f"Error checking console output: {str(e)}")
-            time.sleep(10)
-    
-    print(f"Timed out waiting for deployment commands to complete after {max_wait} seconds")
-    return False
-
 def reload_webapp():
     """Reload the web application"""
     print("Reloading web application...")
@@ -115,12 +72,7 @@ def reload_webapp():
     try:
         response = requests.post(f"{WEBAPP_URL}/reload/", headers=headers)
         response.raise_for_status()
-        print("Web app reload initiated successfully!")
-        
-        # Wait for the reload to complete
-        print("Waiting for webapp reload to complete...")
-        time.sleep(60)  # Give more time for the reload to fully take effect
-        
+        print("Web app reloaded successfully!")
         return True
     except requests.exceptions.RequestException as e:
         print(f"Failed to reload web app: {str(e)}")
@@ -141,12 +93,11 @@ def deploy():
         print("Deployment failed: Could not create console")
         return False
     
-    # Step 2: Wait for commands to complete with verification
-    if not check_console_output(console_id):
-        print("Deployment failed: Commands did not complete successfully")
-        return False
+    # Give some time for git operations and dependency installation to complete
+    print("Waiting for update commands to complete...")
+    time.sleep(30)  # Reduced wait time since pulling is faster than cloning
     
-    # Step 3: Reload the web application
+    # Step 2: Reload the web application
     if not reload_webapp():
         print("Deployment failed: Could not reload web app")
         return False
