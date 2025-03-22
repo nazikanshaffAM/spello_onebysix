@@ -94,7 +94,7 @@ jobs:
     # 1. It's a push to main or master branch
     # 2. It's in the organization's repo (not a fork)
     # Replace YOUR_ORG_NAME with your actual organization name
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.repository_owner == 'spello100'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.repository_owner == 'spello100' ||  github.repository_owner == 'vizakan10')
     
     steps:
     - uses: actions/checkout@v3
