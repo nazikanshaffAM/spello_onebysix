@@ -28,29 +28,19 @@ def create_console_and_run_command():
     """Create a console to run git pull and update dependencies"""
     print("Creating console for deployment commands...")
     
-    # More robust git command sequence
+    # Simplified git command sequence focused on pulling updates
     update_command = (
         f"cd {APP_DIRECTORY} && "
         "echo 'Current directory contents:' && ls -la && "
-        "if [ ! -d .git ]; then "
-        "    echo 'No git repository found. Setting up from scratch...' && "
-        "    # Backup any existing content first"
-        "    mkdir -p ~/backup_before_deploy && "
-        "    cp -r * ~/backup_before_deploy/ 2>/dev/null || : && "
-        f"    git clone -b {GITHUB_BRANCH} https://github.com/{GITHUB_REPO}.git temp_clone && "
-        "    cp -r temp_clone/* . && "
-        "    cp -r temp_clone/.* . 2>/dev/null || : && "
-        "    rm -rf temp_clone && "
-        "    echo 'Repository contents copied to target directory' && "
-        "    echo 'Setting up git repository for future updates' && "
-        "    git init && "
-        f"    git remote add origin https://github.com/{GITHUB_REPO}.git && "
-        "    echo 'Git repository initialized'; "
-        "else "
+        "if [ -d .git ]; then "
         "    echo 'Updating existing git repository...' && "
-        f"    git fetch origin {GITHUB_BRANCH} && "
-        f"    git reset --hard origin/{GITHUB_BRANCH} && "
+        "    git fetch && "  # Fetch all branches
+        f"    git checkout {GITHUB_BRANCH} && "  # Make sure we're on the right branch
+        "    git pull && "  # Pull changes
         "    echo 'Git repository updated'; "
+        "else "
+        "    echo 'Warning: No git repository found. Cannot pull updates.' && "
+        "    echo 'Please ensure your app directory contains a git repository.'; "
         "fi && "
         "echo 'Directory contents after update:' && ls -la && "
         "echo 'Installing dependencies...' && "
@@ -105,7 +95,7 @@ def deploy():
     
     # Give some time for git operations and dependency installation to complete
     print("Waiting for update commands to complete...")
-    time.sleep(60)  # Increased wait time for git operations and dependency installation
+    time.sleep(30)  # Reduced wait time since pulling is faster than cloning
     
     # Step 2: Reload the web application
     if not reload_webapp():
