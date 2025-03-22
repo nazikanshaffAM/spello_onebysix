@@ -932,7 +932,13 @@ def calculate_score(accuracy, level):
         else:
             return 0
 
-
+@app.route("/version")
+def version():
+    return jsonify({
+        "version": "1.0.1",
+        "deployment_time": "2025-03-22",
+        "github_ci_cd": "Verified"
+    })
 
 @app.route('/play-game', methods=['POST'])
 def play_game():
