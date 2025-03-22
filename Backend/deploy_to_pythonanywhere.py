@@ -7,6 +7,8 @@ import time
 API_TOKEN = os.environ.get("PYTHONANYWHERE_API_TOKEN")
 USERNAME = os.environ.get("PYTHONANYWHERE_USERNAME")
 APP_DIRECTORY = os.environ.get("APP_DIRECTORY", f"/home/{USERNAME}/mysite")
+# Get the GitHub repository from environment or default to the current repository
+GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "spello100/your-repo-name")
 
 if not API_TOKEN or not USERNAME:
     print("Error: Missing API token or username environment variables.")
@@ -25,10 +27,21 @@ def create_console_and_run_command():
     """Create a console to run git pull and update dependencies"""
     print("Creating console for deployment commands...")
     
-    # Command to update the code and dependencies
+    # Command to update the code and dependencies - now with git setup if needed
     update_command = (
         f"cd {APP_DIRECTORY} && "
-        "git pull origin main && "
+        "if [ ! -d .git ]; then "
+        "echo 'Initializing git repository...' && "
+        "git init && "
+        f"git remote add origin https://github.com/{GITHUB_REPO}.git && "
+        "git fetch && "
+        "git checkout main -f; "
+        "else "
+        "echo 'Pulling latest changes...' && "
+        "git fetch && "
+        "git reset --hard origin/main; "  # Using reset instead of pull for a cleaner update
+        "fi && "
+        "echo 'Installing dependencies...' && "
         "pip install -r requirements.txt --user"
     )
     
@@ -65,6 +78,7 @@ def deploy():
     """Main deployment function"""
     print(f"Starting deployment to PythonAnywhere for {USERNAME}...")
     print(f"Target directory: {APP_DIRECTORY}")
+    print(f"GitHub repository: {GITHUB_REPO}")
     
     # Step 1: Create a console and run update commands
     console_id = create_console_and_run_command()
@@ -72,9 +86,9 @@ def deploy():
         print("Deployment failed: Could not create console")
         return False
     
-    # Give some time for git pull and dependency installation to complete
+    # Give some time for git operations and dependency installation to complete
     print("Waiting for update commands to complete...")
-    time.sleep(15)  # Increased wait time for dependency installation
+    time.sleep(30)  # Increased wait time for git operations and dependency installation
     
     # Step 2: Reload the web application
     if not reload_webapp():
