@@ -1,9 +1,9 @@
-name: Flask CI
+name: Flask CI and Deploy
 
 on:
   push:
     branches: [ main, master, dev ]
-  
+    
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -86,3 +86,33 @@ jobs:
         docker run --name spello-test -d -p 5000:5000 spello-backend
         sleep 5
         curl -I http://localhost:5000/ || echo "Warning: Application endpoint test failed, but continuing"
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Only deploy when:
+    # 1. It's a push to main or master branch
+    # 2. It's in the organization's repo (not a fork)
+    # Replace YOUR_ORG_NAME with your actual organization name
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.repository_owner == 'spello100'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    
+    - name: Install deployment dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Deploy to PythonAnywhere
+      run: |
+        python Backend/deploy_to_pythonanywhere.py
+      env:
+        PYTHONANYWHERE_API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
+        PYTHONANYWHERE_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
+        APP_DIRECTORY: ${{ secrets.APP_DIRECTORY }}

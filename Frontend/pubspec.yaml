@@ -11,7 +11,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.6.0
+  sdk: '>=3.7.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 dependencies:
@@ -26,13 +26,13 @@ dependencies:
   flutter_slidable: ^4.0.0
   fl_chart: ^0.70.2
   tutorial_coach_mark: ^1.2.13
-  shared_preferences: ^2.5.2
+  shared_preferences: ^2.4.0
   lottie: ^3.3.1
   http: ^1.3.0
   permission_handler: ^11.0.1
   record: ^5.2.1
   path_provider: ^2.1.5
-  path: 1.9.0
+  path: 1.9.1
   audioplayers: ^6.2.0
   provider: ^6.0.5
   shelf_router: ^1.1.4
@@ -129,7 +129,6 @@ flutter:
     - assets/images/newb1.png
     - assets/images/newb2.png
     - assets/images/profile_picture.png
-    - assets/images/help_center_page.png
 
 
   fonts:
