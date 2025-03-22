@@ -1,9 +1,9 @@
-# name: Flask CI and Deploy
+name: Flask CI and Deploy
 
 on:
   push:
     branches: [ main, master, dev ]
-  
+    
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -90,7 +90,11 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    # Only deploy when:
+    # 1. It's a push to main or master branch
+    # 2. It's in the organization's repo (not a fork)
+    # Replace YOUR_ORG_NAME with your actual organization name
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.repository_owner == 'YOUR_ORG_NAME'
     
     steps:
     - uses: actions/checkout@v3
