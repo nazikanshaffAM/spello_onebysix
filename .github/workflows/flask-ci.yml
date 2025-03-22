@@ -1,4 +1,4 @@
-# name: Flask CI and Deploy
+name: Flask CI and Deploy
 
 on:
   push:
@@ -93,7 +93,8 @@ jobs:
     # Only deploy when:
     # 1. It's a push to main or master branch
     # 2. It's in the organization's repo (not a fork)
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.repository_owner == 'spello100' || github.repository_owner == 'vizakan10')
+    # Replace YOUR_ORG_NAME with your actual organization name
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && (github.repository_owner == 'spello100' ||  github.repository_owner == 'vizakan10')
     
     steps:
     - uses: actions/checkout@v3
@@ -114,5 +115,4 @@ jobs:
       env:
         PYTHONANYWHERE_API_TOKEN: ${{ secrets.PYTHONANYWHERE_API_TOKEN }}
         PYTHONANYWHERE_USERNAME: ${{ secrets.PYTHONANYWHERE_USERNAME }}
-        APP_DIRECTORY: "/home/spello/spellomine"
-        WSGI_FILE: "/var/www/spello_pythonanywhere_com_wsgi.py"
+        APP_DIRECTORY: ${{ secrets.APP_DIRECTORY }}
