@@ -7,7 +7,7 @@ from flask import Flask, current_app
 from io import BytesIO
 
 # Import the app
-from app2 import app
+from back import app
 
 # Check if a route exists in the Flask app
 def route_exists(route_path):
