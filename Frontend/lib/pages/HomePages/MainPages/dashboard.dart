@@ -100,8 +100,8 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Dashboard - ${widget.userData['name']}", // Show user name in the title
-          style: const TextStyle(fontSize: 27, fontFamily: "Fredoka One"),
+          "Dashboard ", // Show user name in the title
+          style: const TextStyle(fontSize: 30, fontFamily: "Fredoka One"),
         ),
         backgroundColor: const Color(0xFF3A435F),
         foregroundColor: Colors.white,
