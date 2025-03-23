@@ -1,49 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:hangman/engine/hangman.dart';
-import 'package:hangman/ui/hangman_page.dart';
+import 'package:hangman/engine/hangman.dart'; // Import the Hangman game engine
+import 'package:hangman/ui/hangman_page.dart'; // Import the Hangman game page
 
+// Main function to start the application
 void main() {
   runApp(MyApp());
 }
 
+// Stateless widget for the main application
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Hangman Game',
+      title: 'Hangman Game', // Set the app title
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        primarySwatch: Colors.blue, // Set primary theme color
+        visualDensity: VisualDensity.adaptivePlatformDensity, // Adjust visual density based on platform
       ),
-      home: StartScreen(),
+      home: StartScreen(), // Set the initial screen to StartScreen
     );
   }
 }
 
+// Stateless widget for the Start screen
 class StartScreen extends StatelessWidget {
-  final HangmanGame _engine = HangmanGame();
+  final HangmanGame _engine = HangmanGame(); // Initialize the game engine
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hangman Game'),
+        title: Text('Hangman Game'), // Set the app bar title
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
           children: <Widget>[
+            // Display the game title
             Text(
               'Hangman Game',
               style: TextStyle(
-                fontSize: 40.0,
-                fontWeight: FontWeight.bold,
+                fontSize: 40.0, // Set font size
+                fontWeight: FontWeight.bold, // Make the text bold
               ),
             ),
-            SizedBox(height: 30.0),
+            SizedBox(height: 30.0), // Add space between elements
+            // Button to start the game
             ElevatedButton(
-              child: Text('Start Game'),
+              child: Text('Start Game'), // Button text
               onPressed: () {
+                // Navigate to the Hangman game page
                 Navigator.push(
                   context,
                   MaterialPageRoute(
