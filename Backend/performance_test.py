@@ -122,3 +122,40 @@ def run_load_test(endpoint, method, payload=None, files=None, params=None, name=
             results.append(result)
 
     return results
+
+
+def analyze_results(results):
+    """Analyze performance test results"""
+    response_times = [r["response_time_ms"] for r in results if r["status"] == "SUCCESS"]
+    if not response_times:
+        return {
+            "success_rate": 0,
+            "total_requests": len(results),
+            "min_response_time": 0,
+            "max_response_time": 0,
+            "avg_response_time": 0,
+            "median_response_time": 0,
+            "p90_response_time": 0,
+            "p95_response_time": 0,
+            "p99_response_time": 0
+        }
+
+    success_count = len(response_times)
+    total_count = len(results)
+
+    response_times.sort()
+    p90_index = int(success_count * 0.9)
+    p95_index = int(success_count * 0.95)
+    p99_index = int(success_count * 0.99)
+
+    return {
+        "success_rate": (success_count / total_count) * 100,
+        "total_requests": total_count,
+        "min_response_time": min(response_times),
+        "max_response_time": max(response_times),
+        "avg_response_time": statistics.mean(response_times),
+        "median_response_time": statistics.median(response_times),
+        "p90_response_time": response_times[p90_index - 1] if p90_index > 0 else 0,
+        "p95_response_time": response_times[p95_index - 1] if p95_index > 0 else 0,
+        "p99_response_time": response_times[p99_index - 1] if p99_index > 0 else 0
+    }
