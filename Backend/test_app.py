@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 from flask import Flask, current_app
 from io import BytesIO
 
+
 # Import the app
 from back import app
 

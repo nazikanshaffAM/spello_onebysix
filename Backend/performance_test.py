@@ -9,6 +9,7 @@ import io
 import wave
 from locust import HttpUser, task, between
 
+
 # Base URL for your API
 BASE_URL = "http://localhost:5000"  # Change to your deployment URL
 
@@ -69,18 +70,18 @@ def setup_test_user():
 
 
 # Performance testing functions
-def test_endpoint(session, method, endpoint, payload=None, files=None, params=None, name=None):
+def test_endpoint(sessions, method, endpoint, payload=None, files=None, params=None, name=None):
     """Test a specific endpoint and measure response time"""
     start_time = time.time()
 
     if method.upper() == "GET":
-        response = session.get(f"{BASE_URL}{endpoint}", params=params)
+        response = sessions.get(f"{BASE_URL}{endpoint}", params=params)
     elif method.upper() == "POST":
-        response = session.post(f"{BASE_URL}{endpoint}", json=payload, files=files, params=params)
+        response = sessions.post(f"{BASE_URL}{endpoint}", json=payload, files=files, params=params)
     elif method.upper() == "PUT":
-        response = session.put(f"{BASE_URL}{endpoint}", json=payload, params=params)
+        response = sessions.put(f"{BASE_URL}{endpoint}", json=payload, params=params)
     elif method.upper() == "DELETE":
-        response = session.delete(f"{BASE_URL}{endpoint}", params=params)
+        response = sessions.delete(f"{BASE_URL}{endpoint}", params=params)
     else:
         raise ValueError(f"Unsupported HTTP method: {method}")
 
