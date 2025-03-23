@@ -1,16 +1,16 @@
 # Spello Backend Performance Test Report
 
-Test executed on: 2025-03-23 06:03:41
+Test executed on: 2025-03-23 06:33:09
 
 ## Summary
 
 | API Endpoint | Success Rate | Avg Response (ms) | Median (ms) | 95th Percentile (ms) | Max (ms) |
 |-------------|--------------|-------------------|-------------|----------------------|---------|
-| Login API | 100.00% | 969.99 | 759.67 | 2044.23 | 3656.32 |
-| Get User Profile | 100.00% | 347.52 | 317.78 | 473.60 | 1261.08 |
-| Get Target Word | 100.00% | 273.87 | 231.90 | 375.05 | 1506.89 |
-| Dashboard Data | 100.00% | 254.11 | 217.35 | 356.45 | 1271.14 |
-| Speech-to-Text API | 100.00% | 70.92 | 55.52 | 78.58 | 888.29 |
+| Login API | 100.00% | 955.61 | 726.59 | 1934.98 | 2534.02 |
+| Get User Profile | 100.00% | 395.70 | 354.72 | 652.12 | 1316.85 |
+| Get Target Word | 100.00% | 534.04 | 455.52 | 820.13 | 2201.77 |
+| Dashboard Data | 100.00% | 433.84 | 266.99 | 1138.19 | 1700.03 |
+| Speech-to-Text API | 100.00% | 180.30 | 49.50 | 149.09 | 5890.57 |
 
 ## Detailed Results
 
@@ -18,13 +18,13 @@ Test executed on: 2025-03-23 06:03:41
 
 - **Total Requests**: 100
 - **Success Rate**: 100.00%
-- **Min Response Time**: 326.02 ms
-- **Max Response Time**: 3656.32 ms
-- **Average Response Time**: 969.99 ms
-- **Median Response Time**: 759.67 ms
-- **90th Percentile**: 1849.33 ms
-- **95th Percentile**: 2044.23 ms
-- **99th Percentile**: 2535.59 ms
+- **Min Response Time**: 327.00 ms
+- **Max Response Time**: 2534.02 ms
+- **Average Response Time**: 955.61 ms
+- **Median Response Time**: 726.59 ms
+- **90th Percentile**: 1800.35 ms
+- **95th Percentile**: 1934.98 ms
+- **99th Percentile**: 2413.48 ms
 
 ![Response Time Distribution for Login API](login_api_performance.png)
 
@@ -32,13 +32,13 @@ Test executed on: 2025-03-23 06:03:41
 
 - **Total Requests**: 100
 - **Success Rate**: 100.00%
-- **Min Response Time**: 187.18 ms
-- **Max Response Time**: 1261.08 ms
-- **Average Response Time**: 347.52 ms
-- **Median Response Time**: 317.78 ms
-- **90th Percentile**: 441.38 ms
-- **95th Percentile**: 473.60 ms
-- **99th Percentile**: 1249.08 ms
+- **Min Response Time**: 188.55 ms
+- **Max Response Time**: 1316.85 ms
+- **Average Response Time**: 395.70 ms
+- **Median Response Time**: 354.72 ms
+- **90th Percentile**: 557.12 ms
+- **95th Percentile**: 652.12 ms
+- **99th Percentile**: 1313.85 ms
 
 ![Response Time Distribution for Get User Profile](get_user_profile_performance.png)
 
@@ -46,13 +46,13 @@ Test executed on: 2025-03-23 06:03:41
 
 - **Total Requests**: 100
 - **Success Rate**: 100.00%
-- **Min Response Time**: 164.97 ms
-- **Max Response Time**: 1506.89 ms
-- **Average Response Time**: 273.87 ms
-- **Median Response Time**: 231.90 ms
-- **90th Percentile**: 367.64 ms
-- **95th Percentile**: 375.05 ms
-- **99th Percentile**: 1500.89 ms
+- **Min Response Time**: 213.50 ms
+- **Max Response Time**: 2201.77 ms
+- **Average Response Time**: 534.04 ms
+- **Median Response Time**: 455.52 ms
+- **90th Percentile**: 700.18 ms
+- **95th Percentile**: 820.13 ms
+- **99th Percentile**: 2182.35 ms
 
 ![Response Time Distribution for Get Target Word](get_target_word_performance.png)
 
@@ -60,13 +60,13 @@ Test executed on: 2025-03-23 06:03:41
 
 - **Total Requests**: 100
 - **Success Rate**: 100.00%
-- **Min Response Time**: 161.57 ms
-- **Max Response Time**: 1271.14 ms
-- **Average Response Time**: 254.11 ms
-- **Median Response Time**: 217.35 ms
-- **90th Percentile**: 324.74 ms
-- **95th Percentile**: 356.45 ms
-- **99th Percentile**: 1265.14 ms
+- **Min Response Time**: 158.91 ms
+- **Max Response Time**: 1700.03 ms
+- **Average Response Time**: 433.84 ms
+- **Median Response Time**: 266.99 ms
+- **90th Percentile**: 998.88 ms
+- **95th Percentile**: 1138.19 ms
+- **99th Percentile**: 1202.95 ms
 
 ![Response Time Distribution for Dashboard Data](dashboard_data_performance.png)
 
@@ -74,13 +74,13 @@ Test executed on: 2025-03-23 06:03:41
 
 - **Total Requests**: 50
 - **Success Rate**: 100.00%
-- **Min Response Time**: 31.33 ms
-- **Max Response Time**: 888.29 ms
-- **Average Response Time**: 70.92 ms
-- **Median Response Time**: 55.52 ms
-- **90th Percentile**: 76.93 ms
-- **95th Percentile**: 78.58 ms
-- **99th Percentile**: 95.38 ms
+- **Min Response Time**: 37.01 ms
+- **Max Response Time**: 5890.57 ms
+- **Average Response Time**: 180.30 ms
+- **Median Response Time**: 49.50 ms
+- **90th Percentile**: 94.05 ms
+- **95th Percentile**: 149.09 ms
+- **99th Percentile**: 419.11 ms
 
 ![Response Time Distribution for Speech-to-Text API](speech-to-text_api_performance.png)
 
@@ -88,7 +88,8 @@ Test executed on: 2025-03-23 06:03:41
 
 The following endpoints have slow response times (95th percentile > 1000ms):
 
-- **Login API**: 2044.23 ms
+- **Login API**: 1934.98 ms
+- **Dashboard Data**: 1138.19 ms
 
 Possible improvement areas:
 
