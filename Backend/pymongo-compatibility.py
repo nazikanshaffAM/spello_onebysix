@@ -10,7 +10,7 @@ import importlib.util
 
 def check_pymongo_imports():
     """Check if the application imports pymongo or flask-pymongo"""
-    app_file = 'app.py'
+    app_file = 'back.py'
     imports = []
     
     with open(app_file, 'r') as f:
@@ -29,9 +29,9 @@ def can_use_pymongo():
         
         # Check if we can connect to MongoDB Atlas
         try:
-            # Try to get connection string from app.py
+            # Try to get connection string from back.py
             atlas_uri = None
-            with open('app.py', 'r') as f:
+            with open('back.py', 'r') as f:
                 for line in f:
                     if 'MONGO_URI' in line and 'mongodb+srv' in line:
                         # Extract the connection string
@@ -42,7 +42,7 @@ def can_use_pymongo():
                             break
             
             if not atlas_uri:
-                print("Could not find MongoDB Atlas URI in app.py")
+                print("Could not find MongoDB Atlas URI in back.py")
                 return False
                 
             client = pymongo.MongoClient(atlas_uri, serverSelectionTimeoutMS=5000)
@@ -71,7 +71,7 @@ def can_use_flask_pymongo():
 
 def modify_imports_for_test(use_flask_pymongo=True):
     """Create a temporary version of app.py that uses the specified library"""
-    app_file = 'app.py'
+    app_file = 'back.py'
     backup_file = 'app_backup.py'
     test_file = 'app_test.py'
     
@@ -110,9 +110,9 @@ collection = mongo_db["sp1"]
     return test_file
 
 def restore_app():
-    """Restore the original app.py from backup"""
+    """Restore the original back.py from backup"""
     backup_file = 'app_backup.py'
-    app_file = 'app.py'
+    app_file = 'back.py'
     test_file = 'app_test.py'
     
     # Restore from backup if exists
@@ -157,7 +157,7 @@ def main():
         
     finally:
         restore_app()
-        print("Restored original app.py")
+        print("Restored original back.py")
 
 if __name__ == "__main__":
     main()
