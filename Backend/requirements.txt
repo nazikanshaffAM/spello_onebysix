@@ -9,3 +9,6 @@ pytest-flask==1.2.0
 mongomock==4.0.0
 werkzeug==2.0.1
 setuptools==76.0.0
+matplotlib==3.7.1
+requests==2.28.2
+locust==2.15.1
