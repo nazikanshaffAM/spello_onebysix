@@ -12,7 +12,7 @@ class Game1 extends StatefulWidget {
 
 class Game1State extends State<Game1> {
   final AudioService _audioService = AudioService();
-  String backgroundImage = 'assets/images/b2.jpg'; // Default background
+  String backgroundImage = 'assets/images/b4.jpg'; // Default background
   bool _isRecording = false;
 
   @override
