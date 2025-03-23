@@ -38,3 +38,33 @@ def create_dummy_audio():
         f.write(audio_data.getvalue())
 
     return SAMPLE_AUDIO_PATH
+
+
+
+
+# Helper function to register and log in a test user
+def setup_test_user():
+    """Register and log in a test user for performance testing"""
+    # Check if user exists and delete if so
+    response = requests.get(f"{BASE_URL}/get_user", params={"email": TEST_USER["email"]})
+    if response.status_code == 200:
+        requests.delete(f"{BASE_URL}/delete_user", params={"email": TEST_USER["email"]})
+
+    # Register test user
+    response = requests.post(f"{BASE_URL}/register", json=TEST_USER)
+    if response.status_code != 201:
+        print(f"Failed to register test user: {response.text}")
+        return None
+
+    # Log in test user
+    response = requests.post(f"{BASE_URL}/login", json={
+        "email": TEST_USER["email"],
+        "password": TEST_USER["password"]
+    })
+
+    if response.status_code != 200:
+        print(f"Failed to log in test user: {response.text}")
+        return None
+
+    # Return session cookies
+    return response.cookies
