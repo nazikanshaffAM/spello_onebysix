@@ -58,76 +58,219 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive UI
+    final screenSize = MediaQuery.of(context).size;
+    final double screenHeight = screenSize.height;
+    final double screenWidth = screenSize.width;
+
+    // Responsive font sizing
+    final double titleFontSize =
+        screenWidth * 0.07 > 30 ? 30 : screenWidth * 0.07;
+    final double subtitleFontSize =
+        screenWidth * 0.04 > 18 ? 18 : screenWidth * 0.04;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(color: Colors.black),
+      body: Container(
+        width: screenWidth,
+        height: screenHeight,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/b5.jpg'),
+            fit: BoxFit.cover,
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(screenWidth * 0.04),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Select Background",
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 1.2,
+                // Back button (optional - add if needed)
+                // GestureDetector(
+                //   onTap: () => Navigator.pop(context),
+                //   child: Container(
+                //     padding: const EdgeInsets.all(8.0),
+                //     decoration: BoxDecoration(
+                //       color: const Color(0xFF235A82),
+                //       borderRadius: BorderRadius.circular(12),
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: const Color(0xFF0E3955),
+                //           offset: const Offset(0, 3),
+                //           blurRadius: 0,
+                //         ),
+                //       ],
+                //     ),
+                //     child: const Icon(
+                //       Icons.arrow_back,
+                //       color: Colors.white70,
+                //       size: 24,
+                //     ),
+                //   ),
+                // ),
+
+                SizedBox(height: screenHeight * 0.03),
+
+                // Title with consistent styling from How to Play page
+                Center(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.06,
+                      vertical: screenHeight * 0.015,
                     ),
-                    itemCount: backgroundImages.length,
-                    itemBuilder: (context, index) {
-                      String background = backgroundImages[index];
-                      return GestureDetector(
-                        onTap: () {
-                          _saveSelectedBackground(background);
-                        },
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: selectedBackground == background
-                                      ? Colors.blue
-                                      : Colors.transparent,
-                                  width: 3,
-                                ),
-                                image: DecorationImage(
-                                  image: AssetImage(background),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              color: Colors.black.withOpacity(0.5),
-                              child: Text(
-                                backgroundNames[index], // Displaying background name
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0E3955).withOpacity(0.9),
+                      border: Border.all(
+                        color: const Color(0xFF0E3955),
+                        width: screenWidth * 0.01 > 4 ? 4 : screenWidth * 0.01,
+                      ),
+                      borderRadius: BorderRadius.circular(screenWidth * 0.04),
+                    ),
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color(0xFF00F96B), // Green
+                          Color(0xFF00BCD4), // Cyan
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        'Select Game Map',
+                        style: TextStyle(
+                          fontFamily: 'Fredoka One',
+                          fontSize: titleFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: const [
+                            Shadow(
+                              color: Colors.black38,
+                              offset: Offset(2, 2),
+                              blurRadius: 3,
+                            )
                           ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
                 ),
+
+                SizedBox(height: screenHeight * 0.01),
+
+                // Main content container
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(screenWidth * 0.04),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0E3955).withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFF00BCD4).withOpacity(0.4),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Subtitle
+
+                        SizedBox(height: screenHeight * 0.02),
+
+                        // Background grid
+                        Expanded(
+                          child: GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: screenWidth * 0.03,
+                              mainAxisSpacing: screenHeight * 0.02,
+                              childAspectRatio: 0.96,
+                            ),
+                            itemCount: backgroundImages.length,
+                            itemBuilder: (context, index) {
+                              String background = backgroundImages[index];
+                              bool isSelected =
+                                  selectedBackground == background;
+
+                              return GestureDetector(
+                                onTap: () {
+                                  _saveSelectedBackground(background);
+                                },
+                                child: Stack(
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    // Background image with selection border
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? const Color(
+                                                  0xFF00F96B) // Gradient green matching the title
+                                              : Colors.transparent,
+                                          width: 4,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.3),
+                                            spreadRadius: 1,
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                        image: DecorationImage(
+                                          image: AssetImage(background),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    // Label at the bottom
+                                    Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: screenHeight * 0.01,
+                                        horizontal: screenWidth * 0.02,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF0E3955)
+                                            .withOpacity(0.9),
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(12),
+                                          bottomRight: Radius.circular(12),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        backgroundNames[index],
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Fredoka',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: screenWidth * 0.035 > 14
+                                              ? 14
+                                              : screenWidth * 0.035,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: screenHeight * 0.02),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

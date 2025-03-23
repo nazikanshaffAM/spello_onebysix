@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
       tutorialCoachMark = TutorialCoachMark(
         targets: targets,
         colorShadow: const Color.fromRGBO(0, 0, 0, 0.8),
-        textSkip: "skip",
+        textSkip: "Skip", // Made the skip button text simpler
         paddingFocus: 8,
         onFinish: () async {
           await prefs.setBool(
@@ -99,31 +99,42 @@ class _HomePageState extends State<HomePage> {
 
   void _initTargets() {
     targets = List.generate(gridItems.length, (index) {
-      // Curated prompts for each grid item
+      // Improved descriptive prompts for each grid item
       String prompt;
       switch (gridItems[index]['label']) {
-        case 'Start Practice':
-          prompt = "Begin your practice sessions here. Tap to start!";
-          break;
-        case 'Parental\nControl':
+        case 'START PRACTICE':
           prompt =
-              "Customize your childs gameplay with specific sounds and words. Tap to Customize!";
+              "Browse our game library and select fun activities to practice with. Find the perfect game for your learning needs!";
           break;
-        case 'Dashboard':
-          prompt = "View your progress and insights. Tap to check it out!";
-          break;
-        case 'Notifications':
+        case 'PARENTAL CONTROL':
           prompt =
-              "Stay updated with important alerts. Tap to see notifications!";
+              "Customize games with specific sounds and words for your child's learning journey. Set up the perfect practice environment!";
           break;
-        case 'Settings':
-          prompt = "Customize your app experience. Tap to adjust settings!";
+        case 'DASHBOARD':
+          prompt =
+              "Track weekly progress, view accuracy rates, and see how your skills are improving over time!";
           break;
-        case 'Help Center':
-          prompt = "Get assistance and support. Tap to access help!";
+        case 'NOTIFICATIONS':
+          prompt =
+              "Stay informed with important alerts, practice reminders, and achievement notifications!";
+          break;
+        case 'SETTINGS':
+          prompt =
+              "Adjust app preferences, manage your account, update profile information, and log out when needed!";
+          break;
+        case 'HELP CENTER':
+          prompt =
+              "Find answers to common questions, access tutorials, and get support whenever you need assistance!";
           break;
         default:
-          prompt = "Tap here for ${gridItems[index]['label']}";
+          prompt = "Explore ${gridItems[index]['label']} features";
+      }
+
+      // For the last two tiles (Settings and Help Center), set alignment to top
+      ContentAlign alignment = ContentAlign.bottom;
+      if (index >= 4) {
+        // Index 4 and 5 are Settings and Help Center
+        alignment = ContentAlign.top;
       }
 
       return TargetFocus(
@@ -133,7 +144,7 @@ class _HomePageState extends State<HomePage> {
         radius: 8,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
+            align: alignment, // Use dynamic alignment based on index
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(

@@ -3,7 +3,9 @@ import 'package:flutter/services.dart'; // Import the services package
 import 'package:spello_frontend/pages/HomePages/MainPages/dashboard.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_data_screen.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/game_page.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/help_center.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/homepage.dart';
+import 'package:spello_frontend/pages/HomePages/MainPages/notifications_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/onboarding_page.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/parental_control.dart';
 import 'package:spello_frontend/pages/HomePages/MainPages/settings.dart';
@@ -54,14 +56,14 @@ class MyApp extends StatelessWidget {
                       as Map<String, dynamic>? ??
                   {},
             ),
-        '/notifications': (context) => PageUnderConstruction(),
+        '/notifications': (context) => NotificationsPage(),
         '/game1': (context) => StartPage(),
         '/settings': (context) => Settings(
               userData: ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>? ??
                   {},
             ),
-        '/helpCenter': (context) => PageUnderConstruction(),
+        '/helpCenter': (context) => HelpCenterPage(),
         '/game-data': (context) {
           final args = ModalRoute.of(context)?.settings.arguments
               as Map<String, dynamic>?;

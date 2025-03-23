@@ -6,7 +6,7 @@ class HelpCenterPage extends StatefulWidget {
 }
 
 class _HelpCenterPageState extends State<HelpCenterPage> {
-  final Color primaryColor = Color(0xFF8092CC); // Updated background color
+  final Color primaryColor = Color(0xFF8092CC);
   final Color accentColor = Color(0xFFFFFFFF);
   final Color textColor = Colors.white;
 
@@ -30,119 +30,120 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
       ),
       body: Stack(
         children: [
-          // Cloud Background Elements
-          Positioned(
-            top: screenHeight * 0.05,
-            left: screenWidth * 0.6,
-            child: Opacity(
-              opacity: 0.7,
-              child: Image.asset(
-                "assets/images/cloud.png",
-                width: screenWidth * 0.4,
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.2,
-            right: screenWidth * 0.7,
-            child: Opacity(
-              opacity: 0.7,
-              child: Image.asset(
-                "assets/images/cloud.png",
-                width: screenWidth * 0.4,
-              ),
-            ),
-          ),
-          Positioned(
-            top: screenHeight * 0.47,
-            left: screenWidth * 0.6,
-            child: Opacity(
-              opacity: 0.7,
-              child: Image.asset(
-                "assets/images/cloud.png",
-                width: screenWidth * 0.4,
-              ),
+          // Fixed Cloud Background
+          Positioned.fill(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: screenHeight * 0.05,
+                  left: screenWidth * 0.6,
+                  child: Opacity(
+                    opacity: 0.7,
+                    child: Image.asset(
+                      "assets/images/cloud.png",
+                      width: screenWidth * 0.4,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.2,
+                  right: screenWidth * 0.7,
+                  child: Opacity(
+                    opacity: 0.7,
+                    child: Image.asset(
+                      "assets/images/cloud.png",
+                      width: screenWidth * 0.4,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: screenHeight * 0.47,
+                  left: screenWidth * 0.6,
+                  child: Opacity(
+                    opacity: 0.7,
+                    child: Image.asset(
+                      "assets/images/cloud.png",
+                      width: screenWidth * 0.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
-          // Main Content
-          Container(
-            color: primaryColor, // Updated background color
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    height: screenHeight * 0.5,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage("assets/images/help_center_page.png"),
-                        fit: BoxFit.cover,
-                      ),
+          // Scrollable Content
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  height: screenHeight * 0.4,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/help_center_page.png"),
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(screenWidth * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionTitle("What is Spello?"),
-                        _buildContentText(
-                          "Spello is a gamified speech therapy app designed to make pronunciation practice "
-                          "fun and engaging. It helps improve speech using real-time speech recognition "
-                          "and interactive mini-games with instant feedback.",
-                        ),
-                        SizedBox(height: screenHeight * 0.03),
-                        _buildSectionTitle("How Do the Games Work?"),
-                        _buildGameFeature(
-                          icon: Icons.mic,
-                          title: "Speak to Play",
-                          content:
-                              "Say target words aloud to progress through levels. Get instant feedback on your pronunciation.",
-                        ),
-                        _buildGameFeature(
-                          icon: Icons.feedback,
-                          title: "Real-Time Feedback",
-                          content:
-                              "Advanced speech analysis provides gentle corrections and allows retries.",
-                        ),
-                        _buildGameFeature(
-                          icon: Icons.games,
-                          title: "Interactive Mini-Games",
-                          content:
-                              "Play Flappy Speech, Word Racer, and Pronunciation Battle with voice controls.",
-                        ),
-                        _buildGameFeature(
-                          icon: Icons.trending_up,
-                          title: "Skill Progression",
-                          content:
-                              "Start with simple words and progress to complex sentences. Track your fluency growth!",
-                        ),
-                        SizedBox(height: screenHeight * 0.03),
-                        Divider(color: textColor.withOpacity(0.3)),
-                        SizedBox(height: screenHeight * 0.03),
-                        _buildSectionTitle("Game Examples"),
-                        _buildGameExample("🎮 Flappy Speech",
-                            "Say words to make a bird fly through obstacles"),
-                        _buildGameExample("🚀 Word Racer",
-                            "Control speed by pronouncing words correctly"),
-                        _buildGameExample("🏆 Pronunciation Battle",
-                            "Compete with AI or friends in speech challenges"),
-                        SizedBox(height: screenHeight * 0.05),
-                        Center(
-                          child: Text(
-                            "Need help? Contact: support@spelloapp.com",
-                            style: TextStyle(
+                ),
+                Padding(
+                  padding: EdgeInsets.all(screenWidth * 0.05),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle("What is Spello?"),
+                      _buildContentText(
+                        "Spello is a gamified speech therapy app designed to make pronunciation practice "
+                        "fun and engaging. It helps improve speech using real-time speech recognition "
+                        "and interactive mini-games with instant feedback.",
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      _buildSectionTitle("How Do the Games Work?"),
+                      _buildGameFeature(
+                        icon: Icons.mic,
+                        title: "Speak to Play",
+                        content:
+                            "Say target words aloud to progress through levels. Get instant feedback on your pronunciation.",
+                      ),
+                      _buildGameFeature(
+                        icon: Icons.feedback,
+                        title: "Real-Time Feedback",
+                        content:
+                            "Advanced speech analysis provides gentle corrections and allows retries.",
+                      ),
+                      _buildGameFeature(
+                        icon: Icons.games,
+                        title: "Interactive Mini-Games",
+                        content:
+                            "Play Hangman and Zip and Zap with voice controls.",
+                      ),
+                      _buildGameFeature(
+                        icon: Icons.trending_up,
+                        title: "Skill Progression",
+                        content:
+                            "Start with simple words and progress to complex sentences. Track your fluency growth!",
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      Divider(color: textColor.withOpacity(0.3)),
+                      SizedBox(height: screenHeight * 0.03),
+                      _buildSectionTitle("Game Examples"),
+                      _buildGameExample("🎭 Hangman",
+                          "Guess words letter by letter using your voice before the stick figure is fully drawn."),
+                      _buildGameExample("⚡ Zip and Zap",
+                          "Control a fast-moving object by pronouncing words correctly to avoid obstacles."),
+                      SizedBox(height: screenHeight * 0.05),
+                      Center(
+                        child: Text(
+                          "Need help? Contact: support@spelloapp.com",
+                          style: TextStyle(
                               fontFamily: 'Fredoka',
                               fontSize: screenWidth * 0.035,
-                              color: accentColor,
-                            ),
-                          ),
+                              color: Color(0xFFFFC107),
+                              fontWeight: FontWeight.bold),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -171,6 +172,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
       style: TextStyle(
         fontFamily: 'Fredoka',
         fontSize: 16,
+        fontWeight: FontWeight.bold,
         color: textColor.withOpacity(0.9),
         height: 1.5,
       ),
@@ -205,17 +207,17 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                   style: TextStyle(
                     fontFamily: 'Fredoka One',
                     fontSize: 16,
-                    color: textColor,
+                    color: Color(0xFFFFC107),
                   ),
                 ),
                 SizedBox(height: 5),
                 Text(
                   content,
                   style: TextStyle(
-                    fontFamily: 'Fredoka',
-                    fontSize: 14,
-                    color: textColor.withOpacity(0.8),
-                  ),
+                      fontFamily: 'Fredoka',
+                      fontSize: 14,
+                      color: textColor.withOpacity(0.8),
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -245,7 +247,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                     style: TextStyle(
                       fontFamily: 'Fredoka One',
                       fontSize: 14,
-                      color: accentColor,
+                      color: Color(0xFFFFC107),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -253,6 +255,7 @@ class _HelpCenterPageState extends State<HelpCenterPage> {
                     description,
                     style: TextStyle(
                       fontFamily: 'Fredoka',
+                      fontWeight: FontWeight.bold,
                       fontSize: 13,
                       color: textColor.withOpacity(0.8),
                     ),

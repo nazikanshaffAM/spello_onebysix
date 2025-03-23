@@ -11,7 +11,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.7.0 <4.0.0'
+  sdk: '>=3.6.1 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 dependencies:
@@ -129,6 +129,8 @@ flutter:
     - assets/images/newb1.png
     - assets/images/newb2.png
     - assets/images/profile_picture.png
+    - assets/images/help_center_page.png
+    - assets/images/star.png
 
 
   fonts:
@@ -139,6 +141,15 @@ flutter:
     - family: "Fredoka"
       fonts:
         - asset: assets/fonts/Fredoka.ttf
+
+    - family: "Jaro"
+      fonts:
+        - asset: assets/fonts/gameFont.ttf
+
+
+
+
+
 
 
 
