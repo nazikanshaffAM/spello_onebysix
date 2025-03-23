@@ -29,7 +29,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install flask vosk rapidfuzz pymongo flask-pymongo flask-cors pytest pytest-flask mongomock; fi
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install flask vosk rapidfuzz pymongo flask-pymongo flask-cors pytest pytest-flask mongomock matplotlib requests locust; fi
     
     - name: Download Vosk model or create mock
       run: |
