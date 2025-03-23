@@ -159,3 +159,24 @@ def analyze_results(results):
         "p95_response_time": response_times[p95_index - 1] if p95_index > 0 else 0,
         "p99_response_time": response_times[p99_index - 1] if p99_index > 0 else 0
     }
+
+
+
+def plot_results(results, title):
+    """Generate a plot of response times"""
+    response_times = [r["response_time_ms"] for r in results if r["status"] == "SUCCESS"]
+    if not response_times:
+        print(f"No successful requests for {title}")
+        return
+
+    plt.figure(figsize=(10, 6))
+    plt.hist(response_times, bins=20, alpha=0.7)
+    plt.axvline(statistics.mean(response_times), color='r', linestyle='dashed', linewidth=1)
+    plt.axvline(statistics.median(response_times), color='g', linestyle='dashed', linewidth=1)
+
+    plt.title(f"Response Time Distribution: {title}")
+    plt.xlabel("Response Time (ms)")
+    plt.ylabel("Frequency")
+    plt.legend(['Mean', 'Median', 'Response Times'])
+    plt.savefig(f"{title.replace(' ', '_').lower()}_performance.png")
+    plt.close()
