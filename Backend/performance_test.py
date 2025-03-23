@@ -68,3 +68,36 @@ def setup_test_user():
 
     # Return session cookies
     return response.cookies
+
+
+# Performance testing functions
+def test_endpoint(session, method, endpoint, payload=None, files=None, params=None, name=None):
+    """Test a specific endpoint and measure response time"""
+    start_time = time.time()
+
+    if method.upper() == "GET":
+        response = session.get(f"{BASE_URL}{endpoint}", params=params)
+    elif method.upper() == "POST":
+        response = session.post(f"{BASE_URL}{endpoint}", json=payload, files=files, params=params)
+    elif method.upper() == "PUT":
+        response = session.put(f"{BASE_URL}{endpoint}", json=payload, params=params)
+    elif method.upper() == "DELETE":
+        response = session.delete(f"{BASE_URL}{endpoint}", params=params)
+    else:
+        raise ValueError(f"Unsupported HTTP method: {method}")
+
+    end_time = time.time()
+    response_time = (end_time - start_time) * 1000  # Convert to milliseconds
+
+    endpoint_name = name if name else endpoint
+    status = "SUCCESS" if 200 <= response.status_code < 300 else "FAIL"
+
+    result = {
+        "endpoint": endpoint_name,
+        "method": method,
+        "status_code": response.status_code,
+        "response_time_ms": response_time,
+        "status": status
+    }
+
+    return result
