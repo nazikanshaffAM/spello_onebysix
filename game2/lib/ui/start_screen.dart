@@ -49,7 +49,10 @@ class StartScreen extends StatelessWidget {
             SizedBox(height: MediaQuery.of(context).size.height * 0.05), // Add space between elements
             // Button to start the game
             ElevatedButton(
-              child: Text('Start Game'), // Button text
+              child: Text('Start Game',
+              style: TextStyle(
+                fontWeight: FontWeight.bold
+              ),), // Button text
               onPressed: () {
                 // Navigate to the Hangman game page
                 Navigator.push(
