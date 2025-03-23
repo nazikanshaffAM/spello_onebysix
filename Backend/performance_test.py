@@ -231,3 +231,76 @@ def run_full_test_suite():
             "requests": 100
         }
     ]
+
+
+
+    # Additional test for speech-to-text API with audio file
+    # Note: This is a special case because it needs file upload
+    def test_speech_to_text():
+        results = []
+        for i in range(50):  # Reduce number for speech API as it's more resource-intensive
+            with open(SAMPLE_AUDIO_PATH, 'rb') as audio_file:
+                start_time = time.time()
+                files = {'audio': audio_file}
+                response = session.post(f"{BASE_URL}/speech-to-text", files=files)
+                end_time = time.time()
+
+                response_time = (end_time - start_time) * 1000
+                status = "SUCCESS" if response.status_code == 200 else "FAIL"
+
+                results.append({
+                    "endpoint": "/speech-to-text",
+                    "method": "POST",
+                    "status_code": response.status_code,
+                    "response_time_ms": response_time,
+                    "status": status
+                })
+
+        return results
+
+        # Run all test scenarios
+        all_results = {}
+
+        for scenario in test_scenarios:
+            print(f"Running performance test for: {scenario['name']}")
+            results = run_load_test(
+                endpoint=scenario["endpoint"],
+                method=scenario["method"],
+                payload=scenario.get("payload"),
+                params=scenario.get("params"),
+                name=scenario["name"],
+                num_requests=scenario["requests"],
+                concurrency=scenario["concurrency"]
+            )
+
+            analysis = analyze_results(results)
+            all_results[scenario["name"]] = {
+                "results": results,
+                "analysis": analysis
+            }
+
+            print(f"Completed {scenario['name']} test:")
+            print(f"  Success Rate: {analysis['success_rate']:.2f}%")
+            print(f"  Avg Response Time: {analysis['avg_response_time']:.2f} ms")
+            print(f"  95th Percentile: {analysis['p95_response_time']:.2f} ms")
+
+            plot_results(results, scenario["name"])
+
+        # Run speech-to-text test separately
+        print("Running performance test for: Speech-to-Text API")
+        speech_results = test_speech_to_text()
+        speech_analysis = analyze_results(speech_results)
+        all_results["Speech-to-Text API"] = {
+            "results": speech_results,
+            "analysis": speech_analysis
+        }
+
+        print(f"Completed Speech-to-Text API test:")
+        print(f"  Success Rate: {speech_analysis['success_rate']:.2f}%")
+        print(f"  Avg Response Time: {speech_analysis['avg_response_time']:.2f} ms")
+        print(f"  95th Percentile: {speech_analysis['p95_response_time']:.2f} ms")
+
+        plot_results(speech_results, "Speech-to-Text API")
+
+        # Generate overall performance report
+        generate_performance_report(all_results)
