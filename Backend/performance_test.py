@@ -180,3 +180,54 @@ def plot_results(results, title):
     plt.legend(['Mean', 'Median', 'Response Times'])
     plt.savefig(f"{title.replace(' ', '_').lower()}_performance.png")
     plt.close()
+
+
+
+def run_full_test_suite():
+    """Run a comprehensive test suite on all major endpoints"""
+    # Ensure we have a dummy audio file
+    create_dummy_audio()
+
+    # Create a session with logged-in user
+    session = requests.Session()
+    cookies = setup_test_user()
+    if cookies:
+        session.cookies.update(cookies)
+    else:
+        print("Failed to set up test user. Aborting tests.")
+        return
+
+    # Define test scenarios
+    test_scenarios = [
+        {
+            "name": "Login API",
+            "endpoint": "/login",
+            "method": "POST",
+            "payload": {"email": TEST_USER["email"], "password": TEST_USER["password"]},
+            "concurrency": 20,
+            "requests": 100
+        },
+        {
+            "name": "Get User Profile",
+            "endpoint": "/get_user",
+            "method": "GET",
+            "params": {"email": TEST_USER["email"]},
+            "concurrency": 20,
+            "requests": 100
+        },
+        {
+            "name": "Get Target Word",
+            "endpoint": "/get-target-word",
+            "method": "GET",
+            "params": {"sounds": "p,t,k"},
+            "concurrency": 20,
+            "requests": 100
+        },
+        {
+            "name": "Dashboard Data",
+            "endpoint": "/dashboard",
+            "method": "GET",
+            "concurrency": 20,
+            "requests": 100
+        }
+    ]
