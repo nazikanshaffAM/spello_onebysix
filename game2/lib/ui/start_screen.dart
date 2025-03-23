@@ -42,7 +42,7 @@ class StartScreen extends StatelessWidget {
             Text(
               'Hangman Game',
               style: TextStyle(
-                fontSize: 40.0, // Set font size
+                fontSize: 53.0, // Set font size
                 fontWeight: FontWeight.bold, // Make the text bold
               ),
             ),
@@ -51,7 +51,9 @@ class StartScreen extends StatelessWidget {
             ElevatedButton(
               child: Text('Start Game',
               style: TextStyle(
-                fontWeight: FontWeight.bold
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto',
+                fontSize: 25
               ),), // Button text
               onPressed: () {
                 // Navigate to the Hangman game page
