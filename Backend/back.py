@@ -1051,6 +1051,6 @@ def play_game():
         'current_streak': current_streak
     })
 
-
+# check for deplyment 5
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

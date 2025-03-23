@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                         // Email Field
                         Container(
                           width: screenWidth * 0.8,
-                          height: screenHeight * 0.07,
+                          height: screenHeight * 0.08,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
@@ -217,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
                         // Password Field
                         Container(
                           width: screenWidth * 0.8,
-                          height: screenHeight * 0.07,
+                          height: screenHeight * 0.08,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
@@ -264,7 +264,7 @@ class _LoginPageState extends State<LoginPage> {
                                 return 'Please enter your password';
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters long';
+                                return 'Password must be at least 6 characters';
                               }
                               return null;
                             },
