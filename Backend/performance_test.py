@@ -304,3 +304,115 @@ def run_full_test_suite():
 
         # Generate overall performance report
         generate_performance_report(all_results)
+
+
+
+
+
+
+
+
+
+
+def generate_performance_report(all_results):
+    """Generate a comprehensive performance report"""
+    with open("performance_report.md", "w") as f:
+        f.write("# Spello Backend Performance Test Report\n\n")
+        f.write(f"Test executed on: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+
+        f.write("## Summary\n\n")
+        f.write("| API Endpoint | Success Rate | Avg Response (ms) | Median (ms) | 95th Percentile (ms) | Max (ms) |\n")
+        f.write("|-------------|--------------|-------------------|-------------|----------------------|---------|\n")
+
+        for name, data in all_results.items():
+            analysis = data["analysis"]
+            f.write(f"| {name} | {analysis['success_rate']:.2f}% | {analysis['avg_response_time']:.2f} | " +
+                    f"{analysis['median_response_time']:.2f} | {analysis['p95_response_time']:.2f} | " +
+                    f"{analysis['max_response_time']:.2f} |\n")
+
+        f.write("\n## Detailed Results\n\n")
+
+        for name, data in all_results.items():
+            analysis = data["analysis"]
+            f.write(f"### {name}\n\n")
+            f.write(f"- **Total Requests**: {analysis['total_requests']}\n")
+            f.write(f"- **Success Rate**: {analysis['success_rate']:.2f}%\n")
+            f.write(f"- **Min Response Time**: {analysis['min_response_time']:.2f} ms\n")
+            f.write(f"- **Max Response Time**: {analysis['max_response_time']:.2f} ms\n")
+            f.write(f"- **Average Response Time**: {analysis['avg_response_time']:.2f} ms\n")
+            f.write(f"- **Median Response Time**: {analysis['median_response_time']:.2f} ms\n")
+            f.write(f"- **90th Percentile**: {analysis['p90_response_time']:.2f} ms\n")
+            f.write(f"- **95th Percentile**: {analysis['p95_response_time']:.2f} ms\n")
+            f.write(f"- **99th Percentile**: {analysis['p99_response_time']:.2f} ms\n\n")
+
+            f.write(f"![Response Time Distribution for {name}]({name.replace(' ', '_').lower()}_performance.png)\n\n")
+
+        f.write("## Recommendations\n\n")
+
+        # Automatically identify potential bottlenecks
+        bottlenecks = []
+        for name, data in all_results.items():
+            analysis = data["analysis"]
+            if analysis['p95_response_time'] > 1000:  # More than 1 second is slow
+                bottlenecks.append((name, analysis['p95_response_time']))
+
+        if bottlenecks:
+            f.write("The following endpoints have slow response times (95th percentile > 1000ms):\n\n")
+            for endpoint, time_ms in bottlenecks:
+                f.write(f"- **{endpoint}**: {time_ms:.2f} ms\n")
+
+            f.write("\nPossible improvement areas:\n\n")
+            f.write("1. Implement caching for frequently accessed data\n")
+            f.write("2. Optimize database queries\n")
+            f.write("3. Consider implementing connection pooling\n")
+            f.write("4. Review any heavy processing in these endpoints\n")
+        else:
+            f.write("All endpoints are performing within acceptable response time thresholds.\n")
+
+
+# Locust performance testing class (for distributed load testing)
+class SpelloUser(HttpUser):
+    wait_time = between(1, 3)
+
+    def on_start(self):
+        # Log in at the start of the test
+        response = self.client.post("/login", json={
+            "email": TEST_USER["email"],
+            "password": TEST_USER["password"]
+        })
+
+        if response.status_code != 200:
+            # Try to register if login fails
+            self.client.post("/register", json=TEST_USER)
+            # Try login again
+            self.client.post("/login", json={
+                "email": TEST_USER["email"],
+                "password": TEST_USER["password"]
+            })
+
+    @task(3)
+    def get_dashboard(self):
+        self.client.get("/dashboard")
+
+    @task(5)
+    def get_target_word(self):
+        sounds = ["p", "b", "t", "d", "k"]
+        selected_sounds = random.sample(sounds, k=random.randint(1, 3))
+        self.client.get(f"/get-target-word?sounds={','.join(selected_sounds)}")
+
+    @task(1)
+    def get_profile(self):
+        self.client.get(f"/get_user?email={TEST_USER['email']}")
+
+    @task(1)
+    def update_selected_sounds(self):
+        sounds = ["p", "b", "t", "d", "k"]
+        selected_sounds = random.sample(sounds, k=random.randint(1, 3))
+        self.client.post("/update_selected_sounds",
+                         json={"selected_sounds": selected_sounds, "email": TEST_USER["email"]})
+
+
+if __name__ == "__main__":
+    print("Starting Spello Backend Performance Tests...")
+    run_full_test_suite()
+    print("Performance tests completed. See performance_report.md for results.")
