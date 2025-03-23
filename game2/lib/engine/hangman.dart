@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 class HangmanGame {
-  static const int maxLives = 7;
+  static const int maxLives = 7; // Maximum number of lives
 
+  // List of words for the game
   final List<String> wordPool = [
     "Cat", "Pin", "Bun", "Red", "Sin",
     "Bat", "Sim", "Wow", "Cow", "Dim",
@@ -42,17 +43,17 @@ class HangmanGame {
     "Won", "Wow", "Yap", "Yen", "Yes",
     "Yet", "You", "Zip"
   ];
-  // Example word list
 
-  late String wordToPronounce;
-  int _livesLeft;
-  int _letterIndex = 0;
-  int _accuracy = 0;
+  late String wordToPronounce; // The current word to pronounce
+  int _livesLeft; // Remaining lives
+  int _letterIndex = 0; // Tracks progress in revealing the word
+  int _accuracy = 0; // Last pronunciation accuracy score
 
-  double _totalAccuracy = 0;
-  int _wordsPlayed = 0;
-  Map<String, double> wordPerformance = {};
+  double _totalAccuracy = 0; // Sum of all accuracy scores
+  int _wordsPlayed = 0; // Number of words played
+  Map<String, double> wordPerformance = {}; // Stores accuracy for each word
 
+  // Stream controllers to notify UI about game events
   late StreamController<Null> _onWin;
   Stream<Null> get onWin => _onWin.stream;
 
@@ -71,6 +72,7 @@ class HangmanGame {
   late StreamController<int> _onAccuracyChange;
   Stream<int> get onAccuracyChange => _onAccuracyChange.stream;
 
+  // Constructor initializes the game
   HangmanGame() : _livesLeft = maxLives {
     _onWin = StreamController<Null>.broadcast();
     _onLose = StreamController<Null>.broadcast();
@@ -82,6 +84,7 @@ class HangmanGame {
     _selectNewWord(); // Pick a random word at the start
   }
 
+  // Starts a new game by resetting values
   void newGame() {
     _livesLeft = maxLives;
     _letterIndex = 0;
@@ -98,11 +101,13 @@ class HangmanGame {
     _onAccuracyChange.add(_accuracy);
   }
 
+  // Selects a new random word from the word pool
   void _selectNewWord() {
     final random = Random();
     wordToPronounce = wordPool[random.nextInt(wordPool.length)];
   }
 
+  // Simulates pronunciation attempt
   void pronounceWord() {
     _accuracy = _simulatePronunciationAccuracy();
     _onAccuracyChange.add(_accuracy);
@@ -129,21 +134,25 @@ class HangmanGame {
     }
   }
 
+  // Returns the word with guessed letters revealed and remaining letters as underscores
   String get wordForDisplay {
     return wordToPronounce.substring(0, _letterIndex) +
         '_' * (wordToPronounce.length - _letterIndex);
   }
 
+  // Simulates a pronunciation accuracy percentage (0-100)
   int _simulatePronunciationAccuracy() {
     Random random = Random();
-    return random.nextInt(101); // Simulate accuracy between 0 and 100
+    return random.nextInt(101);
   }
 
+  // Updates accuracy data for the current word
   void _updateWordAccuracy(String word, int accuracy) {
     wordPerformance[word] = accuracy.toDouble();
     _totalAccuracy += accuracy;
     _wordsPlayed++;
   }
 
+  // Calculates the average pronunciation accuracy
   double get averageAccuracy => _wordsPlayed == 0 ? 0 : _totalAccuracy / _wordsPlayed;
 }
