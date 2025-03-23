@@ -70,7 +70,7 @@ def setup_test_user():
 
 
 # Performance testing functions
-def test_endpoint(sessions, method, endpoint, payload=None, files=None, params=None, name=None):
+def performance_test_endpoint(sessions, method, endpoint, payload=None, files=None, params=None, name=None):
     """Test a specific endpoint and measure response time"""
     start_time = time.time()
 
@@ -113,7 +113,7 @@ def run_load_test(endpoint, method, payload=None, files=None, params=None, name=
     results = []
 
     def make_request():
-        return test_endpoint(session, method, endpoint, payload, files, params, name)
+        return performance_test_endpoint(session, method, endpoint, payload, files, params, name)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as executor:
         future_to_req = {executor.submit(make_request): i for i in range(num_requests)}
