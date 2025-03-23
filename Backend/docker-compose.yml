@@ -18,4 +18,4 @@ networks:
   app-network:
     driver: bridge
 
-# No volumes needed since we're using MongoDB Atlas
+# No volumes needed since we're using MongoDB At
