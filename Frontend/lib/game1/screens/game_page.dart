@@ -12,9 +12,8 @@ class Game1 extends StatefulWidget {
 
 class Game1State extends State<Game1> {
   final AudioService _audioService = AudioService();
-  String backgroundImage = 'assets/images/b1.jpg'; // Default background
+  String backgroundImage = 'assets/images/b2.jpg'; // Default background
   bool _isRecording = false;
-
 
   @override
   void initState() {
@@ -25,7 +24,8 @@ class Game1State extends State<Game1> {
   Future<void> _loadBackgroundImage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      backgroundImage = prefs.getString("selectedBackground") ?? 'assets/images/b1.jpg';
+      backgroundImage =
+          prefs.getString("selectedBackground") ?? 'assets/images/b1.jpg';
     });
   }
 
@@ -59,13 +59,32 @@ class Game1State extends State<Game1> {
                 Positioned(
                   top: screenHeight * 0.05,
                   left: screenWidth * 0.05,
-                  child: Text(
-                    "XP: ${gameRules.xp}",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.08,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  child: Stack(
+                    children: [
+                      // This is the outline/stroke effect
+                      Text(
+                        "XP: ${gameRules.xp}",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.08,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Fredoka One",
+                          foreground: Paint()
+                            ..style = PaintingStyle.stroke
+                            ..strokeWidth = 3
+                            ..color = Colors.black,
+                        ),
+                      ),
+                      // This is the text itself
+                      Text(
+                        "XP: ${gameRules.xp}",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.08,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Fredoka One",
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -74,7 +93,8 @@ class Game1State extends State<Game1> {
                   child: Row(
                     children: List.generate(3, (index) {
                       return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.01),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.01),
                         child: Image.asset(
                           index < gameRules.lives
                               ? 'assets/images/heart.png'
@@ -89,40 +109,81 @@ class Game1State extends State<Game1> {
                   alignment: Alignment.topCenter,
                   child: Padding(
                     padding: EdgeInsets.only(top: screenHeight * 0.05),
-                    child: Text(
-                      "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.08,
-                        fontWeight: FontWeight.bold,
-                        color: gameRules.timeLeft <= 10 ? Colors.red : Colors.green,
-                      ),
+                    child: Stack(
+                      children: [
+                        // This is the outline/stroke effect
+                        Text(
+                          "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.08,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Fredoka One",
+                            foreground: Paint()
+                              ..style = PaintingStyle.stroke
+                              ..strokeWidth = 3
+                              ..color = Colors.black,
+                          ),
+                        ),
+                        // This is the text itself
+                        Text(
+                          "${(gameRules.timeLeft ~/ 60).toString().padLeft(2, '0')}:${(gameRules.timeLeft % 60).toString().padLeft(2, '0')}",
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.08,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Fredoka One",
+                            color: gameRules.timeLeft <= 10
+                                ? Colors.red
+                                : Colors.green,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-
-
 
                 AnimatedPositioned(
                   duration: Duration(seconds: 1),
                   curve: Curves.easeInOut,
                   top: gameRules.position,
                   left: screenWidth * 0.5 - 50,
+                  bottom: screenHeight * 0.2,
                   child: Opacity(
                     opacity: gameRules.alienOpacity,
-                    child: Image.asset(gameRules.selectedAlienImage, width: screenWidth * 0.15),
+                    child: Image.asset(gameRules.selectedAlienImage,
+                        width: screenWidth * 0.15),
                   ),
                 ),
 
                 Positioned(
                   bottom: screenHeight * 0.1,
                   left: screenWidth * 0.08,
-                  child: Text(
-                    gameRules.word,
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  child: Stack(
+                    children: [
+                      // This is the outline/stroke effect
+                      Text(
+                        gameRules.word,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Fredoka One",
+                          foreground: Paint()
+                            ..style = PaintingStyle.stroke
+                            ..strokeWidth =
+                                4 // Slightly thicker for larger text
+                            ..color = Colors.black,
+                        ),
+                      ),
+                      // This is the text itself
+                      Text(
+                        gameRules.word,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.12,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Fredoka One",
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Positioned(
@@ -181,10 +242,15 @@ class Game1State extends State<Game1> {
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 100),
-        height: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
-        width: _isRecording ? screenWidth * 0.22 : screenWidth * 0.18, // Increase size on press
+        height: _isRecording
+            ? screenWidth * 0.22
+            : screenWidth * 0.18, // Increase size on press
+        width: _isRecording
+            ? screenWidth * 0.22
+            : screenWidth * 0.18, // Increase size on press
         decoration: BoxDecoration(
-          color: _isRecording ? Colors.green : Colors.red, // Change color on press
+          color:
+              _isRecording ? Colors.green : Colors.red, // Change color on press
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -196,7 +262,9 @@ class Game1State extends State<Game1> {
         ),
         child: Icon(
           Icons.mic,
-          size: _isRecording ? screenWidth * 0.12 : screenWidth * 0.09, // Bigger icon when recording
+          size: _isRecording
+              ? screenWidth * 0.12
+              : screenWidth * 0.09, // Bigger icon when recording
           color: Colors.white,
         ),
       ),

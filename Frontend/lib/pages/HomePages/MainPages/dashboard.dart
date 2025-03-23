@@ -6,9 +6,9 @@ import 'dart:convert';
 class Dashboard extends StatefulWidget {
   final String baseUrl;
   final Map<String, dynamic> userData; // Added parameter to receive user data
-  
+
   const Dashboard({
-    super.key, 
+    super.key,
     required this.baseUrl,
     required this.userData, // Required parameter for user data
   });
@@ -42,19 +42,17 @@ class _DashboardState extends State<Dashboard> {
     try {
       // Get the email from userData to identify the user
       final String userEmail = widget.userData['email'];
-      
-      
-     
+
       final response = await http.get(
-      Uri.parse('${widget.baseUrl}/dashboard?email=$userEmail'),
-      headers: {
-      'Content-Type': 'application/json',
+        Uri.parse('${widget.baseUrl}/dashboard?email=$userEmail'),
+        headers: {
+          'Content-Type': 'application/json',
         },
       );
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        
+
         // Convert weekly trend data to FlSpot
         final List trendsData = data['weekly_trend'];
         List<FlSpot> spots = [];
@@ -62,7 +60,7 @@ class _DashboardState extends State<Dashboard> {
           double accuracy = trendsData[i]['average_accuracy'].toDouble();
           spots.add(FlSpot(i.toDouble(), accuracy));
         }
-        
+
         setState(() {
           _accuracyScore = data['accuracy']['average_accuracy'].toDouble();
           _wordsMastered = data['words_mastered']['count'];
@@ -103,10 +101,7 @@ class _DashboardState extends State<Dashboard> {
       appBar: AppBar(
         title: Text(
           "Dashboard - ${widget.userData['name']}", // Show user name in the title
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          style: const TextStyle(fontSize: 27, fontFamily: "Fredoka One"),
         ),
         backgroundColor: const Color(0xFF3A435F),
         foregroundColor: Colors.white,
@@ -151,16 +146,17 @@ class _DashboardState extends State<Dashboard> {
                             const Text(
                               "Weekly Streak",
                               style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                                  color: textColor,
+                                  fontSize: 16,
+                                  fontFamily: "Fredoka One"),
                             ),
                             const SizedBox(height: 12),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: LinearProgressIndicator(
-                                value: _error.isEmpty ? _streakDays / 7 : 0, // Use 0 when there's an error
+                                value: _error.isEmpty
+                                    ? _streakDays / 7
+                                    : 0, // Use 0 when there's an error
                                 backgroundColor: Colors.grey.shade300,
                                 color: const Color(0xFFFFB000),
                                 minHeight: 15,
@@ -202,19 +198,23 @@ class _DashboardState extends State<Dashboard> {
                                           height: screenHeight * 0.1,
                                           width: screenHeight * 0.1,
                                           child: CircularProgressIndicator(
-                                            value: _error.isEmpty ? _accuracyScore / 100 : 0,
+                                            value: _error.isEmpty
+                                                ? _accuracyScore / 100
+                                                : 0,
                                             strokeWidth: 10,
                                             backgroundColor: Colors.white,
                                             color: chartLineColor,
                                           ),
                                         ),
                                         Text(
-                                          _error.isEmpty ? "${_accuracyScore.toStringAsFixed(1)}%" : "N/A",
+                                          _error.isEmpty
+                                              ? "${_accuracyScore.toStringAsFixed(1)}%"
+                                              : "N/A",
                                           style: const TextStyle(
-                                            color: textColor,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                              color: textColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: "Fredoka "),
                                         ),
                                       ],
                                     ),
@@ -222,10 +222,10 @@ class _DashboardState extends State<Dashboard> {
                                     const Text(
                                       "Accuracy Score",
                                       style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                          color: textColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Fredoka"),
                                     ),
                                   ],
                                 ),
@@ -260,20 +260,21 @@ class _DashboardState extends State<Dashboard> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        _error.isEmpty ? "$_wordsMastered" : "N/A",
+                                        _error.isEmpty
+                                            ? "$_wordsMastered"
+                                            : "N/A",
                                         style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: textColor,
-                                        ),
+                                            fontSize: 24,
+                                            color: textColor,
+                                            fontFamily: "Fredoka One"),
                                       ),
                                       const Text(
                                         "Words Mastered",
                                         style: TextStyle(
-                                          fontSize: 14,
-                                          color: textColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                            fontSize: 14,
+                                            color: textColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Fredoka"),
                                       ),
                                     ],
                                   ),
@@ -301,20 +302,21 @@ class _DashboardState extends State<Dashboard> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        _error.isEmpty ? "Level $_userLevel" : "Level N/A",
+                                        _error.isEmpty
+                                            ? "Level $_userLevel"
+                                            : "Level N/A",
                                         style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: textColor,
-                                        ),
+                                            fontSize: 24,
+                                            color: textColor,
+                                            fontFamily: "Fredoka One"),
                                       ),
                                       const Text(
                                         "Your Level",
                                         style: TextStyle(
-                                          fontSize: 14,
-                                          color: textColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                            fontSize: 14,
+                                            color: textColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "Fredoka"),
                                       ),
                                     ],
                                   ),
@@ -349,10 +351,9 @@ class _DashboardState extends State<Dashboard> {
                             const Text(
                               "Weekly Accuracy Trend",
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: textColor,
-                              ),
+                                  fontSize: 16,
+                                  color: textColor,
+                                  fontFamily: "Fredoka One"),
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             Expanded(
@@ -380,13 +381,14 @@ class _DashboardState extends State<Dashboard> {
                                         titlesData: FlTitlesData(
                                           leftTitles: AxisTitles(
                                             axisNameWidget: const Padding(
-                                              padding: EdgeInsets.only(right: 8.0),
+                                              padding:
+                                                  EdgeInsets.only(right: 8.0),
                                               child: Text(
                                                 "Daily Accuracy (%)",
                                                 style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "Fredoka"),
                                               ),
                                             ),
                                             axisNameSize: 40,
@@ -397,10 +399,13 @@ class _DashboardState extends State<Dashboard> {
                                               getTitlesWidget: (value, meta) {
                                                 if (value % 10 == 0) {
                                                   return Padding(
-                                                    padding: const EdgeInsets.only(right: 4.0),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 4.0),
                                                     child: Text(
                                                       '${value.toInt()}%',
-                                                      style: const TextStyle(fontSize: 10),
+                                                      style: const TextStyle(
+                                                          fontSize: 10),
                                                     ),
                                                   );
                                                 }
@@ -409,10 +414,12 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                           ),
                                           rightTitles: const AxisTitles(
-                                            sideTitles: SideTitles(showTitles: false),
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
                                           ),
                                           topTitles: const AxisTitles(
-                                            sideTitles: SideTitles(showTitles: false),
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
                                           ),
                                           bottomTitles: AxisTitles(
                                             axisNameWidget: const Text(
@@ -436,10 +443,12 @@ class _DashboardState extends State<Dashboard> {
                                                   "Sat",
                                                   "Sun"
                                                 ];
-                                                if (value >= 0 && value < days.length) {
+                                                if (value >= 0 &&
+                                                    value < days.length) {
                                                   return Text(
                                                     days[value.toInt()],
-                                                    style: const TextStyle(fontSize: 12),
+                                                    style: const TextStyle(
+                                                        fontSize: 12),
                                                   );
                                                 }
                                                 return Container();
@@ -450,9 +459,8 @@ class _DashboardState extends State<Dashboard> {
                                         borderData: FlBorderData(
                                           show: true,
                                           border: Border.all(
-                                            color: Colors.grey.shade400, 
-                                            width: 1
-                                          ),
+                                              color: Colors.grey.shade400,
+                                              width: 1),
                                         ),
                                         minX: 0,
                                         maxX: 6,
@@ -471,14 +479,17 @@ class _DashboardState extends State<Dashboard> {
                                                 begin: Alignment.topCenter,
                                                 end: Alignment.bottomCenter,
                                                 colors: [
-                                                  graphFillColor.withOpacity(0.9),
-                                                  graphFillColor.withOpacity(0.5),
+                                                  graphFillColor
+                                                      .withOpacity(0.9),
+                                                  graphFillColor
+                                                      .withOpacity(0.5),
                                                 ],
                                               ),
                                             ),
                                             dotData: FlDotData(
                                               show: true,
-                                              getDotPainter: (spot, percent, barData, index) {
+                                              getDotPainter: (spot, percent,
+                                                  barData, index) {
                                                 return FlDotCirclePainter(
                                                   radius: 4,
                                                   color: Colors.white,
@@ -493,25 +504,28 @@ class _DashboardState extends State<Dashboard> {
                                     )
                                   : Center(
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           const Text(
                                             "No data available",
                                             style: TextStyle(
-                                              color: textColor,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                                color: textColor,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: "Fredoka"),
                                           ),
                                           if (_error.isNotEmpty)
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 8.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 8.0),
                                               child: Text(
                                                 "Check your connection",
                                                 style: TextStyle(
-                                                  color: textColor.withOpacity(0.7),
-                                                  fontSize: 14,
-                                                ),
+                                                    color: textColor
+                                                        .withOpacity(0.7),
+                                                    fontSize: 14,
+                                                    fontFamily: "Fredoka"),
                                               ),
                                             ),
                                         ],
@@ -521,7 +535,7 @@ class _DashboardState extends State<Dashboard> {
                           ],
                         ),
                       ),
-                      
+
                       // User Email Info
                       SizedBox(height: screenHeight * 0.02),
                       Container(
@@ -544,18 +558,17 @@ class _DashboardState extends State<Dashboard> {
                             const Text(
                               "Account Information",
                               style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                                  color: textColor,
+                                  fontSize: 16,
+                                  fontFamily: "Fredoka One"),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               "Email: ${widget.userData['email']}",
                               style: const TextStyle(
-                                color: textColor,
-                                fontSize: 14,
-                              ),
+                                  color: textColor,
+                                  fontSize: 14,
+                                  fontFamily: "Fredoka"),
                             ),
                           ],
                         ),
@@ -563,7 +576,7 @@ class _DashboardState extends State<Dashboard> {
                     ],
                   ),
                 ),
-                
+
                 // Error Banner - only show when there's an error
                 if (_error.isNotEmpty)
                   Positioned(
@@ -572,7 +585,8 @@ class _DashboardState extends State<Dashboard> {
                     right: 0,
                     child: Container(
                       color: Colors.red.shade100,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
                       child: Row(
                         children: [
                           const Icon(Icons.wifi_off, color: Colors.red),
@@ -580,7 +594,9 @@ class _DashboardState extends State<Dashboard> {
                           Expanded(
                             child: Text(
                               "Connection error: Unable to load data",
-                              style: TextStyle(color: Colors.red.shade900),
+                              style: TextStyle(
+                                  color: Colors.red.shade900,
+                                  fontFamily: "Fredoka"),
                             ),
                           ),
                           ElevatedButton(
@@ -588,10 +604,15 @@ class _DashboardState extends State<Dashboard> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red.shade900,
                               foregroundColor: Colors.white,
-                              textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              textStyle:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
                             ),
-                            child: const Text("Retry"),
+                            child: const Text(
+                              "Retry",
+                              style: TextStyle(fontFamily: "Fredoka"),
+                            ),
                           ),
                         ],
                       ),

@@ -130,6 +130,7 @@ flutter:
     - assets/images/newb2.png
     - assets/images/profile_picture.png
     - assets/images/help_center_page.png
+    - assets/images/star.png
 
 
   fonts:
@@ -140,6 +141,15 @@ flutter:
     - family: "Fredoka"
       fonts:
         - asset: assets/fonts/Fredoka.ttf
+
+    - family: "Jaro"
+      fonts:
+        - asset: assets/fonts/gameFont.ttf
+
+
+
+
+
 
 
 

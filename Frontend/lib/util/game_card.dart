@@ -6,6 +6,7 @@ class GameCard extends StatefulWidget {
   final String imageName;
   final String routeName;
   final bool isRecommended;
+  final String description;
 
   const GameCard({
     super.key,
@@ -13,6 +14,7 @@ class GameCard extends StatefulWidget {
     required this.imageName,
     required this.routeName,
     required this.isRecommended,
+    required this.description,
   });
 
   @override
@@ -37,11 +39,9 @@ class _GameCardState extends State<GameCard> {
               borderRadius: BorderRadius.circular(45),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFF2E354E)
-                      .withOpacity(0.2), // Shadow color with transparency
-                  spreadRadius: 2, // How much the shadow spreads
-                  // How blurred the shadow is
-                  offset: Offset(0, 4), // Horizontal and vertical offset
+                  color: Color(0xFF2E354E).withOpacity(0.7),
+                  spreadRadius: 2,
+                  offset: Offset(0, 3),
                 ),
               ],
             ),
@@ -50,8 +50,8 @@ class _GameCardState extends State<GameCard> {
 
         // Positioned Game Image
         Positioned(
-          left: screenWidth * 0.13, // Moves right
-          top: screenHeight * 0.022, // Moves up
+          left: screenWidth * 0.13,
+          top: screenHeight * 0.022,
           child: Container(
             width: screenWidth * 0.25,
             height: screenWidth * 0.25,
@@ -72,7 +72,7 @@ class _GameCardState extends State<GameCard> {
         // Conditional "Recommended" Container
         if (widget.isRecommended)
           Positioned(
-            left: screenWidth * 0.4, // Moves right
+            left: screenWidth * 0.4,
             top: screenHeight * 0.14,
             child: Container(
               height: screenWidth * 0.06,
@@ -96,16 +96,17 @@ class _GameCardState extends State<GameCard> {
             ),
           ),
 
-        // Positioned Game Name
+        // Positioned Game Name - Moving slightly right
         Positioned(
-          left: screenWidth * 0.43, // Moves right
-          top: screenHeight * 0.028, // Moves up
+          left: screenWidth *
+              0.45, // Increased from 0.43 to add more space from side
+          top: screenHeight * 0.028,
           child: SizedBox(
-            width: screenWidth * 0.45, // Limits width
+            width: screenWidth * 0.43, // Adjusted width to fit within card
             child: Text(
               widget.gameName,
               style: TextStyle(
-                fontSize: screenHeight * 0.022, // Bigger font
+                fontSize: screenHeight * 0.022,
                 fontFamily: "Fredoka",
                 fontWeight: FontWeight.bold,
               ),
@@ -113,10 +114,32 @@ class _GameCardState extends State<GameCard> {
           ),
         ),
 
+        // Positioned Game Description - Increased spacing from game name
+        Positioned(
+          left: screenWidth * 0.45, // Same left alignment as game name
+          top: screenHeight *
+              0.07, // Increased from 0.055 to add more space from name
+          child: SizedBox(
+            width: screenWidth * 0.6, // Same width as game name
+            child: Text(
+              widget.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
+                fontFamily: "Fredoka",
+                fontWeight: FontWeight.bold, // Changed to bold
+                color:
+                    Colors.grey[500], // Slightly darker for better readability
+              ),
+            ),
+          ),
+        ),
+
         // Positioned Play Button
         Positioned(
-          right: screenWidth * 0.04, // Move left
-          top: screenHeight * 0.12, // Move down slightly
+          right: screenWidth * 0.04,
+          top: screenHeight * 0.12,
           child: PlayButton(onTap: widget.routeName),
         ),
       ],

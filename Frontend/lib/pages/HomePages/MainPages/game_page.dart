@@ -3,11 +3,8 @@ import 'package:spello_frontend/util/game_card.dart';
 
 class GamePage extends StatefulWidget {
   final Map<String, dynamic> userData;
-  
-  const GamePage({
-    super.key, 
-    required this.userData
-  });
+
+  const GamePage({super.key, required this.userData});
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -16,40 +13,46 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> {
   final List<Map<String, dynamic>> games = [
     {
-      'name': 'HangMan 🎮',
-      'image': 'assets/images/hangman.png',
-      'isRecommended': true,
-      'route': '/game1'  // Updated route
-    },
-    {
-      'name': 'Word Rush',
+      'name': 'Zip & Zap',
       'image': 'assets/images/game_two.png',
-      'isRecommended': false,
-      'route': '/game-data'  // Updated route
+      'isRecommended': true,
+      'route': '/game1', // Updated route
+      'description': 'Practice repetition '
     },
     {
-      'name': 'ZIP & ZAP',
+      'name': 'Hangman',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/game-data'  // Updated route
+      'route': '/game-data', // Updated route
+      'description': 'Build consistency'
+    },
+    {
+      'name': 'Word Mania',
+      'image': 'assets/images/page_under_construction.png',
+      'isRecommended': false,
+      'route': '/game-data', // Updated route
+      'description': 'Enhance vocabulary'
     },
     {
       'name': ' Bee',
       'image': 'assets/images/game_one.png',
       'isRecommended': false,
-      'route': '/game-data'  // Updated route
+      'route': '/game-data', // Updated route
+      'description': 'Improve spelling'
     },
     {
       'name': 'Word ',
       'image': 'assets/images/game_two.png',
       'isRecommended': false,
-      'route': '/game-data'  // Updated route
+      'route': '/game-data', // Updated route
+      'description': 'Master patterns'
     },
     {
       'name': 'ZIP ',
       'image': 'assets/images/game_three.png',
       'isRecommended': false,
-      'route': '/game-data'  // Updated route
+      'route': '/game-data', // Updated route
+      'description': 'Develop speed'
     },
   ];
 
@@ -64,7 +67,8 @@ class _GamePageState extends State<GamePage> {
     super.initState();
     // Debug print to verify userData is being received correctly
     print("GamePage received userData: ${widget.userData}");
-    print("User Email: $userEmail"); // Log email specifically to verify it's being received
+    print(
+        "User Email: $userEmail"); // Log email specifically to verify it's being received
   }
 
   @override
@@ -116,7 +120,7 @@ class _GamePageState extends State<GamePage> {
                   Container(
                     height: screenHeight * 0.22,
                     decoration: const BoxDecoration(
-                      color: Color(0xFF4C5679),
+                      color: Color(0xFF3A435F),
                       borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(40),
                         bottomRight: Radius.circular(40),
@@ -131,12 +135,12 @@ class _GamePageState extends State<GamePage> {
                             SizedBox(width: screenWidth * 0.08),
                             CircleAvatar(
                               backgroundColor: Colors.white60,
-                              radius: 22,
+                              radius: 25,
                               child: const CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/images/start.png'),
+                                backgroundImage: AssetImage(
+                                    'assets/images/profile_picture.png'),
                                 backgroundColor: Colors.red,
-                                radius: 18,
+                                radius: 22,
                               ),
                             ),
                             SizedBox(width: screenWidth * 0.02),
@@ -158,7 +162,8 @@ class _GamePageState extends State<GamePage> {
                                         size: screenHeight * 0.018),
                                     SizedBox(width: screenWidth * 0.01),
                                     Text(
-                                      userScore.toString(), // Use user score from userData
+                                      userScore
+                                          .toString(), // Use user score from userData
                                       style: TextStyle(
                                         fontFamily: "Fredoka",
                                         fontSize: screenHeight * 0.018,
@@ -244,36 +249,40 @@ class _GamePageState extends State<GamePage> {
                       padding: EdgeInsets.only(bottom: screenHeight * 0.025),
                       child: GestureDetector(
                         onTap: () {
-                                // Debug print to verify what's in the userData before navigation
-                                print("Before navigation - userData contains: ${widget.userData}");
-                                
-                                // Make sure we're passing a complete userData object
-                                final completeUserData = {
-                                  'name': userName,
-                                  'email': userEmail,
-                                  'score': userScore,
-                                  'level': userLevel,
-                                  // Add any other fields that might be needed
-                                };
-                                
-                                // Navigate with the complete data
-                                Navigator.pushNamed(
-                                  context,
-                                  '/game-data',
-                                  arguments: {
-                                    'userData': widget.userData, 
-                                    'gameName': game['name']
-                                  },
-                                );
-                                
-                                // Debug print after setting up arguments
-                                print("Navigating to ${game['name']} with userData: $completeUserData");
-                              },
+                          // Debug print to verify what's in the userData before navigation
+                          print(
+                              "Before navigation - userData contains: ${widget.userData}");
+
+                          // Make sure we're passing a complete userData object
+                          final completeUserData = {
+                            'name': userName,
+                            'email': userEmail,
+                            'score': userScore,
+                            'level': userLevel,
+                            // Add any other fields that might be needed
+                          };
+
+                          // Navigate with the complete data
+                          Navigator.pushNamed(
+                            context,
+                            '/game-data',
+                            arguments: {
+                              'userData': widget.userData,
+                              'gameName': game['name']
+                            },
+                          );
+
+                          // Debug print after setting up arguments
+                          print(
+                              "Navigating to ${game['name']} with userData: $completeUserData");
+                        },
                         child: GameCard(
                           gameName: game['name']!,
                           imageName: game['image']!,
                           routeName: game['route']!,
                           isRecommended: game['isRecommended']!,
+                          description:
+                              game['description']!, // Pass the description
                         ),
                       ),
                     );
