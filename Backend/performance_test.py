@@ -101,3 +101,24 @@ def test_endpoint(session, method, endpoint, payload=None, files=None, params=No
     }
 
     return result
+
+def run_load_test(endpoint, method, payload=None, files=None, params=None, name=None,
+                  num_requests=100, concurrency=10):
+    """Run a load test on a specific endpoint with concurrent requests"""
+    session = requests.Session()
+    cookies = setup_test_user()
+    if cookies:
+        session.cookies.update(cookies)
+
+    results = []
+
+    def make_request():
+        return test_endpoint(session, method, endpoint, payload, files, params, name)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=concurrency) as executor:
+        future_to_req = {executor.submit(make_request): i for i in range(num_requests)}
+        for future in concurrent.futures.as_completed(future_to_req):
+            result = future.result()
+            results.append(result)
+
+    return results
