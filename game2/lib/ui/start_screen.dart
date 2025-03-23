@@ -44,7 +44,7 @@ class StartScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold, // Make the text bold
               ),
             ),
-            SizedBox(height: 30.0), // Add space between elements
+            SizedBox(height: MediaQuery.of(context).size.height * 0.05), // Add space between elements
             // Button to start the game
             ElevatedButton(
               child: Text('Start Game'), // Button text
