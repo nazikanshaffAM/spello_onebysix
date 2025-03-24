@@ -24,7 +24,7 @@ class HowToPlayPage extends StatelessWidget {
                     '4. You have 7 lives. If your accuracy is low, you lose a life.\n'
                     '5. Correctly pronounce enough words to win the game!',
                 textAlign: TextAlign.center, // Center-align the text
-                style: TextStyle(fontSize: 22.0), // Set font size
+                style: TextStyle(fontSize: 22.0, color: Colors.lightBlue), // Set font size
               ),
               SizedBox(height: 20), // Add some space between the text and the button
               ElevatedButton(
