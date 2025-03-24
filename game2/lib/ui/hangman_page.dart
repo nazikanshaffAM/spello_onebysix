@@ -219,7 +219,7 @@ class _HangmanPageState extends State<HangmanPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings, color: Colors.black), // Settings button
+            icon: Icon(Icons.settings, color: Colors.black,), // Settings button
             onPressed: () {
               // Navigate to the settings page
               Navigator.push(
@@ -243,17 +243,18 @@ class _HangmanPageState extends State<HangmanPage> {
             ),
             Padding(
               padding: EdgeInsets.all(20.0),
-              child: Text('Lives: $_livesLeft'), // Show remaining lives
+              child: Text('Lives: $_livesLeft',
+              style: TextStyle(fontSize: 17),), // Show remaining lives
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
-              child: Text('Accuracy: $_accuracy%', style: TextStyle(fontSize: 18.0)), // Show accuracy
+              child: Text('Accuracy: $_accuracy%', style: TextStyle(fontSize: 20.0)), // Show accuracy
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
                 _feedbackMessage, // Show feedback message
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
