@@ -28,7 +28,7 @@ class ResultPage extends StatelessWidget {
             // Display the number of lives left
             Text(
               'Lives Left: $livesLeft',
-              style: TextStyle(fontSize: 30), // Set font size
+              style: TextStyle(fontSize: 30, color: Colors.redAccent), // Set font size
             ),
             SizedBox(height: 50), // Add space before the button
             ElevatedButton(
