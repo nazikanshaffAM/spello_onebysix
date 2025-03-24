@@ -43,7 +43,7 @@ class SettingsPage extends StatelessWidget {
                   );
                 },
                 child: Text('Restart',
-                style: TextStyle(fontSize: 25),), // Button text
+                style: TextStyle(fontSize: 25, color: Colors.redAccent),), // Button text
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),  // Optional: Adjust button size
                 ),
