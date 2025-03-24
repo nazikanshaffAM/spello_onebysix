@@ -244,11 +244,11 @@ class _HangmanPageState extends State<HangmanPage> {
             Padding(
               padding: EdgeInsets.all(20.0),
               child: Text('Lives: $_livesLeft',
-              style: TextStyle(fontSize: 17),), // Show remaining lives
+              style: TextStyle(fontSize: 17, color: Colors.deepOrange),), // Show remaining lives
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
-              child: Text('Accuracy: $_accuracy%', style: TextStyle(fontSize: 20.0)), // Show accuracy
+              child: Text('Accuracy: $_accuracy%', style: TextStyle(fontSize: 20.0, color: Colors.green)), // Show accuracy
             ),
             Padding(
               padding: EdgeInsets.all(10.0),

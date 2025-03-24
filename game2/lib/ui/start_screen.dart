@@ -44,6 +44,7 @@ class StartScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 53.0, // Set font size
                 fontWeight: FontWeight.bold, // Make the text bold
+                color: Colors.indigo
               ),
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.05), // Add space between elements
@@ -53,7 +54,8 @@ class StartScreen extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Roboto',
-                fontSize: 25
+                fontSize: 25,
+                color: Colors.blue
               ),), // Button text
               onPressed: () {
                 // Navigate to the Hangman game page

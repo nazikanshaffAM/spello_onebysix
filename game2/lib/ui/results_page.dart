@@ -22,13 +22,13 @@ class ResultPage extends StatelessWidget {
             // Display the average accuracy percentage
             Text(
               'Average Accuracy: ${averageAccuracy.toStringAsFixed(2)}%',
-              style: TextStyle(fontSize: 22), // Set font size
+              style: TextStyle(fontSize: 28, color: Colors.lightGreen), // Set font size
             ),
             SizedBox(height: 20), // Add space between elements
             // Display the number of lives left
             Text(
               'Lives Left: $livesLeft',
-              style: TextStyle(fontSize: 22), // Set font size
+              style: TextStyle(fontSize: 30, color: Colors.redAccent), // Set font size
             ),
             SizedBox(height: 50), // Add space before the button
             ElevatedButton(
