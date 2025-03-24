@@ -28,7 +28,7 @@ class SettingsPage extends StatelessWidget {
                   );
                 },
                 child: Text('How to Play',
-                style: TextStyle(fontSize: 25),), // Button text
+                style: TextStyle(fontSize: 25, color: Colors.green),), // Button text
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),  // Optional: Adjust button size
                 ),
