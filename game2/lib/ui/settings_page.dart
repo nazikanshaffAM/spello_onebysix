@@ -27,7 +27,8 @@ class SettingsPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => HowToPlayPage()),
                   );
                 },
-                child: Text('How to Play'), // Button text
+                child: Text('How to Play',
+                style: TextStyle(fontSize: 25),), // Button text
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),  // Optional: Adjust button size
                 ),
@@ -41,7 +42,8 @@ class SettingsPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => HangmanPage(_engine)),
                   );
                 },
-                child: Text('Restart'), // Button text
+                child: Text('Restart',
+                style: TextStyle(fontSize: 25),), // Button text
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(200, 50),  // Optional: Adjust button size
                 ),
