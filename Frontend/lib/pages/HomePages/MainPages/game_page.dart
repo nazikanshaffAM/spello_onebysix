@@ -250,39 +250,37 @@ class _GamePageState extends State<GamePage> {
                       child: GestureDetector(
                         onTap: () {
                           // Debug print to verify what's in the userData before navigation
-                          print(
-                              "Before navigation - userData contains: ${widget.userData}");
+                          print("Before navigation - userData contains: ${widget.userData}");
 
-                          // Make sure we're passing a complete userData object
-                          final completeUserData = {
-                            'name': userName,
-                            'email': userEmail,
-                            'score': userScore,
-                            'level': userLevel,
-                            // Add any other fields that might be needed
-                          };
+                          // Special handling for "Zip & Zap" game
+                          if (game['name'] == 'Zip & Zap') {
+                            print("Navigating to Zip & Zap with userData: ${widget.userData}");
+                            Navigator.pushNamed(
+                              context,
+                              '/game1',
+                              arguments: widget.userData,
+                            );
+                          } else {
+                            // For all other games, use the existing '/game-data' route
+                            Navigator.pushNamed(
+                              context,
+                              '/game-data',
+                              arguments: {
+                                'userData': widget.userData,
+                                'gameName': game['name']
+                              },
+                            );
+                          }
 
-                          // Navigate with the complete data
-                          Navigator.pushNamed(
-                            context,
-                            '/game-data',
-                            arguments: {
-                              'userData': widget.userData,
-                              'gameName': game['name']
-                            },
-                          );
-
-                          // Debug print after setting up arguments
-                          print(
-                              "Navigating to ${game['name']} with userData: $completeUserData");
+                          // Debug print after navigation
+                          print("Navigated to ${game['name']}");
                         },
                         child: GameCard(
                           gameName: game['name']!,
                           imageName: game['image']!,
                           routeName: game['route']!,
                           isRecommended: game['isRecommended']!,
-                          description:
-                              game['description']!, // Pass the description
+                          description: game['description']!, // Pass the description
                         ),
                       ),
                     );
