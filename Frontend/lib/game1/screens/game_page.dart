@@ -6,6 +6,10 @@ import '../game_logic/game_rules.dart';
 import '../game_logic/audio_recorder.dart';
 
 class Game1 extends StatefulWidget {
+  final Map<String, dynamic>? userData;
+  
+  const Game1({Key? key, this.userData}) : super(key: key);
+  
   @override
   Game1State createState() => Game1State();
 }
@@ -19,6 +23,10 @@ class Game1State extends State<Game1> {
   void initState() {
     super.initState();
     _loadBackgroundImage();
+    print("Game1 received userData: ${widget.userData}");
+    if (widget.userData != null && widget.userData!.containsKey('email')) {
+      print("User Email in Game1: ${widget.userData!['email']}");
+    }
   }
 
   Future<void> _loadBackgroundImage() async {
@@ -35,7 +43,7 @@ class Game1State extends State<Game1> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return ChangeNotifierProvider(
-      create: (_) => GameRules(context),
+      create: (_) => GameRules(context, userData: widget.userData),
       child: Scaffold(
         body: Consumer<GameRules>(
           builder: (context, gameRules, child) {

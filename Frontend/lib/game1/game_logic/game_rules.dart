@@ -8,7 +8,7 @@ class GameRules extends ChangeNotifier {
   double position = 600;
   int xp = 0;
   int lives = 3;
-  int timeLeft = 30;
+  int timeLeft = 60;
   String word = "";  // Store the current word
   bool gameEnded = false;
   bool shouldAnimate = true;
@@ -28,12 +28,10 @@ class GameRules extends ChangeNotifier {
 
   // Track selected alien
   String selectedAlienImage = 'assets/images/alien1.png';
-  //String sampleEmail = "xyz@gmail.com";
-  //List<String> selectedSounds = ['p', 'b', 't'];
 
-
-
-  GameRules(this.context) {
+  Map<String, dynamic>? userData;
+  GameRules(this.context, {this.userData}) {
+    print("GameRules received userData: $userData");
     initializeGame();
   }
 
@@ -43,9 +41,15 @@ class GameRules extends ChangeNotifier {
     notifyListeners(); // Notify UI that loading has started
 
     try {
-      // Fetch target word using session cookies (no need for login)
-      String? fetchedWord = await ApiService.fetchTargetWord();
+      // Debug print to check if we have the email
+      if (userData != null && userData!.containsKey('email')) {
+        print("GameRules using email for authentication: ${userData!['email']}");
+      } else {
+        print("Warning: No email found in userData for authentication");
+      }
 
+      // Fetch target word using the user's email for authentication
+      String? fetchedWord = await ApiService.fetchTargetWord(userData);
 
       if (fetchedWord != null && fetchedWord.isNotEmpty) {
         word = fetchedWord;
@@ -93,7 +97,7 @@ class GameRules extends ChangeNotifier {
 
   // Check pronunciation accuracy
   void checkPronunciation(String filePath) async {
-    int? accuracy = await ApiService.uploadAudio(filePath);
+    int? accuracy = await ApiService.uploadAudio(filePath, userData);
 
     if (accuracy != null) {
       if (accuracy >= 75) {
@@ -105,7 +109,7 @@ class GameRules extends ChangeNotifier {
           xp += 100;
 
           // Fetch the next word after pronunciation check
-          String? fetchedWord = await ApiService.fetchTargetWord();
+          String? fetchedWord = await ApiService.fetchTargetWord(userData);
           if (fetchedWord != null && fetchedWord.isNotEmpty) {
             word = fetchedWord;
           } else {
@@ -118,7 +122,7 @@ class GameRules extends ChangeNotifier {
         moveImageHalfway();
       }
     } else {
-      print("Error: Could not fetch pronunciation accuracy.");
+      print("Error: words");
     }
 
     notifyListeners();
@@ -126,7 +130,7 @@ class GameRules extends ChangeNotifier {
 
 
   void moveImageToTop() {
-      position = 200;
+      position = 400;
       notifyListeners();
 
       // Wait for animation to complete before setting opacity to 0

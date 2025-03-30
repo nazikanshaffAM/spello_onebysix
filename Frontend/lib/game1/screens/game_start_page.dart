@@ -4,7 +4,9 @@ import 'game_page.dart';
 import 'how_to_play_page.dart';
 
 class StartPage extends StatefulWidget {
-  const StartPage({super.key});
+  final Map<String, dynamic>? userData;
+  
+  const StartPage({super.key, this.userData});
 
   @override
   State<StartPage> createState() => _StartPageState();
@@ -12,6 +14,13 @@ class StartPage extends StatefulWidget {
 
 class _StartPageState extends State<StartPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  
+  @override
+  void initState() {
+    super.initState();
+    // Debug print to verify userData is received
+    print("StartPage received userData: ${widget.userData}");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,10 +105,11 @@ class _StartPageState extends State<StartPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildButton('NEW GAME', () {
+                        print("Navigating to Game1 with userData: ${widget.userData}");
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Game1(),
+                            builder: (context) => Game1(userData: widget.userData),
                           ),
                         );
                       }),

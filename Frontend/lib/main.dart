@@ -57,7 +57,11 @@ class MyApp extends StatelessWidget {
                   {},
             ),
         '/notifications': (context) => NotificationsPage(),
-        '/game1': (context) => StartPage(),
+        '/game1': (context) {
+  final userData = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>? ?? {};
+  print("Navigating to /game1 with user data: $userData");
+  return StartPage(userData: userData);
+},
         '/settings': (context) => Settings(
               userData: ModalRoute.of(context)!.settings.arguments
                       as Map<String, dynamic>? ??
