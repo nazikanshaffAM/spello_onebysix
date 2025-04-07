@@ -15,6 +15,7 @@ import 'package:spello_frontend/pages/LoginRelatedPages/login.dart';
 import 'package:spello_frontend/config/config.dart';
 
 import 'game1/screens/game_start_page.dart';
+//example
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
