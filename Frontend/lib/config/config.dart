@@ -10,6 +10,6 @@ class Config {
   
   // You can add environment-specific configurations too
   static String getEnvironment() {
-    return 'development'; // or 'production', 'staging', etc.
+    return 'development'; // or 'production', 'staging',
   }
 }
